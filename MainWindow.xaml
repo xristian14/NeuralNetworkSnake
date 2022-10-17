@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:NeuralNetworkSnake"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Нейронная сеть управления змейкой" Height="650" Width="920">
+        WindowState="Maximized"
+        Title="Нейронная сеть управления змейкой" Height="750" Width="1020">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -15,16 +16,19 @@
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Margin="0 3 0 3">
                 <TextBlock Text="Количество скрытых слоёв" Margin="6 0 0 0"/>
-                <Slider Value="2" Minimum="1" Maximum="3" Width="30" Margin="6 0 0 0"/>
-                <TextBlock Text="2" Margin="3 0 0 0"/>
+                <Slider Value="{Binding HiddenLayersCount}" Minimum="1" Maximum="3" Width="30" Margin="6 0 0 0"/>
+                <TextBlock Text="{Binding HiddenLayersCount}" Margin="3 0 0 0"/>
                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
                 <TextBlock Text="Размер скрытых слоёв:" Margin="6 0 0 0"/>
                 <TextBlock Text="1-й слой" Margin="6 0 0 0"/>
-                <TextBox Width="30" Margin="6 0 0 0"/>
+                <TextBox Text="{Binding FirstHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
                 <TextBlock Text="2-й слой" Margin="6 0 0 0"/>
-                <TextBox Width="30" Margin="6 0 0 0"/>
+                <TextBox Text="{Binding SecondHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
                 <TextBlock Text="3-й слой" Margin="6 0 0 0"/>
-                <TextBox Width="30" Margin="6 0 0 0"/>
+                <TextBox Text="{Binding ThirdHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
+                <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
+                <TextBlock Text="Алгоритм обучения" Margin="6 0 0 0"/>
+                <ComboBox ItemsSource="{Binding AlgorithmLearningCombobox}" SelectedItem="SelectedAlgorithmLearningCombobox" SelectedIndex="0" Margin="6 0 0 0"/>
                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
                 <Button Content="Создать нейросеть" Margin="6 0 0 0" Padding="4 1"/>
             </StackPanel>
@@ -42,24 +46,61 @@
                 <StackPanel Grid.Row="0" Orientation="Vertical" Background="#FFB2FFE5">
                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                         <TextBlock Text="Слои" Margin="6 0 0 0"/>
-                        <TextBlock Text="48-18-8-3" Margin="6 0 0 0"/>
+                        <TextBlock Text="{Binding LayersText}" Margin="6 0 0 0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
                         <TextBlock Text="Поколение" Margin="6 0 0 0"/>
-                        <TextBlock Text="46" Margin="6 0 6 0"/>
+                        <TextBlock Text="{Binding Age, StringFormat={}{0:N0}}" Margin="6 0 6 0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                         <TextBlock Text="Размер поля" Margin="6 0 0 0"/>
                         <TextBox Width="30" Margin="6 0 6 0"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                        <TextBlock Text="Размер популяции" Margin="6 0 0 0"/>
-                        <TextBox Width="40" Margin="6 0 6 0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                        <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
-                        <TextBox Width="30" Margin="6 0 6 0"/>
-                    </StackPanel>
+                    <TextBlock Text="Алгоритм обучения" Margin="6 6 6 0"/>
+                    <TabControl  VerticalAlignment="Top" Margin="6 2 6 0">
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock Text="Генетический алгоритм"/>
+                            </TabItem.Header>
+                            <TabItem.Content>
+                                <StackPanel Orientation="Vertical">
+
+                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                        <TextBlock Text="Размер популяции" Margin="6 0 0 0"/>
+                                        <TextBox Width="40" Margin="6 0 6 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                        <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
+                                        <TextBox Width="30" Margin="6 0 6 0"/>
+                                    </StackPanel>
+                                    <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
+                                    <ListView Grid.Row="2" ItemsSource="{Binding AlgorithmParametersView, Mode=OneWay}" SelectedItem="{Binding SelectedAlgorithmParameterView, Mode=TwoWay}" SelectionMode="Single" Height="100" Margin="6 3 6 4">
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem">
+                                                <Setter Property="Focusable" Value="False"/>
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Счёт" Width="80"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Яблок" Width="50"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                            </TabItem.Content>
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock Text="Deep Q-Learning"/>
+                            </TabItem.Header>
+                            <TabItem.Content>
+                                <StackPanel Orientation="Vertical">
+                                    
+                                </StackPanel>
+                            </TabItem.Content>
+                        </TabItem>
+                    </TabControl>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 4 0 0">
                         <TextBlock Text="Симуляция"/>
                     </StackPanel>
@@ -82,20 +123,6 @@
                         <TextBlock Text="Осталось, сек"/>
                         <TextBlock Text="46" Margin="6 0 6 0" Width="35"/>
                     </StackPanel>
-                    <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
-                    <ListView Grid.Row="2" ItemsSource="{Binding AlgorithmParametersView, Mode=OneWay}" SelectedItem="{Binding SelectedAlgorithmParameterView, Mode=TwoWay}" SelectionMode="Single" Height="100" Margin="6 3 6 4">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="Focusable" Value="False"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Счёт" Width="80"/>
-                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Яблок" Width="50"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Orientation="Vertical" Background="#FFEBCEFF">
                     <TextBlock Text="Лучшие результаты" HorizontalAlignment="Center" Margin="0 2 0 0"/>

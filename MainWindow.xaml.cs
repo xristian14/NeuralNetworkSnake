@@ -23,6 +23,9 @@ namespace NeuralNetworkSnake
         public MainWindow()
         {
             InitializeComponent();
+
+            ViewModel viewModel = new ViewModel();
+            DataContext = viewModel;
         }
     }
 }
