@@ -54,7 +54,9 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                         <TextBlock Text="Размер поля" Margin="6 0 0 0"/>
-                        <TextBox Width="30" Margin="6 0 6 0"/>
+                        <TextBox Text="{Binding BoardSize}" Width="30" Margin="6 0 6 0"/>
+                        <TextBlock Text="Количество яблок" Margin="6 0 0 0"/>
+                        <TextBox Text="{Binding ApplesCount}" Width="30" Margin="6 0 6 0"/>
                     </StackPanel>
                     <TextBlock Text="Алгоритм обучения" Margin="6 6 6 0"/>
                     <TabControl  VerticalAlignment="Top" Margin="6 2 6 0">
@@ -67,11 +69,11 @@
 
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Размер популяции" Margin="6 0 0 0"/>
-                                        <TextBox Width="40" Margin="6 0 6 0"/>
+                                        <TextBox Text="{Binding PopulationSize}" Width="30" Margin="6 0 6 0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
-                                        <TextBox Width="30" Margin="6 0 6 0"/>
+                                        <TextBox Text="{Binding MutationPercent}" Width="30" Margin="6 0 6 0"/>
                                     </StackPanel>
                                     <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
                                     <ListView Grid.Row="2" ItemsSource="{Binding AlgorithmParametersView, Mode=OneWay}" SelectedItem="{Binding SelectedAlgorithmParameterView, Mode=TwoWay}" SelectionMode="Single" Height="100" Margin="6 3 6 4">
@@ -84,6 +86,7 @@
                                             <GridView>
                                                 <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Счёт" Width="80"/>
                                                 <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Яблок" Width="50"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Остаток ходов" Width="85"/>
                                             </GridView>
                                         </ListView.View>
                                     </ListView>
@@ -104,24 +107,25 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 4 0 0">
                         <TextBlock Text="Симуляция"/>
                     </StackPanel>
-                    <RadioButton GroupName="simulationType" Content="В режиме реального времени" Margin="6 0 6 0"/>
+                    <RadioButton IsChecked="{Binding IsRealtimeSimulation}" GroupName="simulationType" Content="В режиме реального времени" Margin="6 0 6 0"/>
                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                         <TextBlock Text="Задержка между ходами, мс" Margin="6 0 0 0"/>
-                        <Slider x:Name="sliderMoveDelay" Minimum="1" Maximum="1000" Width="70" Value="250" Margin="4 0 0 0"/>
-                        <TextBlock Text="250" Margin="4 0 6 0"/>
+                        <Slider Minimum="1" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
+                        <TextBlock Text="{Binding RealtimeDelay}" Margin="4 0 6 0"/>
                     </StackPanel>
                     <RadioButton GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>
                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                         <TextBlock Text="Длительность, сек" Margin="6 0 0 0"/>
-                        <TextBox Width="45" Margin="6 0 6 0"/>
+                        <Slider Minimum="5" Maximum="600" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
+                        <TextBlock Text="{Binding FixedDuration}" Margin="4 0 6 0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 6 0 0">
                         <Button Content="Запустить" Width="72" Padding="0 2" Margin="2 0"/>
                         <Button Content="Остановить" Width="72" Padding="0 2" Margin="2 0"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0 2 0 2" HorizontalAlignment="Center">
                         <TextBlock Text="Осталось, сек"/>
-                        <TextBlock Text="46" Margin="6 0 6 0" Width="35"/>
+                        <TextBlock Text="{Binding RemainingTime}" Margin="6 0 6 0" Width="35"/>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Orientation="Vertical" Background="#FFEBCEFF">
