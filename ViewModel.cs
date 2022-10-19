@@ -167,8 +167,8 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private int _mutationPercent = 1;
-        public int MutationPercent
+        private double _mutationPercent = 1;
+        public double MutationPercent
         {
             get { return _mutationPercent; }
             set

@@ -36,5 +36,33 @@ namespace NeuralNetworkSnake
                 }
             }
         }
+        public static double[] SoftMaxVector(float[] inputVector)
+        {
+            double[] outputVector = new double[inputVector.Length];
+            double vectorSum = 0;
+            for(int i = 0; i < inputVector.Length; i++)
+            {
+                vectorSum += Math.Pow(Math.E, inputVector[i]);
+            }
+            for(int i = 0; i < inputVector.Length; i++)
+            {
+                outputVector[i] = Math.Pow(Math.E, inputVector[i]) / vectorSum;
+            }
+            return outputVector;
+        }
+        public static double[] SoftMaxVector(double[] inputVector)
+        {
+            double[] outputVector = new double[inputVector.Length];
+            double vectorSum = 0;
+            for(int i = 0; i < inputVector.Length; i++)
+            {
+                vectorSum += Math.Pow(Math.E, inputVector[i]);
+            }
+            for(int i = 0; i < inputVector.Length; i++)
+            {
+                outputVector[i] = Math.Pow(Math.E, inputVector[i]) / vectorSum;
+            }
+            return outputVector;
+        }
     }
 }

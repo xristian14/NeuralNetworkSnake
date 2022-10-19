@@ -10,8 +10,10 @@ namespace NeuralNetworkSnake
     {
         public Matrix[] Weights;
         public float[][] Biases;
+        public int[] Layers;
         public NeuralNetworkUnit(int[] layers)
         {
+            Layers = layers;
             Weights = new Matrix[layers.Length - 1];
             Biases = new float[layers.Length - 1][];
             for(int i = 0; i < layers.Length - 1; i++)
