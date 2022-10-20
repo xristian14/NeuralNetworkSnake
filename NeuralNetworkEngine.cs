@@ -16,7 +16,7 @@ namespace NeuralNetworkSnake
                 {
                     for (int k = 0; k < neuralNetworkUnit.Weights[i].Rows; k++)
                     {
-                        neuralNetworkUnit.Weights[i].Cells[k, n] = Rand.GetFloat(-1, 1);
+                        neuralNetworkUnit.Weights[i][k, n] = Rand.GetFloat(-1, 1);
                     }
                     neuralNetworkUnit.Biases[i][n] = Rand.GetFloat(-1, 1);
                 }
@@ -30,7 +30,7 @@ namespace NeuralNetworkSnake
                 {
                     for (int k = 0; k < neuralNetworkUnit.Weights[i].Rows; k++)
                     {
-                        neuralNetworkUnit.Weights[i].Cells[k, n] = 0;
+                        neuralNetworkUnit.Weights[i][k, n] = 0;
                     }
                     neuralNetworkUnit.Biases[i][n] = 0;
                 }

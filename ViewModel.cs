@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.LinearAlgebra;
+using System.Diagnostics;
+using System.Windows.Input;
 
 namespace NeuralNetworkSnake
 {
@@ -11,9 +14,8 @@ namespace NeuralNetworkSnake
     {
         public ViewModel()
         {
-            int[] a = new int[3] { 2, 3, 4 };
-            NeuralNetworkUnit neuralNetworkUnit = new NeuralNetworkUnit(a);
-            NeuralNetworkEngine.FillRandomly(neuralNetworkUnit);
+            
+            
         }
         private int _hiddenLayersCount = 1;
         public int HiddenLayersCount
@@ -175,6 +177,39 @@ namespace NeuralNetworkSnake
             {
                 _mutationPercent = value;
                 OnPropertyChanged();
+            }
+        }
+        public void testFunc()
+        {
+            int[] a = new int[3] { 1000, 1000, 1 };
+            NeuralNetworkUnit neuralNetworkUnit = new NeuralNetworkUnit(a);
+            NeuralNetworkEngine.FillRandomly(neuralNetworkUnit);
+            Stopwatch stopwatch1 = new Stopwatch();
+            stopwatch1.Start();
+            for (int i = 0; i < 10; i++)
+            {
+                _ = neuralNetworkUnit.Weights[0] * neuralNetworkUnit.Weights[1];
+            }
+            stopwatch1.Stop();
+            Stopwatch stopwatch2 = new Stopwatch();
+            stopwatch2.Start();
+            for (int i = 0; i < 10; i++)
+            {
+                _ = neuralNetworkUnit.Weights[0] * neuralNetworkUnit.Weights[1];
+            }
+            stopwatch2.Stop();
+            FirstHiddenLayerCountNeurons = "stopwatch1=" + stopwatch1.ElapsedMilliseconds + "мс  stopwatch2=" + stopwatch2.ElapsedMilliseconds + "мс";
+            int y = 0;
+        }
+
+        public ICommand ButtonTest_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    testFunc();
+                }, (obj) => true);
             }
         }
     }

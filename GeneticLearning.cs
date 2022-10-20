@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace NeuralNetworkSnake
 {
@@ -44,8 +45,6 @@ namespace NeuralNetworkSnake
             NeuralNetworkUnitGeneticLearning[] newPopulation = new NeuralNetworkUnitGeneticLearning[PopulationSize];
             for (int i = 0; i < PopulationSize; i++)
             {
-                newPopulation[i] = new NeuralNetworkUnitGeneticLearning(new NeuralNetworkUnit(Layers));
-                
                 double softMaxRatingParent = Rand.GetDouble(0, 1);
                 int k = 0;
                 double sum = 0;
@@ -64,14 +63,37 @@ namespace NeuralNetworkSnake
                     k++;
                 }
                 int indexSecondParent = k - 1;
-
-
+                newPopulation[i] = new NeuralNetworkUnitGeneticLearning(Crossing(Population[indexFirstParent].NeuralNetworkUnit, Population[indexSecondParent].NeuralNetworkUnit));
             }
+            Population = newPopulation;
         }
         private NeuralNetworkUnit Crossing(NeuralNetworkUnit parent1, NeuralNetworkUnit parent2)
         {
             NeuralNetworkUnit child = new NeuralNetworkUnit(Layers);
-
+            /*for(int i = 0; i < parent1.Weights.Length; i++)
+            {
+                for (int n = 0; n < parent1.Weights[i].Columns; n++)
+                {
+                    for (int k = 0; k < parent1.Weights[i].Rows; k++)
+                    {
+                        //веса
+                        if(Rand.GetFloat(0, 1) < 0.5f)
+                            child.Weights[i].Cells[k, n] = parent1.Weights[i].Cells[k, n];
+                        else
+                            child.Weights[i].Cells[k, n] = parent2.Weights[i].Cells[k, n];
+                        if(Rand.GetDouble(0, 100) < MutationPercent)
+                            child.Weights[i].Cells[k, n] = Rand.GetFloat(-1, 1);
+                    }
+                    //смещение
+                    if (Rand.GetFloat(0, 1) < 0.5f)
+                        child.Biases[i][n] = parent1.Biases[i][n];
+                    else
+                        child.Biases[i][n] = parent2.Biases[i][n];
+                    if (Rand.GetDouble(0, 100) < MutationPercent)
+                        child.Biases[i][n] = Rand.GetFloat(-1, 1);
+                }
+            }*/
+            return child;
         }
     }
 }
