@@ -17,8 +17,7 @@ namespace NeuralNetworkSnake
             Population = new NeuralNetworkUnitGeneticLearning[populationSize];
             for(int i = 0; i < populationSize; i++)
             {
-                Population[i] = new NeuralNetworkUnitGeneticLearning(new NeuralNetworkUnit(layers));
-                NeuralNetworkEngine.FillRandomly(Population[i].NeuralNetworkUnit);
+                Population[i] = new NeuralNetworkUnitGeneticLearning(NeuralNetworkUnit.CreateNeuralNetworkUnitRandomly(layers));
             }
         }
         private int[] Layers;
@@ -40,12 +39,12 @@ namespace NeuralNetworkSnake
             {
                 populationRatings[i] = Population[i].Rating;
             }
-            double[] softMaxRatings = NeuralNetworkEngine.SoftMaxVector(populationRatings);
+            double[] softMaxRatings = Features.SoftMaxVector(populationRatings);
             //генерируем новую популяцию
             NeuralNetworkUnitGeneticLearning[] newPopulation = new NeuralNetworkUnitGeneticLearning[PopulationSize];
             for (int i = 0; i < PopulationSize; i++)
             {
-                double softMaxRatingParent = Rand.GetDouble(0, 1);
+                double softMaxRatingParent = Features.GetRandDouble(0, 1);
                 int k = 0;
                 double sum = 0;
                 while(k < PopulationSize && sum < softMaxRatingParent)
@@ -54,7 +53,7 @@ namespace NeuralNetworkSnake
                     k++;
                 }
                 int indexFirstParent = k - 1;
-                softMaxRatingParent = Rand.GetDouble(0, 1);
+                softMaxRatingParent = Features.GetRandDouble(0, 1);
                 k = 0;
                 sum = 0;
                 while (k < PopulationSize && sum < softMaxRatingParent)
@@ -69,30 +68,30 @@ namespace NeuralNetworkSnake
         }
         private NeuralNetworkUnit Crossing(NeuralNetworkUnit parent1, NeuralNetworkUnit parent2)
         {
-            NeuralNetworkUnit child = new NeuralNetworkUnit(Layers);
-            /*for(int i = 0; i < parent1.Weights.Length; i++)
+            NeuralNetworkUnit child = NeuralNetworkUnit.CreateNeuralNetworkUnitZero(Layers);
+            for(int i = 0; i < parent1.Weights.Length; i++)
             {
-                for (int n = 0; n < parent1.Weights[i].Columns; n++)
+                for (int n = 0; n < parent1.Weights[i].ColumnCount; n++)
                 {
-                    for (int k = 0; k < parent1.Weights[i].Rows; k++)
+                    for (int k = 0; k < parent1.Weights[i].RowCount; k++)
                     {
                         //веса
-                        if(Rand.GetFloat(0, 1) < 0.5f)
-                            child.Weights[i].Cells[k, n] = parent1.Weights[i].Cells[k, n];
+                        if(Features.GetRandFloat(0, 1) < 0.5f)
+                            child.Weights[i][k, n] = parent1.Weights[i][k, n];
                         else
-                            child.Weights[i].Cells[k, n] = parent2.Weights[i].Cells[k, n];
-                        if(Rand.GetDouble(0, 100) < MutationPercent)
-                            child.Weights[i].Cells[k, n] = Rand.GetFloat(-1, 1);
+                            child.Weights[i][k, n] = parent2.Weights[i][k, n];
+                        if(Features.GetRandDouble(0, 100) < MutationPercent)
+                            child.Weights[i][k, n] = Features.GetRandFloat(-1, 1);
                     }
                     //смещение
-                    if (Rand.GetFloat(0, 1) < 0.5f)
+                    if (Features.GetRandFloat(0, 1) < 0.5f)
                         child.Biases[i][n] = parent1.Biases[i][n];
                     else
                         child.Biases[i][n] = parent2.Biases[i][n];
-                    if (Rand.GetDouble(0, 100) < MutationPercent)
-                        child.Biases[i][n] = Rand.GetFloat(-1, 1);
+                    if (Features.GetRandDouble(0, 100) < MutationPercent)
+                        child.Biases[i][n] = Features.GetRandFloat(-1, 1);
                 }
-            }*/
+            }
             return child;
         }
     }

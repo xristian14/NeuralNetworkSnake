@@ -30,7 +30,7 @@
                 <TextBlock Text="Алгоритм обучения" Margin="6 0 0 0"/>
                 <ComboBox ItemsSource="{Binding AlgorithmLearningCombobox}" SelectedItem="SelectedAlgorithmLearningCombobox" SelectedIndex="0" Margin="6 0 0 0"/>
                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
-                <Button Content="Создать нейросеть" Command="{Binding ButtonTest_Click}" Margin="6 0 0 0" Padding="4 1"/>
+                <Button Content="Создать нейросеть" Command="{Binding CreateNeuralNetwork_Click}" Margin="6 0 0 0" Padding="4 1"/>
             </StackPanel>
         </StackPanel>
         <Grid Grid.Row="1">

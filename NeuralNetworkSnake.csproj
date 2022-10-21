@@ -62,13 +62,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="Features.cs" />
     <Compile Include="GeneticLearning.cs" />
     <Compile Include="LightweightMatrixCSharp\Matrix.cs" />
     <Compile Include="Matrix.cs" />
-    <Compile Include="NeuralNetworkEngine.cs" />
     <Compile Include="NeuralNetworkUnit.cs" />
     <Compile Include="NeuralNetworkUnitGeneticLearning.cs" />
-    <Compile Include="Rand.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Page Include="MainWindow.xaml">

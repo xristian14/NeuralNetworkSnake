@@ -17,6 +17,7 @@ namespace NeuralNetworkSnake
             
             
         }
+        private GeneticLearning GeneticLearning;
         private int _hiddenLayersCount = 1;
         public int HiddenLayersCount
         {
@@ -33,7 +34,10 @@ namespace NeuralNetworkSnake
             get { return _firstHiddenLayerCountNeurons; }
             set
             {
-                _firstHiddenLayerCountNeurons = value;
+                if (int.TryParse(value, out int res))
+                {
+                    _firstHiddenLayerCountNeurons = value;
+                }
                 OnPropertyChanged();
             }
         }
@@ -43,7 +47,10 @@ namespace NeuralNetworkSnake
             get { return _secondHiddenLayerCountNeurons; }
             set
             {
-                _secondHiddenLayerCountNeurons = value;
+                if (int.TryParse(value, out int res))
+                {
+                    _secondHiddenLayerCountNeurons = value;
+                }
                 OnPropertyChanged();
             }
         }
@@ -53,7 +60,10 @@ namespace NeuralNetworkSnake
             get { return _thirdHiddenLayerCountNeurons; }
             set
             {
-                _thirdHiddenLayerCountNeurons = value;
+                if (int.TryParse(value, out int res))
+                {
+                    _thirdHiddenLayerCountNeurons = value;
+                }
                 OnPropertyChanged();
             }
         }
@@ -159,46 +169,102 @@ namespace NeuralNetworkSnake
         }
 
         /*генетический алгоритм*/
-        private int _populationSize = 50;
-        public int PopulationSize
+        private string _populationSize = "50";
+        public string PopulationSize
         {
             get { return _populationSize; }
             set
             {
-                _populationSize = value;
+                if(int.TryParse(value, out int res))
+                {
+                    _populationSize = value;
+                }
                 OnPropertyChanged();
             }
         }
-        private double _mutationPercent = 1;
-        public double MutationPercent
+        private string _mutationPercent = "1";
+        public string MutationPercent
         {
             get { return _mutationPercent; }
             set
             {
-                _mutationPercent = value;
+                if (double.TryParse(value, out double res))
+                {
+                    _populationSize = value;
+                }
                 OnPropertyChanged();
             }
         }
+
+        public ICommand CreateNeuralNetwork_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    int[] layers = new int[2 + HiddenLayersCount];
+                    layers[0] = 48;
+                    if(HiddenLayersCount >= 1)
+                    {
+                        layers[1] = int.Parse(FirstHiddenLayerCountNeurons);
+                    }
+                    if (HiddenLayersCount >= 2)
+                    {
+                        layers[2] = int.Parse(SecondHiddenLayerCountNeurons);
+                    }
+                    if (HiddenLayersCount >= 3)
+                    {
+                        layers[3] = int.Parse(ThirdHiddenLayerCountNeurons);
+                    }
+                    layers[layers.Length - 1] = 3;
+                    GeneticLearning = new GeneticLearning(int.Parse(PopulationSize), layers);
+
+                    LayersText = layers[0].ToString();
+                    for (int i = 1; i < layers.Length; i++)
+                    {
+                        LayersText += "-" + layers[i].ToString();
+                    }
+                }, (obj) => true);
+            }
+        }
+
+
+
+        private bool _isFirstTest = true;
+        private NeuralNetworkUnit _neuralNetworkUnitTest;
+        Matrix<float> _matrix3;
+        Vector<float> _vector1;
         public void testFunc()
         {
-            int[] a = new int[3] { 1000, 1000, 1 };
-            NeuralNetworkUnit neuralNetworkUnit = new NeuralNetworkUnit(a);
-            NeuralNetworkEngine.FillRandomly(neuralNetworkUnit);
+            if (_isFirstTest)
+            {
+                _isFirstTest = false;
+                int[] a = new int[3] { 440000, 100, 1 };
+                _neuralNetworkUnitTest = NeuralNetworkUnit.CreateNeuralNetworkUnitRandomly(a);
+
+                _matrix3 = Matrix<float>.Build.Random(a[0], a[1]);
+                _vector1 = Vector<float>.Build.Random(a[1]);
+            }
+
+            int iteration = 1;
+            
             Stopwatch stopwatch1 = new Stopwatch();
             stopwatch1.Start();
-            for (int i = 0; i < 10; i++)
+            /*for (int i = 0; i < iteration; i++)
             {
-                _ = neuralNetworkUnit.Weights[0] * neuralNetworkUnit.Weights[1];
-            }
+                _ = _neuralNetworkUnitTest.Weights[0] * _neuralNetworkUnitTest.Weights[1];
+            }*/
             stopwatch1.Stop();
-            Stopwatch stopwatch2 = new Stopwatch();
-            stopwatch2.Start();
-            for (int i = 0; i < 10; i++)
+
+            Stopwatch stopwatch4 = new Stopwatch();
+            stopwatch4.Start();
+            for (int i = 0; i < iteration; i++)
             {
-                _ = neuralNetworkUnit.Weights[0] * neuralNetworkUnit.Weights[1];
+                _ = _matrix3 * _vector1;
             }
-            stopwatch2.Stop();
-            FirstHiddenLayerCountNeurons = "stopwatch1=" + stopwatch1.ElapsedMilliseconds + "мс  stopwatch2=" + stopwatch2.ElapsedMilliseconds + "мс";
+            stopwatch4.Stop();
+
+            FirstHiddenLayerCountNeurons = "stopwatch1=" + stopwatch1.ElapsedMilliseconds + "мс  stopwatch4 = " + stopwatch4.ElapsedMilliseconds + "мс";
             int y = 0;
         }
 
