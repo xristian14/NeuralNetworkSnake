@@ -17,7 +17,6 @@ namespace NeuralNetworkSnake
         {
             UpdateBoardCells();
 
-
         }
         private GeneticLearning GeneticLearning;
         private int _hiddenLayersCount = 1;
@@ -128,14 +127,21 @@ namespace NeuralNetworkSnake
                 if(int.TryParse(value, out int res))
                 {
                     _boardSize = value;
+                    BoardSizeInt = int.Parse(value);
                     UpdateBoardCells();
                 }
                 OnPropertyChanged();
             }
         }
+        private int _boardSizeInt;
         public int BoardSizeInt
         {
-            get { return int.Parse(BoardSize); }
+            get { return _boardSizeInt; }
+            set
+            {
+                _boardSizeInt = value;
+                OnPropertyChanged();
+            }
         }
         private string _applesCount = "1";
         public string ApplesCount

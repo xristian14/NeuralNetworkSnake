@@ -142,7 +142,7 @@
                     <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 0"/>
                 </StackPanel>
             </Grid>
-            <ItemsControl Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
+            <ItemsControl Grid.Column="1" Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Rows="{Binding BoardSizeInt}" Columns="{Binding BoardSizeInt}"/>
@@ -150,7 +150,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF7F7F7" Fill="#FFFBFBFB"/>
+                        <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
