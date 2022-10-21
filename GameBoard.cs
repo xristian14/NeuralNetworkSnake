@@ -51,6 +51,18 @@ namespace NeuralNetworkSnake
             {
                 AppleGenerate();
             }
+            Score = _oneStepScore;
+            _maxStepsWithoutApples = (int)Math.Round(boardSize * 2.5);
+        }
+        private double _oneStepScore = 0.001;
+        private int _stepsWithoutApples = 0;
+        private int _maxStepsWithoutApples = 0;
+        private double _appleScore = 1;
+        private double _score;
+        public double Score
+        {
+            get { return _score; }
+            private set { _score = value; }
         }
         private bool IsGameOver = false;
         private int BoardSize;
@@ -167,6 +179,7 @@ namespace NeuralNetworkSnake
         }
         public void MoveSnake(int xOffset,int yOffset)
         {
+            Score += _oneStepScore;
             int newX = SnakeCoordinates[SnakeCoordinates.Count - 1].X + xOffset;
             int newY = SnakeCoordinates[SnakeCoordinates.Count - 1].Y + yOffset;
             if(newX >= BoardCellsInfo.GetLength(0) || newY >= BoardCellsInfo.GetLength(1)) //если врезались в стенку
@@ -178,6 +191,7 @@ namespace NeuralNetworkSnake
                 SnakeCoordinates.Add(new SnakeCoordinate(newX, newY));
                 if (!BoardCellsInfo[newX, newY].IsApple)
                 {
+                    _stepsWithoutApples++;
                     int tailTipX = SnakeCoordinates[0].X;
                     int tailTipY = SnakeCoordinates[0].Y;
                     BoardCellsInfo[tailTipX, tailTipY].IsSnake = false;
@@ -185,6 +199,7 @@ namespace NeuralNetworkSnake
                 }
                 else //съели яблоко
                 {
+                    Score += Math.Round(_appleScore - _appleScore * ((double)_stepsWithoutApples / _maxStepsWithoutApples * 0.4), 3); //чем быстрее добрались до яблока, тем больше счета получим. На максимальном количестве ходов снижается 40% счета от яблока
                     BoardCellsInfo[newX, newY].IsApple = false;
                     AppleGenerate(); //генерируем новое яблоко
                 }
