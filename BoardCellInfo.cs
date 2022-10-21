@@ -11,9 +11,9 @@ namespace NeuralNetworkSnake
         public BoardCellInfo()
         {
             IsSnake = false;
-            isApple = false;
+            IsApple = false;
         }
         public bool IsSnake { get; set; }
-        public bool isApple { get; set; }
+        public bool IsApple { get; set; }
     }
 }

@@ -61,6 +61,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppleCoordinate.cs" />
     <Compile Include="BoardCell.cs" />
     <Compile Include="BoardCellInfo.cs" />
     <Compile Include="DelegateCommand.cs" />
