@@ -61,6 +61,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BoardCell.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="Features.cs" />
     <Compile Include="GeneticLearning.cs" />

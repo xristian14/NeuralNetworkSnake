@@ -99,7 +99,7 @@
                             </TabItem.Header>
                             <TabItem.Content>
                                 <StackPanel Orientation="Vertical">
-                                    
+
                                 </StackPanel>
                             </TabItem.Content>
                         </TabItem>
@@ -120,7 +120,7 @@
                         <TextBlock Text="{Binding FixedDuration}" Margin="4 0 6 0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 6 0 0">
-                        <Button Content="Запустить" Width="72" Padding="0 2" Margin="2 0"/>
+                        <Button Content="Запустить" Command="{Binding StartSimulation_Click}" Width="72" Padding="0 2" Margin="2 0"/>
                         <Button Content="Остановить" Width="72" Padding="0 2" Margin="2 0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0 2 0 2" HorizontalAlignment="Center">
@@ -142,6 +142,18 @@
                     <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 0"/>
                 </StackPanel>
             </Grid>
+            <ItemsControl Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="{Binding BoardSizeInt}" Columns="{Binding BoardSizeInt}"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF7F7F7" Fill="#FFFBFBFB"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
     </Grid>
 </Window>

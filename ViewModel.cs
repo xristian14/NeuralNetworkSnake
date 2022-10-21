@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
 using System.Windows.Input;
+using System.Windows;
 
 namespace NeuralNetworkSnake
 {
@@ -14,8 +15,9 @@ namespace NeuralNetworkSnake
     {
         public ViewModel()
         {
-            
-            
+            UpdateBoardCells();
+
+
         }
         private GeneticLearning GeneticLearning;
         private int _hiddenLayersCount = 1;
@@ -107,15 +109,33 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
+        private double _boardCellSize = 14;
+        public double BoardCellSize
+        {
+            get { return _boardCellSize; }
+            private set
+            {
+                _boardCellSize = value;
+                OnPropertyChanged();
+            }
+        }
         private string _boardSize = "13";
         public string BoardSize
         {
             get { return _boardSize; }
             set
             {
-                _boardSize = value;
+                if(int.TryParse(value, out int res))
+                {
+                    _boardSize = value;
+                    UpdateBoardCells();
+                }
                 OnPropertyChanged();
             }
+        }
+        public int BoardSizeInt
+        {
+            get { return int.Parse(BoardSize); }
         }
         private string _applesCount = "1";
         public string ApplesCount
@@ -165,6 +185,30 @@ namespace NeuralNetworkSnake
             {
                 _remainingTime = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<BoardCell> _boardCells = new ObservableCollection<BoardCell>();
+        public ObservableCollection<BoardCell> BoardCells
+        {
+            get { return _boardCells; }
+            set
+            {
+                _boardCells = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void UpdateBoardCells()
+        {
+            BoardCells.Clear();
+            int boardSize = int.Parse(BoardSize);
+            for(int i = 0; i < boardSize; i++)
+            {
+                for(int k = 0; k < boardSize; k++)
+                {
+                    BoardCells.Add(new BoardCell(BoardCellSize));
+                }
             }
         }
 
@@ -227,6 +271,19 @@ namespace NeuralNetworkSnake
                 }, (obj) => true);
             }
         }
+        public ICommand StartSimulation_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    
+                }, (obj) => true);
+            }
+        }
+
+
+
 
 
 
