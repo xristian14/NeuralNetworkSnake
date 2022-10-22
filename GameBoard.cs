@@ -54,12 +54,15 @@ namespace NeuralNetworkSnake
                 AppleGenerate();
             }
             Score = _oneStepScore;
-            _maxStepsWithoutApples = (int)Math.Round(boardSize * 2.5);
+            _appleScoreReduceMaxSteps = (int)Math.Round(boardSize * 2.5);
+            _maxStepsWithoutApples = (int)Math.Round((double)boardSize * boardSize);
         }
         private double _oneStepScore = 0.001;
         private int _stepsWithoutApples = 0;
         private int _maxStepsWithoutApples = 0;
         private double _appleScore = 1; //базовая стоимость съеденного яблока
+        private int _appleScoreReduceMaxSteps = 0; //количество шагов, на котором стоимость яблока будет максимально уменьшена
+        private double _appleScoreReduce = 0.4; //величина от стоимости яблока, на которое уменьшится его стоимость при количестве шагов _appleScoreReduceMaxSteps
         private double _score;
         public double Score
         {
@@ -395,11 +398,15 @@ namespace NeuralNetworkSnake
                 else //съели яблоко
                 {
                     EatenApples++;
-                    Score += Math.Round(_appleScore - _appleScore * ((double)_stepsWithoutApples / _maxStepsWithoutApples * 0.4), 3); //чем быстрее добрались до яблока, тем больше счета получим. На максимальном количестве ходов снижается 40% счета от яблока
+                    Score += Math.Round(_appleScore - _appleScore * ((double)_stepsWithoutApples / _appleScoreReduceMaxSteps * _appleScoreReduce), 3); //чем быстрее добрались до яблока, тем больше счета получим
                     BoardCellsInfo[newX, newY].IsApple = false;
                     AppleGenerate(); //генерируем новое яблоко
                 }
                 if (BoardCellsInfo[newX, newY].IsSnake) //если врезались в хвост
+                {
+                    IsGameOver = true;
+                }
+                if(_stepsWithoutApples >= _maxStepsWithoutApples)
                 {
                     IsGameOver = true;
                 }

@@ -293,7 +293,11 @@ namespace NeuralNetworkSnake
             {
                 if (double.TryParse(value, out double res))
                 {
-                    _populationSize = value;
+                    _mutationPercent = value;
+                    if(_simulation != null)
+                    {
+                        _simulation.SetMutationPercent(res);
+                    }
                 }
                 OnPropertyChanged();
             }

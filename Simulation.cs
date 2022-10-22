@@ -22,7 +22,7 @@ namespace NeuralNetworkSnake
             DispatcherInvoke((Action)(() => {
                 ViewModel.getInstance().Age = Age;
             }));
-            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.PopulationSize, BoardSize, ApplesCount);
+            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
         }
         private GeneticLearning _geneticLearning;
         private GameBoard[] _gameBoardsGeneticLearning;
@@ -60,11 +60,11 @@ namespace NeuralNetworkSnake
         private int Age = 0;
         public void SetMutationPercent(double mutationPercent)
         {
-            _geneticLearning.MutationPercent = mutationPercent;
+            _geneticLearning.SetMutationPercent(mutationPercent);
         }
         public void SetPopulationSize(int size)
         {
-            _geneticLearning.PopulationSize = size;
+            _geneticLearning.SetNewPopulationSize(size);
         }
         private GameBoard[] CreateGameBoards(int count, int boardSize, int applesCount)
         {
@@ -72,17 +72,24 @@ namespace NeuralNetworkSnake
             for (int i = 0; i < count; i++)
             {
                 gameBoards[i] = new GameBoard(boardSize, applesCount);
-                DispatcherInvoke((Action)(() => {
-                    ViewModel.getInstance().SnakesForRenders.Add(new SnakesForRender());
-                    ViewModel.getInstance().ApplesForRenders.Add(new ApplesForRender());
-                }));
             }
+            DispatcherInvoke((Action)(() => {
+                int countGameBoard = count;
+                ViewModel viewModel = ViewModel.getInstance();
+                viewModel.SnakesForRenders.Clear();
+                viewModel.ApplesForRenders.Clear();
+                for (int i = 0; i < countGameBoard; i++)
+                {
+                    viewModel.SnakesForRenders.Add(new SnakesForRender());
+                    viewModel.ApplesForRenders.Add(new ApplesForRender());
+                }
+            }));
             return gameBoards;
         }
         private void UpdateViewModelSnakeAppleCoordinates()
         {
-            ViewModel viewModel = ViewModel.getInstance();
             DispatcherInvoke((Action)(() => {
+                ViewModel viewModel = ViewModel.getInstance();
                 int u = 0;
                 for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
                 {
@@ -145,7 +152,7 @@ namespace NeuralNetworkSnake
                     Vector<float> outputs = _geneticLearning.Population[i].NeuralNetworkUnit.ForwardPropagation(inputs);
                     int xOffset = 0;
                     int yOffset = 0;
-                    int indexMaximum = outputs.AbsoluteMaximumIndex();
+                    int indexMaximum = outputs.MaximumIndex();
                     if (_gameBoardsGeneticLearning[i].IsSnakeGoUp())
                     {
                         if(indexMaximum == 0)
@@ -232,7 +239,7 @@ namespace NeuralNetworkSnake
                 {
                     SetGeneticLearningRating();
                     _geneticLearning.SpawnNewGeneration();
-                    _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.PopulationSize, BoardSize, ApplesCount);
+                    _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
                     Age++;
                     DispatcherInvoke((Action)(() => {
                         ViewModel.getInstance().Age = Age;
@@ -254,7 +261,7 @@ namespace NeuralNetworkSnake
                 {
                     SetGeneticLearningRating();
                     _geneticLearning.SpawnNewGeneration();
-                    _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.PopulationSize, BoardSize, ApplesCount);
+                    _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
                     Age++;
                     DispatcherInvoke((Action)(() => {
                         ViewModel.getInstance().Age = Age;
