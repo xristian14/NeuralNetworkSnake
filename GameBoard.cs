@@ -59,12 +59,18 @@ namespace NeuralNetworkSnake
         private double _oneStepScore = 0.001;
         private int _stepsWithoutApples = 0;
         private int _maxStepsWithoutApples = 0;
-        private double _appleScore = 1;
+        private double _appleScore = 1; //базовая стоимость съеденного яблока
         private double _score;
         public double Score
         {
             get { return _score; }
             private set { _score = value; }
+        }
+        private int _eatenApples = 0;
+        public int EatenApples
+        {
+            get { return _eatenApples; }
+            private set { _eatenApples = value; }
         }
         private bool IsGameOver = false;
         private int BoardSize;
@@ -207,19 +213,19 @@ namespace NeuralNetworkSnake
                 //если угол - вертикальная или горизонтальная линия, вычисляем расстояние до стенки по прямой
                 if (Math.Abs(angle - 0) < 0.1 || Math.Abs(angle - 90) < 0.1 || Math.Abs(angle - 180) < 0.1 || Math.Abs(angle - 270) < 0.1)
                 {
-                    if (angle - 0 < 0.1) //до правой стенки
+                    if (Math.Abs(angle - 0) < 0.1) //до правой стенки
                     {
                         distanceToWall = BoardSize - headCenterX;
                     }
-                    if (angle - 90 < 0.1) //до верхней стенки
+                    if (Math.Abs(angle - 90) < 0.1) //до верхней стенки
                     {
                         distanceToWall = headCenterY;
                     }
-                    if (angle - 180 < 0.1) //до левой стенки
+                    if (Math.Abs(angle - 180) < 0.1) //до левой стенки
                     {
                         distanceToWall = headCenterX;
                     }
-                    if (angle - 270 < 0.1) //до нижней стенки
+                    if (Math.Abs(angle - 270) < 0.1) //до нижней стенки
                     {
                         distanceToWall = BoardSize - headCenterY;
                     }
@@ -388,6 +394,7 @@ namespace NeuralNetworkSnake
                 }
                 else //съели яблоко
                 {
+                    EatenApples++;
                     Score += Math.Round(_appleScore - _appleScore * ((double)_stepsWithoutApples / _maxStepsWithoutApples * 0.4), 3); //чем быстрее добрались до яблока, тем больше счета получим. На максимальном количестве ходов снижается 40% счета от яблока
                     BoardCellsInfo[newX, newY].IsApple = false;
                     AppleGenerate(); //генерируем новое яблоко

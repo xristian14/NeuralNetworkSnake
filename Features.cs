@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,18 @@ namespace NeuralNetworkSnake
         public static double DegreeToRadian(double degree)
         {
             return degree * Math.PI / 180;
+        }
+        public static Vector<float> ReLuVector(Vector<float> vector)
+        {
+            for(int i = 0; i < vector.Count; i++)
+            {
+                vector[i] = ReLuFloat(vector[i]);
+            }
+            return vector;
+        }
+        public static float ReLuFloat(float value)
+        {
+            return Math.Max(0, value);
         }
     }
 }

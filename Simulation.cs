@@ -154,7 +154,7 @@ namespace NeuralNetworkSnake
                         }
                         if (indexMaximum == 1)
                         {
-                            yOffset = 1;
+                            yOffset = -1;
                         }
                         if (indexMaximum == 2)
                         {
@@ -165,7 +165,7 @@ namespace NeuralNetworkSnake
                     {
                         if(indexMaximum == 0)
                         {
-                            yOffset = 1;
+                            yOffset = -1;
                         }
                         if (indexMaximum == 1)
                         {
@@ -173,7 +173,7 @@ namespace NeuralNetworkSnake
                         }
                         if (indexMaximum == 2)
                         {
-                            yOffset = -1;
+                            yOffset = 1;
                         }
                     }
                     if (_gameBoardsGeneticLearning[i].IsSnakeGoDown())
@@ -184,7 +184,7 @@ namespace NeuralNetworkSnake
                         }
                         if (indexMaximum == 1)
                         {
-                            yOffset = -1;
+                            yOffset = 1;
                         }
                         if (indexMaximum == 2)
                         {
@@ -195,7 +195,7 @@ namespace NeuralNetworkSnake
                     {
                         if(indexMaximum == 0)
                         {
-                            yOffset = -1;
+                            yOffset = 1;
                         }
                         if (indexMaximum == 1)
                         {
@@ -203,7 +203,7 @@ namespace NeuralNetworkSnake
                         }
                         if (indexMaximum == 2)
                         {
-                            yOffset = 1;
+                            yOffset = -1;
                         }
                     }
                     _gameBoardsGeneticLearning[i].MoveSnake(xOffset, yOffset);
@@ -219,12 +219,12 @@ namespace NeuralNetworkSnake
                 double maxRating = 0;
                 for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
                 {
-                    if(_gameBoardsGeneticLearning[i].Score > maxRating && _gameBoardsGeneticLearning[i].Score < 0.04)
+                    if(_gameBoardsGeneticLearning[i].Score > maxRating && _gameBoardsGeneticLearning[i].EatenApples == 0)
                     {
                         maxRating = _gameBoardsGeneticLearning[i].Score;
                     }
                 }
-                if(maxRating > 0.030)
+                if(maxRating > 0.050)
                 {
                     int y = 0;
                 }
