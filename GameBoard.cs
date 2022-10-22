@@ -256,33 +256,102 @@ namespace NeuralNetworkSnake
             {
                 //расстояние до стенки
                 double angle = (angles[i] + correctionAngle) - Math.Truncate((angles[i] + correctionAngle) / 360) * 360; //приводим результирующий угол в диапазон от 0 до 360
-                //определяем в какой из четырех углов квадрата направлен угол
                 double distanceToWall = 0;
-                double angleToUpRight = Math.Abs(angle - 45);
-                double angleToUpLeft = Math.Abs(angle - 135);
-                double angleToDownLeft = Math.Abs(angle - 225);
-                double angleToDownRight = Math.Abs(angle - 315);
                 //если угол - вертикальная или горизонтальная линия, вычисляем расстояние до стенки по прямой
-                if(angle == 0 || angle == 90 || angle == 180 || angle == 270)
+                if(angle - 0 < 0.1 || angle - 90 < 0.1 || angle - 180 < 0.1 || angle - 270 < 0.1)
                 {
-                    if(angle == 0) //до правой стенки
+                    if(angle - 0 < 0.1) //до правой стенки
                     {
                         distanceToWall = BoardSize - headCenterX;
                     }
-                    if(angle == 90) //до верхней стенки
+                    if(angle - 90 < 0.1) //до верхней стенки
                     {
                         distanceToWall = headCenterY;
                     }
-                    if(angle == 180) //до левой стенки
+                    if(angle - 180 < 0.1) //до левой стенки
                     {
-                        distanceToWall = BoardSize - headCenterX;
+                        distanceToWall = headCenterX;
                     }
-                    if(angle == 270) //до нижней стенки
+                    if(angle - 270 < 0.1) //до нижней стенки
                     {
-                        distanceToWall = BoardSize - headCenterX;
+                        distanceToWall = BoardSize - headCenterY;
                     }
                 }
+                else //иначе вычисляем расстояние до стенок к которым направлен вектор
+                {
+                    //определяем в какой из четырех углов квадрата направлен вектора
+                    double angleToUpRight = Math.Abs(angle - 45);
+                    double angleToUpLeft = Math.Abs(angle - 135);
+                    double angleToDownLeft = Math.Abs(angle - 225);
+                    double angleToDownRight = Math.Abs(angle - 315);
+
+                    bool isToUpLeft = angleToUpLeft < angleToUpRight && angleToUpLeft < angleToDownLeft && angleToUpLeft < angleToDownRight;
+                    bool isToUpRight = angleToUpRight < angleToUpLeft && angleToUpRight < angleToDownLeft && angleToUpRight < angleToDownRight;
+                    bool isToDownRight = angleToDownRight < angleToUpRight && angleToDownRight < angleToUpLeft && angleToDownRight < angleToDownLeft;
+                    bool isToDownLeft = angleToDownLeft < angleToUpRight && angleToDownLeft < angleToUpLeft && angleToDownLeft < angleToDownRight;
+
+                    //расстояние до верхней стенки
+                    double distanceToUp = 0;
+                    if(isToUpLeft || isToUpRight)
+                    {
+                        double y = BoardSize;
+                        double x = (y - InvertCoordinate(headCenterY)) / Math.Tan(Features.DegreeToRadian(angle)) + headCenterX;
+                        distanceToUp = Math.Sqrt(Math.Pow(x - headCenterX, 2) + Math.Pow(y - InvertCoordinate(headCenterY), 2));
+                    }
+
+                    //расстояние до правой стенки
+                    double distanceToRight = 0;
+                    if(isToUpRight || isToDownRight)
+                    {
+                        double x = BoardSize;
+                        double y = Math.Tan(Features.DegreeToRadian(angle)) * (x - headCenterX) + InvertCoordinate(headCenterY);
+                        distanceToRight = Math.Sqrt(Math.Pow(x - headCenterX, 2) + Math.Pow(y - InvertCoordinate(headCenterY), 2));
+                    }
+
+                    //расстояние до нижней стенки
+                    double distanceToDown = 0;
+                    if(isToDownRight || isToDownLeft)
+                    {
+                        double y = 0;
+                        double x = (y - InvertCoordinate(headCenterY)) / Math.Tan(Features.DegreeToRadian(angle)) + headCenterX;
+                        distanceToDown = Math.Sqrt(Math.Pow(x - headCenterX, 2) + Math.Pow(y - InvertCoordinate(headCenterY), 2));
+                    }
+
+                    //расстояние до левой стенки
+                    double distanceToLeft = 0;
+                    if (isToDownLeft || isToUpLeft)
+                    {
+                        double x = 0;
+                        double y = Math.Tan(Features.DegreeToRadian(angle)) * (x - headCenterX) + InvertCoordinate(headCenterY);
+                        distanceToLeft = Math.Sqrt(Math.Pow(x - headCenterX, 2) + Math.Pow(y - InvertCoordinate(headCenterY), 2));
+                    }
+
+                    if (isToUpLeft)
+                    {
+                        distanceToWall = Math.Min(distanceToUp, distanceToLeft);
+                    }
+                    else if (isToUpRight)
+                    {
+                        distanceToWall = Math.Min(distanceToUp, distanceToRight);
+                    }
+                    else if (isToDownRight)
+                    {
+                        distanceToWall = Math.Min(distanceToRight, distanceToDown);
+                    }
+                    else if (isToDownLeft)
+                    {
+                        distanceToWall = Math.Min(distanceToDown, distanceToLeft);
+                    }
+                }
+                inputs[i] = (float)(1 / distanceToWall);
+
+                //расстояние до ближайшего яблока
+
             }
+        }
+        public double InvertCoordinate(double coordinate)
+        {
+            return BoardSize - coordinate;
         }
         public void MoveSnake(int xOffset,int yOffset)
         {

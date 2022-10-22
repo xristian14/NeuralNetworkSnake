@@ -49,5 +49,9 @@ namespace NeuralNetworkSnake
             }
             return outputVector;
         }
+        public static double DegreeToRadian(double degree)
+        {
+            return degree * Math.PI / 180;
+        }
     }
 }
