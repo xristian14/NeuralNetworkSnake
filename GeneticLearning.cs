@@ -21,8 +21,19 @@ namespace NeuralNetworkSnake
             }
         }
         private int[] Layers;
-        private double MutationPercent;
-        private int PopulationSize;
+        private readonly object locker = new object();
+        private double _mutationPercent { get; set; }
+        public double MutationPercent //реализация потокобезопасного получения и установки свойства
+        {
+            get { lock (locker) { return _mutationPercent; } }
+            set { lock (locker) { _mutationPercent = value; } }
+        }
+        private int _populationSize { get; set; }
+        public int PopulationSize //реализация потокобезопасного получения и установки свойства
+        {
+            get { lock (locker) { return _populationSize; } }
+            set { lock (locker) { _populationSize = value; } }
+        }
         public NeuralNetworkUnitGeneticLearning[] Population;
         public void SetMutationPercent(double mutationPercent)
         {

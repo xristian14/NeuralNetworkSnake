@@ -121,7 +121,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 6 0 0">
                         <Button Content="Запустить" Command="{Binding StartSimulation_Click}" Width="72" Padding="0 2" Margin="2 0"/>
-                        <Button Content="Остановить" Width="72" Padding="0 2" Margin="2 0"/>
+                        <Button Content="Остановить" Command="{Binding StopSimulation_Click}" Width="72" Padding="0 2" Margin="2 0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0 2 0 2" HorizontalAlignment="Center">
                         <TextBlock Text="Осталось, сек"/>
@@ -142,6 +142,7 @@
                     <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 0"/>
                 </StackPanel>
             </Grid>
+            <!--Поле-->
             <ItemsControl Grid.Column="1" Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -151,6 +152,38 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <!--Змейки-->
+            <ItemsControl Grid.Column="1" Margin="10 10 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRenders}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesCoordinate}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ItemsControl>
+                                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#FF494949"/>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                    <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                        </ItemsControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

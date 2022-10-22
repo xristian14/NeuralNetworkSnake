@@ -57,11 +57,11 @@ namespace NeuralNetworkSnake
         }
         public Vector<float> ForwardPropagation(Vector<float> inputs)
         {
-            Vector<float> outputs = Weights[0] * inputs;
+            Vector<float> outputs = inputs * Weights[0];
             inputs = outputs;
             for (int i = 2; i < Layers.Length; i++)
             {
-                outputs = Weights[i - 1] * inputs;
+                outputs = inputs * Weights[i - 1];
                 inputs = outputs;
             }
             return outputs;

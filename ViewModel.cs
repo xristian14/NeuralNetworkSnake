@@ -13,11 +13,21 @@ namespace NeuralNetworkSnake
 {
     class ViewModel : ViewModelBase
     {
-        public ViewModel()
+        private static ViewModel _instance;
+        private ViewModel()
         {
             BoardSizeInt = int.Parse(BoardSize);
             UpdateBoardCells();
         }
+        public static ViewModel getInstance()
+        {
+            if (_instance == null)
+            {
+                _instance = new ViewModel();
+            }
+            return _instance;
+        }
+        
         private Simulation _simulation;
         private int _hiddenLayersCount = 1;
         public int HiddenLayersCount
@@ -29,7 +39,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _firstHiddenLayerCountNeurons = "3";
+        private string _firstHiddenLayerCountNeurons = "20";
         public string FirstHiddenLayerCountNeurons
         {
             get { return _firstHiddenLayerCountNeurons; }
@@ -42,7 +52,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _secondHiddenLayerCountNeurons = "3";
+        private string _secondHiddenLayerCountNeurons = "20";
         public string SecondHiddenLayerCountNeurons
         {
             get { return _secondHiddenLayerCountNeurons; }
@@ -55,7 +65,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _thirdHiddenLayerCountNeurons = "3";
+        private string _thirdHiddenLayerCountNeurons = "20";
         public string ThirdHiddenLayerCountNeurons
         {
             get { return _thirdHiddenLayerCountNeurons; }
@@ -198,11 +208,15 @@ namespace NeuralNetworkSnake
             set
             {
                 _fixedDuration = value;
+                if (_simulation != null)
+                {
+                    _simulation.FixedDuration = value;
+                }
                 OnPropertyChanged();
             }
         }
-        private int _remainingTime = 30;
-        public int RemainingTime
+        private long _remainingTime = 0;
+        public long RemainingTime
         {
             get { return _remainingTime; }
             set
@@ -233,6 +247,27 @@ namespace NeuralNetworkSnake
                 {
                     BoardCells.Add(new BoardCell(BoardCellSize));
                 }
+            }
+        }
+
+        private ObservableCollection<SnakesForRender> _snakesForRenders = new ObservableCollection<SnakesForRender>();
+        public ObservableCollection<SnakesForRender> SnakesForRenders
+        {
+            get { return _snakesForRenders; }
+            set
+            {
+                _snakesForRenders = value;
+                OnPropertyChanged();
+            }
+        }
+        private ObservableCollection<ApplesForRender> _applesForRenders = new ObservableCollection<ApplesForRender>();
+        public ObservableCollection<ApplesForRender> ApplesForRenders
+        {
+            get { return _applesForRenders; }
+            set
+            {
+                _applesForRenders = value;
+                OnPropertyChanged();
             }
         }
 
@@ -272,7 +307,7 @@ namespace NeuralNetworkSnake
                 return new DelegateCommand((obj) =>
                 {
                     int[] layers = new int[2 + HiddenLayersCount];
-                    layers[0] = 48;
+                    layers[0] = 39;
                     if(HiddenLayersCount >= 1)
                     {
                         layers[1] = int.Parse(FirstHiddenLayerCountNeurons);
@@ -288,13 +323,10 @@ namespace NeuralNetworkSnake
                     layers[layers.Length - 1] = 3;
                     int populationSize = int.Parse(PopulationSize);
 
+                    SnakesForRenders.Clear();
+                    ApplesForRenders.Clear();
                     GeneticLearning geneticLearning = new GeneticLearning(populationSize, layers);
-                    GameBoard[] gameBoardsGeneticLearning = new GameBoard[populationSize];
-                    for(int i = 0; i < populationSize; i++)
-                    {
-                        gameBoardsGeneticLearning[i] = new GameBoard(BoardSizeInt, int.Parse(ApplesCount));
-                    }
-                    _simulation = new Simulation(geneticLearning, gameBoardsGeneticLearning, RealtimeDelay);
+                    _simulation = new Simulation(geneticLearning, RealtimeDelay, BoardSizeInt, int.Parse(ApplesCount));
 
                     LayersText = layers[0].ToString();
                     for (int i = 1; i < layers.Length; i++)
@@ -311,7 +343,24 @@ namespace NeuralNetworkSnake
             {
                 return new DelegateCommand((obj) =>
                 {
-                    
+                    if (IsRealtimeSimulation)
+                    {
+                        Task.Run(() => _simulation.RealTimeSimulate()); //запускаем в отдельном потоке чтобы форма обновлялась
+                    }
+                    else
+                    {
+                        Task.Run(() => _simulation.FixedTimeSimulate()); //запускаем в отдельном потоке чтобы форма обновлялась
+                    }
+                }, (obj) => true);
+            }
+        }
+        public ICommand StopSimulation_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    _simulation.IsRunning = false;
                 }, (obj) => true);
             }
         }

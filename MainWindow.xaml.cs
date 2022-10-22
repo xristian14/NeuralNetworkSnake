@@ -24,7 +24,7 @@ namespace NeuralNetworkSnake
         {
             InitializeComponent();
 
-            ViewModel viewModel = new ViewModel();
+            ViewModel viewModel = ViewModel.getInstance();
             DataContext = viewModel;
         }
     }

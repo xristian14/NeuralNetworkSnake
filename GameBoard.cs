@@ -371,7 +371,7 @@ namespace NeuralNetworkSnake
             Score += _oneStepScore;
             int newX = SnakeCoordinates[SnakeCoordinates.Count - 1].X + xOffset;
             int newY = SnakeCoordinates[SnakeCoordinates.Count - 1].Y + yOffset;
-            if(newX >= BoardCellsInfo.GetLength(0) || newY >= BoardCellsInfo.GetLength(1)) //если врезались в стенку
+            if(newX >= BoardCellsInfo.GetLength(0) || newX < 0 || newY >= BoardCellsInfo.GetLength(1) || newY < 0) //если врезались в стенку
             {
                 IsGameOver = true;
             }
