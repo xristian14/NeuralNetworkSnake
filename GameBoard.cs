@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace NeuralNetworkSnake
 {
@@ -176,6 +177,112 @@ namespace NeuralNetworkSnake
         public bool GetIsGameOver()
         {
             return IsGameOver;
+        }
+        public Vector<float> GetInputs()
+        {
+            Vector<float> inputs = Vector<float>.Build.Dense(48, 0);
+            int lastIndex = 0;
+            for (int i = 0; i < 16; i++) //расстояние до стенки
+            {
+                float distance = 0;
+                if(i % 4 == 0) //если под прямым углом
+                {
+                    switch (i % 4)
+                    {
+                        case 0:
+                            distance = SnakeCoordinates[SnakeCoordinates.Count - 1].Y; //to up
+                            break;
+                        case 1:
+                            distance = BoardSize - SnakeCoordinates[SnakeCoordinates.Count - 1].X; //to right
+                            break;
+                        case 2:
+                            distance = BoardSize - SnakeCoordinates[SnakeCoordinates.Count - 1].Y; //to down
+                            break;
+                        case 3:
+                            distance = SnakeCoordinates[SnakeCoordinates.Count - 1].X; //to left
+                            break;
+                    }
+                }
+                else //если под наклоном
+                {
+                    float angle = 360 / 16 * i;
+                    if(angle > 0 && angle < 90)
+                    {
+                        float distanceToUp = SnakeCoordinates[SnakeCoordinates.Count - 1].Y / (float)Math.Cos(angle);
+                        float distanceToRight = (BoardSize - SnakeCoordinates[SnakeCoordinates.Count - 1].X) / (float)Math.Cos(90 - angle);
+                        distance = Math.Min(distanceToUp, distanceToRight);
+                    }
+                    else if (angle > 90 && angle < 180)
+                    {
+                        float distanceToRight = (BoardSize - SnakeCoordinates[SnakeCoordinates.Count - 1].X) / (float)Math.Cos(angle - 90);
+                        float distanceToDown = BoardSize - SnakeCoordinates[SnakeCoordinates.Count - 1].Y / (float)Math.Cos(180 - angle);
+                        distance = Math.Min(distanceToRight, distanceToDown);
+                    }
+                    else if (angle > 180 && angle < 270)
+                    {
+                        float distanceToDown = BoardSize - SnakeCoordinates[SnakeCoordinates.Count - 1].Y / (float)Math.Cos(angle - 180);
+                        float distanceToLeft = SnakeCoordinates[SnakeCoordinates.Count - 1].X / (float)Math.Cos(270 - angle);
+                        distance = Math.Min(distanceToDown, distanceToLeft);
+                    }
+                    else if (angle > 270 && angle < 360)
+                    {
+                        float distanceToLeft = SnakeCoordinates[SnakeCoordinates.Count - 1].X / (float)Math.Cos(angle - 270);
+                        float distanceToUp = SnakeCoordinates[SnakeCoordinates.Count - 1].Y / (float)Math.Cos(360 - angle);
+                        distance = Math.Min(distanceToLeft, distanceToUp);
+                    }
+                }
+                inputs[lastIndex + i] = 1 / distance;
+            }
+            lastIndex += 16;
+            //расстояние до яблок
+            double headCenterX = SnakeCoordinates[SnakeCoordinates.Count - 1].X + 0.5;
+            double headCenterY = SnakeCoordinates[SnakeCoordinates.Count - 1].Y + 0.5;
+            //определяем угол изменения вектора взгляда, исходя из направления змейки
+            double correctionAngle = 0;
+            if (IsSnakeGoRight())
+            {
+                correctionAngle = 270;
+            }
+            if (IsSnakeGoDown())
+            {
+                correctionAngle = 180;
+            }
+            if (IsSnakeGoLeft())
+            {
+                correctionAngle = 90;
+            }
+            double[] angles = new double[13] { 224, 202, 180, 157.5, 135, 112.5, 90, 67.5, 45, 22.5, 0, 338, 316 }; //углы наклона лучей, оносительно оси X
+            for(int i = 0; i < angles.Length; i++)
+            {
+                //расстояние до стенки
+                double angle = (angles[i] + correctionAngle) - Math.Truncate((angles[i] + correctionAngle) / 360) * 360; //приводим результирующий угол в диапазон от 0 до 360
+                //определяем в какой из четырех углов квадрата направлен угол
+                double distanceToWall = 0;
+                double angleToUpRight = Math.Abs(angle - 45);
+                double angleToUpLeft = Math.Abs(angle - 135);
+                double angleToDownLeft = Math.Abs(angle - 225);
+                double angleToDownRight = Math.Abs(angle - 315);
+                //если угол - вертикальная или горизонтальная линия, вычисляем расстояние до стенки по прямой
+                if(angle == 0 || angle == 90 || angle == 180 || angle == 270)
+                {
+                    if(angle == 0) //до правой стенки
+                    {
+                        distanceToWall = BoardSize - headCenterX;
+                    }
+                    if(angle == 90) //до верхней стенки
+                    {
+                        distanceToWall = headCenterY;
+                    }
+                    if(angle == 180) //до левой стенки
+                    {
+                        distanceToWall = BoardSize - headCenterX;
+                    }
+                    if(angle == 270) //до нижней стенки
+                    {
+                        distanceToWall = BoardSize - headCenterX;
+                    }
+                }
+            }
         }
         public void MoveSnake(int xOffset,int yOffset)
         {

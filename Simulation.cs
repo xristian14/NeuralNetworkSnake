@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace NeuralNetworkSnake
 {
     class Simulation
     {
-        public Simulation(GeneticLearning geneticLearning,GameBoard[] gameBoardsGeneticLearning, int pauseMillisecDelay)
+        public Simulation(GeneticLearning geneticLearning, GameBoard[] gameBoardsGeneticLearning, int pauseMillisecDelay)
         {
             _geneticLearning = geneticLearning;
             _gameBoardsGeneticLearning = gameBoardsGeneticLearning;
@@ -30,9 +31,18 @@ namespace NeuralNetworkSnake
             get { lock (locker) { return _pauseMillisecDelay; } }
             set { lock (locker) { _pauseMillisecDelay = value; } }
         }
-        private void Simulate()
+        private bool SimulateOneStep()
         {
-
+            bool isAllGameOver = true;
+            for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+            {
+                if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
+                {
+                    _geneticLearning.Population[i].NeuralNetworkUnit.ForwardPropagation
+                    isAllGameOver = false;
+                    _gameBoardsGeneticLearning[i].MoveSnake()
+                }
+            }
         }
         public void RealTimeSimulate(Simulation simulation)
         {
