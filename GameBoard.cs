@@ -149,7 +149,7 @@ namespace NeuralNetworkSnake
         }
         public bool IsSnakeGoUp()
         {
-            if(SnakeCoordinates[SnakeCoordinates.Count-1].Y > SnakeCoordinates[SnakeCoordinates.Count - 2].Y)
+            if(SnakeCoordinates[SnakeCoordinates.Count-1].Y < SnakeCoordinates[SnakeCoordinates.Count - 2].Y)
                 return true;
             else
                 return false;
@@ -163,7 +163,7 @@ namespace NeuralNetworkSnake
         }
         public bool IsSnakeGoDown()
         {
-            if(SnakeCoordinates[SnakeCoordinates.Count-1].Y < SnakeCoordinates[SnakeCoordinates.Count - 2].Y)
+            if(SnakeCoordinates[SnakeCoordinates.Count-1].Y > SnakeCoordinates[SnakeCoordinates.Count - 2].Y)
                 return true;
             else
                 return false;
@@ -205,7 +205,7 @@ namespace NeuralNetworkSnake
                 double angle = (angles[i] + correctionAngle) - Math.Truncate((angles[i] + correctionAngle) / 360) * 360; //приводим результирующий угол в диапазон от 0 до 360
                 double distanceToWall = 0;
                 //если угол - вертикальная или горизонтальная линия, вычисляем расстояние до стенки по прямой
-                if (angle - 0 < 0.1 || angle - 90 < 0.1 || angle - 180 < 0.1 || angle - 270 < 0.1)
+                if (Math.Abs(angle - 0) < 0.1 || Math.Abs(angle - 90) < 0.1 || Math.Abs(angle - 180) < 0.1 || Math.Abs(angle - 270) < 0.1)
                 {
                     if (angle - 0 < 0.1) //до правой стенки
                     {

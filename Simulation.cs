@@ -19,6 +19,9 @@ namespace NeuralNetworkSnake
             ApplesCount = applesCount;
             IsRunning = false;
             Age = 0;
+            DispatcherInvoke((Action)(() => {
+                ViewModel.getInstance().Age = Age;
+            }));
             _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.PopulationSize, BoardSize, ApplesCount);
         }
         private GeneticLearning _geneticLearning;
@@ -80,20 +83,46 @@ namespace NeuralNetworkSnake
         {
             ViewModel viewModel = ViewModel.getInstance();
             DispatcherInvoke((Action)(() => {
+                int u = 0;
                 for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
                 {
-                    while(_gameBoardsGeneticLearning[i].SnakeCoordinates.Count > viewModel.SnakesForRenders[i].SnakesCoordinate.Count)
+                    if (!viewModel.SnakesForRenders[i].IsGameOver)
                     {
-                        int index = viewModel.SnakesForRenders[i].SnakesCoordinate.Count;
-                        SnakeForRender snakeForRender = new SnakeForRender((int)(_gameBoardsGeneticLearning[i].SnakeCoordinates[index].Y * viewModel.BoardCellSize), (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates[index].X * viewModel.BoardCellSize), (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
-                        viewModel.SnakesForRenders[i].SnakesCoordinate.Add(snakeForRender);
+                        //положение змейки
+                        if(_gameBoardsGeneticLearning[i].SnakeCoordinates.Count == viewModel.SnakesForRenders[i].SnakesCoordinate.Count)
+                        {
+                            int newTop = (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates.Last().Y * viewModel.BoardCellSize);
+                            int newLeft = (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates.Last().X * viewModel.BoardCellSize);
+                            if (viewModel.SnakesForRenders[i].SnakesCoordinate.Last().Top == newTop && viewModel.SnakesForRenders[i].SnakesCoordinate.Last().Top == newLeft)
+                            {
+                                viewModel.SnakesForRenders[i].IsGameOver = true;
+                            }
+                            else
+                            {
+                                viewModel.SnakesForRenders[i].SnakesCoordinate.RemoveAt(0);
+                                SnakeForRender snakeForRender = new SnakeForRender(newTop, newLeft, (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
+                                viewModel.SnakesForRenders[i].SnakesCoordinate.Add(snakeForRender);
+                            }
+                        }
+                        else
+                        {
+                            while (_gameBoardsGeneticLearning[i].SnakeCoordinates.Count > viewModel.SnakesForRenders[i].SnakesCoordinate.Count)
+                            {
+                                int index = viewModel.SnakesForRenders[i].SnakesCoordinate.Count;
+                                SnakeForRender snakeForRender = new SnakeForRender((int)(_gameBoardsGeneticLearning[i].SnakeCoordinates[index].Y * viewModel.BoardCellSize), (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates[index].X * viewModel.BoardCellSize), (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
+                                viewModel.SnakesForRenders[i].SnakesCoordinate.Add(snakeForRender);
+                            }
+                        }
+                        //положение яблока
+                        viewModel.ApplesForRenders[i].ApplesCoordinates.Clear();
+                        while (_gameBoardsGeneticLearning[i].AppleCoordinates.Count > viewModel.ApplesForRenders[i].ApplesCoordinates.Count)
+                        {
+                            int index = viewModel.ApplesForRenders[i].ApplesCoordinates.Count;
+                            SnakeForRender snakeForRender = new SnakeForRender((int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].Y * viewModel.BoardCellSize), (int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].X * viewModel.BoardCellSize), (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
+                            viewModel.ApplesForRenders[i].ApplesCoordinates.Add(snakeForRender);
+                        }
                     }
-                    while (_gameBoardsGeneticLearning[i].AppleCoordinates.Count > viewModel.ApplesForRenders[i].ApplesCoordinates.Count)
-                    {
-                        int index = viewModel.ApplesForRenders[i].ApplesCoordinates.Count;
-                        SnakeForRender snakeForRender = new SnakeForRender((int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].Y * viewModel.BoardCellSize), (int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].X * viewModel.BoardCellSize), (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
-                        viewModel.ApplesForRenders[i].ApplesCoordinates.Add(snakeForRender);
-                    }
+                    
                 }
             }));
         }
@@ -112,7 +141,8 @@ namespace NeuralNetworkSnake
                 if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
                 {
                     isAllGameOver = false;
-                    Vector<float> outputs = _geneticLearning.Population[i].NeuralNetworkUnit.ForwardPropagation(_gameBoardsGeneticLearning[i].GetInputs());
+                    Vector<float> inputs = _gameBoardsGeneticLearning[i].GetInputs();
+                    Vector<float> outputs = _geneticLearning.Population[i].NeuralNetworkUnit.ForwardPropagation(inputs);
                     int xOffset = 0;
                     int yOffset = 0;
                     int indexMaximum = outputs.AbsoluteMaximumIndex();
@@ -186,6 +216,18 @@ namespace NeuralNetworkSnake
             IsRunning = true;
             while (IsRunning)
             {
+                double maxRating = 0;
+                for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+                {
+                    if(_gameBoardsGeneticLearning[i].Score > maxRating && _gameBoardsGeneticLearning[i].Score < 0.04)
+                    {
+                        maxRating = _gameBoardsGeneticLearning[i].Score;
+                    }
+                }
+                if(maxRating > 0.030)
+                {
+                    int y = 0;
+                }
                 if (SimulateOneStep())
                 {
                     SetGeneticLearningRating();

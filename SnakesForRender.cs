@@ -9,6 +9,7 @@ namespace NeuralNetworkSnake
 {
     class SnakesForRender : ViewModelBase
     {
+        public bool IsGameOver = false;
         private ObservableCollection<SnakeForRender> _snakesCoordinate = new ObservableCollection<SnakeForRender>();
         public ObservableCollection<SnakeForRender> SnakesCoordinate
         {
