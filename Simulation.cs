@@ -126,6 +126,11 @@ namespace NeuralNetworkSnake
                             SnakeForRender snakeForRender = new SnakeForRender((int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].Y * viewModel.BoardCellSize), (int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].X * viewModel.BoardCellSize), (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
                             viewModel.ApplesForRenders[i].ApplesCoordinates.Add(snakeForRender);
                         }
+                        if (viewModel.SnakesForRenders[i].IsGameOver)
+                        {
+                            viewModel.SnakesForRenders[i].SnakesCoordinate.Clear();
+                            viewModel.ApplesForRenders[i].ApplesCoordinates.Clear();
+                        }
                     }
                 }
             }));

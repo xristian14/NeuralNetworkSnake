@@ -28,9 +28,6 @@ namespace NeuralNetworkSnake
             Random random = new Random();
             SnakeCoordinates.Add(new SnakeCoordinate(random.Next(1, boardSize - 1), random.Next(1, boardSize - 1))); //начальная координата
 
-            SnakeCoordinates[0].X = 4;
-            SnakeCoordinates[0].Y = 5;
-
             int nextX = SnakeCoordinates[0].X;
             int nextY = SnakeCoordinates[0].Y;
             BoardCellsInfo[nextX, nextY].IsSnake = true;
@@ -50,11 +47,8 @@ namespace NeuralNetworkSnake
                     nextY--;
                     break;
             }
-
-            nextX = 5;
-            nextY = 5;
-
             SnakeCoordinates.Add(new SnakeCoordinate(nextX, nextY));
+
             BoardCellsInfo[nextX, nextY].IsSnake = true;
             //генерируем яблоки
             for(int i = 0; i < appleCount; i++)
@@ -160,17 +154,6 @@ namespace NeuralNetworkSnake
                     }
                     direction = !direction;
                 }
-
-
-                AppleCoordinates.Add(new AppleCoordinate(3, 6));
-                AppleCoordinates.Add(new AppleCoordinate(4, 6));
-                AppleCoordinates.Add(new AppleCoordinate(5, 6));
-                AppleCoordinates.Add(new AppleCoordinate(6, 6));
-                AppleCoordinates.Add(new AppleCoordinate(7, 6));
-                AppleCoordinates.Add(new AppleCoordinate(8, 6));
-                AppleCoordinates.Add(new AppleCoordinate(9, 6));
-                currentX = 9;
-                currentY = 5;
 
                 AppleCoordinates.Add(new AppleCoordinate(currentX, currentY));
                 BoardCellsInfo[currentX, currentY].IsApple = true;
@@ -322,7 +305,7 @@ namespace NeuralNetworkSnake
                         distanceToWall = Math.Min(distanceToDown, distanceToLeft);
                     }
                 }
-                inputs[i] = (float)(1 / (Math.Abs(distanceToWall) - 0.5 + 1)); //-0.5 потому что мы считаем расстояние из середины клетки, то есть оно получается на 0.5 больше. +1 потому что на расстоянии 0 значение активации должно быть 1, а для этого нужно прибавить 1, т.к. иначе будет деление на 0 и получится бесконечность
+                inputs[i] = (float)(1 / (distanceToWall - 0.5 + 1)); //-0.5 потому что мы считаем расстояние из середины клетки, то есть оно получается на 0.5 больше. +1 потому что на расстоянии 0 значение активации должно быть 1, а для этого нужно прибавить 1, т.к. иначе будет деление на 0 и получится бесконечность
 
                 //расстояние до ближайшего яблока
                 double minDistanceToApple = 0;
@@ -433,41 +416,118 @@ namespace NeuralNetworkSnake
                         }
                     }
                 }
-                inputs[angles.Length + i] = isAppleWasFind ? (float)(1 / (Math.Abs(minDistanceToApple) - 0.5 + 1)) : 0;
+                inputs[angles.Length + i] = isAppleWasFind ? (float)(1 / (minDistanceToApple - 0.5 + 1)) : 0;
 
                 //расстояние до ближайшего хвоста
                 double minDistanceToTail = 0;
                 bool isTailWasFind = false;
-                for (int k = 0; k < SnakeCoordinates.Count - 1; k++)
+                for (int k = 0; k < SnakeCoordinates.Count; k++)
                 {
-                    //координаты 4 вершин тела змейки
+                    //координаты 4 вершин квадрата яблока
                     Point[] points = new Point[4] { new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y + 1)), new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y + 1)) };
+                    bool isTailToRightHead = headCenterX < points[0].X; //хвост правее головы
+                    bool isTailToUpHead = InvertCoordinate(headCenterY) < points[0].Y; //хвост выше головы
+                    bool isTailToLeftHead = headCenterX > points[2].X; //хвост левее головы
+                    bool isTailToDownHead = InvertCoordinate(headCenterY) > points[1].Y; //хвост ниже головы
 
-                    double yVectorForX1 = Math.Tan(Features.DegreeToRadian(angle)) * (points[0].X - headCenterX) + InvertCoordinate(headCenterY); //y=tan(angle)*(x-x0)+y0
-                    double yVectorForX2 = Math.Tan(Features.DegreeToRadian(angle)) * (points[2].X - headCenterX) + InvertCoordinate(headCenterY);
-                    //если значения вектора для всех X квадрата всегда больше или всегда меньше значений Y квадрата, значит вектор не пересекает квадрат
-                    bool vectorDirection = yVectorForX1 > points[0].Y;
-                    bool isVectorDirectionDifferent = false;
-                    isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[0].Y ? isVectorDirectionDifferent : false;
-                    isVectorDirectionDifferent = vectorDirection == yVectorForX1 > points[1].Y ? isVectorDirectionDifferent : false;
-                    isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[1].Y ? isVectorDirectionDifferent : false;
-                    if (isVectorDirectionDifferent) //пересекли квадрат
+                    if (isStraightRight || isStraightUp || isStraightLeft || isStraightDown) //если угол - вертикальная или горизонтальная линия, вычисляем расстояние до хвоста по прямой
                     {
-                        double yVectorForX1Distance = Math.Sqrt(Math.Pow(points[0].X - headCenterX, 2) + Math.Pow(yVectorForX1 - InvertCoordinate(headCenterY), 2));
-                        double yVectorForX2Distance = Math.Sqrt(Math.Pow(points[2].X - headCenterX, 2) + Math.Pow(yVectorForX2 - InvertCoordinate(headCenterY), 2));
-                        double distanceToTail = Math.Min(yVectorForX1Distance, yVectorForX2Distance);
-                        if (isTailWasFind)
+                        bool isStraightTailFind = false;
+                        double distanceToTail = 0;
+                        if (isStraightRight) //до правого хвоста
                         {
-                            minDistanceToTail = Math.Min(minDistanceToTail, distanceToTail);
+                            if (InvertCoordinate(headCenterY) > points[0].Y && InvertCoordinate(headCenterY) < points[1].Y && isTailToRightHead)
+                            {
+                                distanceToTail = points[0].X - headCenterX;
+                                isStraightTailFind = true;
+                            }
                         }
-                        else
+                        if (isStraightUp) //до верхнего хвоста
                         {
-                            minDistanceToTail = distanceToTail;
+                            if (headCenterX > points[0].X && headCenterX < points[2].X && isTailToUpHead)
+                            {
+                                distanceToTail = points[0].Y - InvertCoordinate(headCenterY);
+                                isStraightTailFind = true;
+                            }
                         }
-                        isTailWasFind = true;
+                        if (isStraightLeft) //до левого хвоста
+                        {
+                            if (InvertCoordinate(headCenterY) > points[0].Y && InvertCoordinate(headCenterY) < points[1].Y && isTailToLeftHead)
+                            {
+                                distanceToTail = headCenterX - points[2].X;
+                                isStraightTailFind = true;
+                            }
+                        }
+                        if (isStraightDown) //до нижнего хвоста
+                        {
+                            if (headCenterX > points[0].X && headCenterX < points[2].X && isTailToDownHead)
+                            {
+                                distanceToTail = InvertCoordinate(headCenterY) - points[1].Y;
+                                isStraightTailFind = true;
+                            }
+                        }
+                        if (isStraightTailFind)
+                        {
+                            if (isTailWasFind)
+                            {
+                                minDistanceToTail = Math.Min(minDistanceToTail, distanceToTail);
+                            }
+                            else
+                            {
+                                minDistanceToTail = distanceToTail;
+                            }
+                            isTailWasFind = true;
+                        }
+                    }
+                    else //иначе вычисляем расстояние до хвостов к которым направлен вектор под углом
+                    {
+                        bool isTailReverseToVector = false; //находится ли хвост в противоположном направлении от вектора. Ведь в этом случае уравнение прямой определит что хвост лежит на ней
+                        if ((isToUpLeft && isTailToDownHead) || (isToUpLeft && isTailToRightHead))
+                        {
+                            isTailReverseToVector = true;
+                        }
+                        if ((isToUpRight && isTailToDownHead) || (isToUpRight && isTailToLeftHead))
+                        {
+                            isTailReverseToVector = true;
+                        }
+                        if ((isToDownRight && isTailToUpHead) || (isToDownRight && isTailToLeftHead))
+                        {
+                            isTailReverseToVector = true;
+                        }
+                        if ((isToDownLeft && isTailToUpHead) || (isToDownLeft && isTailToRightHead))
+                        {
+                            isTailReverseToVector = true;
+                        }
+
+                        if (!isTailReverseToVector) //если вектор и хвост не в противоположных направлениях проверяем пересекает ли вектор хвост, иначе пропускаем этот хвост, т.к. формула может дать пересечение с противоположной стороны
+                        {
+                            double yVectorForX1 = Math.Tan(Features.DegreeToRadian(angle)) * (points[0].X - headCenterX) + InvertCoordinate(headCenterY); //y=tan(angle)*(x-x0)+y0  -  значение Y для функции линии в точке X
+                            double yVectorForX2 = Math.Tan(Features.DegreeToRadian(angle)) * (points[2].X - headCenterX) + InvertCoordinate(headCenterY);
+                            //если значения вектора для всех X квадрата всегда больше или всегда меньше значений Y квадрата, значит вектор не пересекает квадрат
+                            bool vectorDirection = yVectorForX1 > points[0].Y;
+                            bool isVectorDirectionDifferent = false;
+                            isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[0].Y ? isVectorDirectionDifferent : true;
+                            isVectorDirectionDifferent = vectorDirection == yVectorForX1 > points[1].Y ? isVectorDirectionDifferent : true;
+                            isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[1].Y ? isVectorDirectionDifferent : true;
+                            if (isVectorDirectionDifferent) //пересекли квадрат
+                            {
+                                double yVectorForX1Distance = Math.Sqrt(Math.Pow(points[0].X - headCenterX, 2) + Math.Pow(yVectorForX1 - InvertCoordinate(headCenterY), 2));
+                                double yVectorForX2Distance = Math.Sqrt(Math.Pow(points[2].X - headCenterX, 2) + Math.Pow(yVectorForX2 - InvertCoordinate(headCenterY), 2));
+                                double distanceToTail = Math.Min(yVectorForX1Distance, yVectorForX2Distance);
+                                if (isTailWasFind)
+                                {
+                                    minDistanceToTail = Math.Min(minDistanceToTail, distanceToTail);
+                                }
+                                else
+                                {
+                                    minDistanceToTail = distanceToTail;
+                                }
+                                isTailWasFind = true;
+                            }
+                        }
                     }
                 }
-                inputs[angles.Length * 2 + i] = isTailWasFind ? (float)(1 / (Math.Abs(minDistanceToTail) - 0.5 + 1)) : 0;
+                inputs[angles.Length * 2 + i] = isTailWasFind ? (float)(1 / (minDistanceToTail - 0.5 + 1)) : 0;
             }
             return inputs;
         }
