@@ -330,7 +330,7 @@ namespace NeuralNetworkSnake
                     SnakesForRenders.Clear();
                     ApplesForRenders.Clear();
                     GeneticLearning geneticLearning = new GeneticLearning(populationSize, layers);
-                    _simulation = new Simulation(geneticLearning, RealtimeDelay, BoardSizeInt, int.Parse(ApplesCount));
+                    _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, BoardSizeInt, int.Parse(ApplesCount));
 
                     LayersText = layers[0].ToString();
                     for (int i = 1; i < layers.Length; i++)

@@ -11,10 +11,11 @@ namespace NeuralNetworkSnake
 {
     class Simulation : ViewModelBase
     {
-        public Simulation(GeneticLearning geneticLearning, int pauseMillisecDelay, int boardSize, int applesCount)
+        public Simulation(GeneticLearning geneticLearning, int pauseMillisecDelay, int fixedDuration, int boardSize, int applesCount)
         {
             _geneticLearning = geneticLearning;
             PauseMillisecDelay = pauseMillisecDelay;
+            FixedDuration = fixedDuration;
             BoardSize = boardSize;
             ApplesCount = applesCount;
             IsRunning = false;
@@ -95,21 +96,18 @@ namespace NeuralNetworkSnake
                 {
                     if (!viewModel.SnakesForRenders[i].IsGameOver)
                     {
+                        if (_gameBoardsGeneticLearning[i].GetIsGameOver())
+                        {
+                            viewModel.SnakesForRenders[i].IsGameOver = true;
+                        }
                         //положение змейки
                         if(_gameBoardsGeneticLearning[i].SnakeCoordinates.Count == viewModel.SnakesForRenders[i].SnakesCoordinate.Count)
                         {
                             int newTop = (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates.Last().Y * viewModel.BoardCellSize);
                             int newLeft = (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates.Last().X * viewModel.BoardCellSize);
-                            if (viewModel.SnakesForRenders[i].SnakesCoordinate.Last().Top == newTop && viewModel.SnakesForRenders[i].SnakesCoordinate.Last().Top == newLeft)
-                            {
-                                viewModel.SnakesForRenders[i].IsGameOver = true;
-                            }
-                            else
-                            {
-                                viewModel.SnakesForRenders[i].SnakesCoordinate.RemoveAt(0);
-                                SnakeForRender snakeForRender = new SnakeForRender(newTop, newLeft, (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
-                                viewModel.SnakesForRenders[i].SnakesCoordinate.Add(snakeForRender);
-                            }
+                            viewModel.SnakesForRenders[i].SnakesCoordinate.RemoveAt(0);
+                            SnakeForRender snakeForRender = new SnakeForRender(newTop, newLeft, (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
+                            viewModel.SnakesForRenders[i].SnakesCoordinate.Add(snakeForRender);
                         }
                         else
                         {
@@ -129,7 +127,6 @@ namespace NeuralNetworkSnake
                             viewModel.ApplesForRenders[i].ApplesCoordinates.Add(snakeForRender);
                         }
                     }
-                    
                 }
             }));
         }
@@ -152,6 +149,7 @@ namespace NeuralNetworkSnake
                     Vector<float> outputs = _geneticLearning.Population[i].NeuralNetworkUnit.ForwardPropagation(inputs);
                     int xOffset = 0;
                     int yOffset = 0;
+
                     int indexMaximum = outputs.MaximumIndex();
                     if (_gameBoardsGeneticLearning[i].IsSnakeGoUp())
                     {
@@ -254,7 +252,7 @@ namespace NeuralNetworkSnake
             IsRunning = true;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            long lastRemaining = stopwatch.ElapsedMilliseconds / 1000;
+            long lastRemaining = FixedDuration - stopwatch.ElapsedMilliseconds / 1000;
             while (IsRunning)
             {
                 if (SimulateOneStep())
@@ -267,14 +265,14 @@ namespace NeuralNetworkSnake
                         ViewModel.getInstance().Age = Age;
                     }));
                 }
-                if(stopwatch.ElapsedMilliseconds / 1000 != lastRemaining)
+                if(FixedDuration - stopwatch.ElapsedMilliseconds / 1000 != lastRemaining)
                 {
-                    lastRemaining = stopwatch.ElapsedMilliseconds / 1000;
+                    lastRemaining = FixedDuration - stopwatch.ElapsedMilliseconds / 1000;
                     DispatcherInvoke((Action)(() => {
                         ViewModel.getInstance().RemainingTime = lastRemaining;
                     }));
                 }
-                if(lastRemaining >= FixedDuration)
+                if(lastRemaining <= 0)
                 {
                     IsRunning = false;
                 }

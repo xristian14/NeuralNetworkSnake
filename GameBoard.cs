@@ -56,6 +56,7 @@ namespace NeuralNetworkSnake
             Score = _oneStepScore;
             _appleScoreReduceMaxSteps = (int)Math.Round(boardSize * 2.5);
             _maxStepsWithoutApples = (int)Math.Round((double)boardSize * boardSize);
+            //_maxStepsWithoutApples = _appleScoreReduceMaxSteps;
         }
         private double _oneStepScore = 0.001;
         private int _stepsWithoutApples = 0;
@@ -377,6 +378,10 @@ namespace NeuralNetworkSnake
         }
         public void MoveSnake(int xOffset,int yOffset)
         {
+            if(Math.Abs(xOffset) > 0 && Math.Abs(yOffset) > 0)
+            {
+                int Y = 0;
+            }
             Score += _oneStepScore;
             int newX = SnakeCoordinates[SnakeCoordinates.Count - 1].X + xOffset;
             int newY = SnakeCoordinates[SnakeCoordinates.Count - 1].Y + yOffset;
@@ -400,6 +405,8 @@ namespace NeuralNetworkSnake
                     EatenApples++;
                     Score += Math.Round(_appleScore - _appleScore * ((double)_stepsWithoutApples / _appleScoreReduceMaxSteps * _appleScoreReduce), 3); //чем быстрее добрались до яблока, тем больше счета получим
                     BoardCellsInfo[newX, newY].IsApple = false;
+                    _stepsWithoutApples = 0;
+                    AppleCoordinates.Remove(AppleCoordinates.Where(a => a.X == newX && a.Y == newY).First()); //удаляем съеденное яблоко
                     AppleGenerate(); //генерируем новое яблоко
                 }
                 if (BoardCellsInfo[newX, newY].IsSnake) //если врезались в хвост
