@@ -27,12 +27,12 @@ namespace NeuralNetworkSnake
             //генерируем начальную позицию змейки
             Random random = new Random();
             SnakeCoordinates.Add(new SnakeCoordinate(random.Next(1, boardSize - 1), random.Next(1, boardSize - 1))); //начальная координата
-            SnakeCoordinates[0].X = 5;
-            SnakeCoordinates[0].Y = 6;
+
+            SnakeCoordinates[0].X = 4;
+            SnakeCoordinates[0].Y = 5;
 
             int nextX = SnakeCoordinates[0].X;
             int nextY = SnakeCoordinates[0].Y;
-
             BoardCellsInfo[nextX, nextY].IsSnake = true;
             int direction = random.Next(0, 3);
             switch (direction) //направление от начальной координаты
@@ -161,8 +161,16 @@ namespace NeuralNetworkSnake
                     direction = !direction;
                 }
 
-                currentX = 3;
-                currentY = 3;
+
+                AppleCoordinates.Add(new AppleCoordinate(3, 6));
+                AppleCoordinates.Add(new AppleCoordinate(4, 6));
+                AppleCoordinates.Add(new AppleCoordinate(5, 6));
+                AppleCoordinates.Add(new AppleCoordinate(6, 6));
+                AppleCoordinates.Add(new AppleCoordinate(7, 6));
+                AppleCoordinates.Add(new AppleCoordinate(8, 6));
+                AppleCoordinates.Add(new AppleCoordinate(9, 6));
+                currentX = 9;
+                currentY = 5;
 
                 AppleCoordinates.Add(new AppleCoordinate(currentX, currentY));
                 BoardCellsInfo[currentX, currentY].IsApple = true;
@@ -314,7 +322,7 @@ namespace NeuralNetworkSnake
                         distanceToWall = Math.Min(distanceToDown, distanceToLeft);
                     }
                 }
-                inputs[i] = (float)(1 / distanceToWall);
+                inputs[i] = (float)(1 / (Math.Abs(distanceToWall) - 0.5 + 1)); //-0.5 потому что мы считаем расстояние из середины клетки, то есть оно получается на 0.5 больше. +1 потому что на расстоянии 0 значение активации должно быть 1, а для этого нужно прибавить 1, т.к. иначе будет деление на 0 и получится бесконечность
 
                 //расстояние до ближайшего яблока
                 double minDistanceToApple = 0;
@@ -322,13 +330,11 @@ namespace NeuralNetworkSnake
                 for (int k = 0; k < AppleCoordinates.Count; k++)
                 {
                     //координаты 4 вершин квадрата яблока
-                    Point[] points = new Point[4] { new Point(AppleCoordinates[k].X, InvertCoordinate(AppleCoordinates[k].Y)), new Point(AppleCoordinates[k].X, InvertCoordinate(AppleCoordinates[k].Y + 1)), new Point(AppleCoordinates[k].X + 1, InvertCoordinate(AppleCoordinates[k].Y + 1)), new Point(AppleCoordinates[k].X + 1, InvertCoordinate(AppleCoordinates[k].Y)) };
-
-                    
-
-
-
-
+                    Point[] points = new Point[4] { new Point(AppleCoordinates[k].X, InvertCoordinate(AppleCoordinates[k].Y + 1)), new Point(AppleCoordinates[k].X, InvertCoordinate(AppleCoordinates[k].Y)), new Point(AppleCoordinates[k].X + 1, InvertCoordinate(AppleCoordinates[k].Y)), new Point(AppleCoordinates[k].X + 1, InvertCoordinate(AppleCoordinates[k].Y + 1)) };
+                    bool isAppleToRightHead = headCenterX < points[0].X; //яблоко правее головы
+                    bool isAppleToUpHead = InvertCoordinate(headCenterY) < points[0].Y; //яблоко выше головы
+                    bool isAppleToLeftHead = headCenterX > points[2].X; //яблоко левее головы
+                    bool isAppleToDownHead = InvertCoordinate(headCenterY) > points[1].Y; //яблоко ниже головы
 
                     if (isStraightRight || isStraightUp || isStraightLeft || isStraightDown) //если угол - вертикальная или горизонтальная линия, вычисляем расстояние до яблока по прямой
                     {
@@ -336,7 +342,7 @@ namespace NeuralNetworkSnake
                         double distanceToApple = 0;
                         if (isStraightRight) //до правого яблока
                         {
-                            if(InvertCoordinate(headCenterY) > points[0].Y && InvertCoordinate(headCenterY) < points[1].Y && headCenterX < points[0].X)
+                            if(InvertCoordinate(headCenterY) > points[0].Y && InvertCoordinate(headCenterY) < points[1].Y && isAppleToRightHead)
                             {
                                 distanceToApple = points[0].X - headCenterX;
                                 isStraightAppleFind = true;
@@ -344,7 +350,7 @@ namespace NeuralNetworkSnake
                         }
                         if (isStraightUp) //до верхнего яблока
                         {
-                            if (headCenterX > points[0].X && headCenterX < points[2].X && InvertCoordinate(headCenterY) < points[0].Y)
+                            if (headCenterX > points[0].X && headCenterX < points[2].X && isAppleToUpHead)
                             {
                                 distanceToApple = points[0].Y - InvertCoordinate(headCenterY);
                                 isStraightAppleFind = true;
@@ -352,7 +358,7 @@ namespace NeuralNetworkSnake
                         }
                         if (isStraightLeft) //до левого яблока
                         {
-                            if (InvertCoordinate(headCenterY) > points[0].Y && InvertCoordinate(headCenterY) < points[1].Y && headCenterX > points[0].X)
+                            if (InvertCoordinate(headCenterY) > points[0].Y && InvertCoordinate(headCenterY) < points[1].Y && isAppleToLeftHead)
                             {
                                 distanceToApple = headCenterX - points[2].X;
                                 isStraightAppleFind = true;
@@ -360,9 +366,9 @@ namespace NeuralNetworkSnake
                         }
                         if (isStraightDown) //до нижнего яблока
                         {
-                            if (headCenterX > points[0].X && headCenterX < points[2].X && InvertCoordinate(headCenterY) > points[1].Y)
+                            if (headCenterX > points[0].X && headCenterX < points[2].X && isAppleToDownHead)
                             {
-                                distanceToApple = points[0].Y - InvertCoordinate(headCenterY);
+                                distanceToApple = InvertCoordinate(headCenterY) - points[1].Y;
                                 isStraightAppleFind = true;
                             }
                         }
@@ -381,32 +387,53 @@ namespace NeuralNetworkSnake
                     }
                     else //иначе вычисляем расстояние до яблок к которым направлен вектор под углом
                     {
-                        double yVectorForX1 = Math.Tan(Features.DegreeToRadian(angle)) * (points[0].X - headCenterX) + InvertCoordinate(headCenterY); //y=tan(angle)*(x-x0)+y0  -  значение Y для функции линии в точке X
-                        double yVectorForX2 = Math.Tan(Features.DegreeToRadian(angle)) * (points[2].X - headCenterX) + InvertCoordinate(headCenterY);
-                        //если значения вектора для всех X квадрата всегда больше или всегда меньше значений Y квадрата, значит вектор не пересекает квадрат
-                        bool vectorDirection = yVectorForX1 > points[0].Y;
-                        bool isVectorDirectionDifferent = false;
-                        isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[0].Y ? isVectorDirectionDifferent : true;
-                        isVectorDirectionDifferent = vectorDirection == yVectorForX1 > points[1].Y ? isVectorDirectionDifferent : true;
-                        isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[1].Y ? isVectorDirectionDifferent : true;
-                        if (isVectorDirectionDifferent) //пересекли квадрат
+                        bool isAppleReverseToVector = false; //находится ли яблоко в противоположном направлении от вектора. Ведь в этом случае уравнение прямой определит что яблоко лежит на ней
+                        if((isToUpLeft && isAppleToDownHead) || (isToUpLeft && isAppleToRightHead))
                         {
-                            double yVectorForX1Distance = Math.Sqrt(Math.Pow(points[0].X - headCenterX, 2) + Math.Pow(yVectorForX1 - InvertCoordinate(headCenterY), 2));
-                            double yVectorForX2Distance = Math.Sqrt(Math.Pow(points[2].X - headCenterX, 2) + Math.Pow(yVectorForX2 - InvertCoordinate(headCenterY), 2));
-                            double distanceToApple = Math.Min(yVectorForX1Distance, yVectorForX2Distance);
-                            if (isAppleWasFind)
+                            isAppleReverseToVector = true;
+                        }
+                        if ((isToUpRight && isAppleToDownHead) || (isToUpRight && isAppleToLeftHead))
+                        {
+                            isAppleReverseToVector = true;
+                        }
+                        if ((isToDownRight && isAppleToUpHead) || (isToDownRight && isAppleToLeftHead))
+                        {
+                            isAppleReverseToVector = true;
+                        }
+                        if ((isToDownLeft && isAppleToUpHead) || (isToDownLeft && isAppleToRightHead))
+                        {
+                            isAppleReverseToVector = true;
+                        }
+
+                        if (!isAppleReverseToVector) //если вектор и яблоко не в противоположных направлениях проверяем пересекает ли вектор яблоко, иначе пропускаем это яблоко, т.к. формула может дать пересечение с противоположной стороны
+                        {
+                            double yVectorForX1 = Math.Tan(Features.DegreeToRadian(angle)) * (points[0].X - headCenterX) + InvertCoordinate(headCenterY); //y=tan(angle)*(x-x0)+y0  -  значение Y для функции линии в точке X
+                            double yVectorForX2 = Math.Tan(Features.DegreeToRadian(angle)) * (points[2].X - headCenterX) + InvertCoordinate(headCenterY);
+                            //если значения вектора для всех X квадрата всегда больше или всегда меньше значений Y квадрата, значит вектор не пересекает квадрат
+                            bool vectorDirection = yVectorForX1 > points[0].Y;
+                            bool isVectorDirectionDifferent = false;
+                            isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[0].Y ? isVectorDirectionDifferent : true;
+                            isVectorDirectionDifferent = vectorDirection == yVectorForX1 > points[1].Y ? isVectorDirectionDifferent : true;
+                            isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[1].Y ? isVectorDirectionDifferent : true;
+                            if (isVectorDirectionDifferent) //пересекли квадрат
                             {
-                                minDistanceToApple = Math.Min(minDistanceToApple, distanceToApple);
+                                double yVectorForX1Distance = Math.Sqrt(Math.Pow(points[0].X - headCenterX, 2) + Math.Pow(yVectorForX1 - InvertCoordinate(headCenterY), 2));
+                                double yVectorForX2Distance = Math.Sqrt(Math.Pow(points[2].X - headCenterX, 2) + Math.Pow(yVectorForX2 - InvertCoordinate(headCenterY), 2));
+                                double distanceToApple = Math.Min(yVectorForX1Distance, yVectorForX2Distance);
+                                if (isAppleWasFind)
+                                {
+                                    minDistanceToApple = Math.Min(minDistanceToApple, distanceToApple);
+                                }
+                                else
+                                {
+                                    minDistanceToApple = distanceToApple;
+                                }
+                                isAppleWasFind = true;
                             }
-                            else
-                            {
-                                minDistanceToApple = distanceToApple;
-                            }
-                            isAppleWasFind = true;
                         }
                     }
                 }
-                inputs[angles.Length + i] = isAppleWasFind ? (float)(1 / minDistanceToApple) : 0;
+                inputs[angles.Length + i] = isAppleWasFind ? (float)(1 / (Math.Abs(minDistanceToApple) - 0.5 + 1)) : 0;
 
                 //расстояние до ближайшего хвоста
                 double minDistanceToTail = 0;
@@ -414,7 +441,7 @@ namespace NeuralNetworkSnake
                 for (int k = 0; k < SnakeCoordinates.Count - 1; k++)
                 {
                     //координаты 4 вершин тела змейки
-                    Point[] points = new Point[4] { new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y)), new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y + 1)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y + 1)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y)) };
+                    Point[] points = new Point[4] { new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y + 1)), new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y + 1)) };
 
                     double yVectorForX1 = Math.Tan(Features.DegreeToRadian(angle)) * (points[0].X - headCenterX) + InvertCoordinate(headCenterY); //y=tan(angle)*(x-x0)+y0
                     double yVectorForX2 = Math.Tan(Features.DegreeToRadian(angle)) * (points[2].X - headCenterX) + InvertCoordinate(headCenterY);
@@ -440,7 +467,7 @@ namespace NeuralNetworkSnake
                         isTailWasFind = true;
                     }
                 }
-                inputs[angles.Length * 2 + i] = isTailWasFind ? (float)(1 / minDistanceToTail) : 0;
+                inputs[angles.Length * 2 + i] = isTailWasFind ? (float)(1 / (Math.Abs(minDistanceToTail) - 0.5 + 1)) : 0;
             }
             return inputs;
         }
