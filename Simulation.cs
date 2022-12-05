@@ -248,6 +248,25 @@ namespace NeuralNetworkSnake
                         ViewModel.getInstance().Age = Age;
                     }));
                 }
+
+
+
+                for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+                {
+                    if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
+                    {
+                        if (ViewModel.getInstance().IsRealtimeSimulation) //вывод inputs
+                        {
+                            DispatcherInvoke((Action)(() => {
+                                ViewModel.getInstance().UpdateInputsInfo(_gameBoardsGeneticLearning[i].GetInputs());
+                            }));
+                            break;
+                        }
+                    }
+                }
+
+
+
                 UpdateViewModelSnakeAppleCoordinates();
                 Thread.Sleep(PauseMillisecDelay);
             }

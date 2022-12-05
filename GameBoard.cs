@@ -114,6 +114,16 @@ namespace NeuralNetworkSnake
                 int currentY = y;
                 while (!isFind)
                 {
+                    if (currentX >= BoardSize) //если в цикле поиска вперед, мы не нашли, возвращаемся к стартовой координате
+                    {
+                        currentX = x;
+                        currentY = y;
+                    }
+                    if (currentX < 0) //если в цикле поиска назад, мы не нашли, возвращаемся к стартовой координате
+                    {
+                        currentX = x;
+                        currentY = y;
+                    }
                     if (direction)
                     {
                         while (!isFind && currentX < BoardSize)
@@ -146,7 +156,7 @@ namespace NeuralNetworkSnake
                                 currentY--;
                                 if (currentY < 0)
                                 {
-                                    currentY = 0;
+                                    currentY = BoardSize - 1;
                                     currentX--;
                                 }
                             }
@@ -305,7 +315,7 @@ namespace NeuralNetworkSnake
                         distanceToWall = Math.Min(distanceToDown, distanceToLeft);
                     }
                 }
-                inputs[i] = (float)(1 / (distanceToWall - 0.5 + 1)); //-0.5 потому что мы считаем расстояние из середины клетки, то есть оно получается на 0.5 больше. +1 потому что на расстоянии 0 значение активации должно быть 1, а для этого нужно прибавить 1, т.к. иначе будет деление на 0 и получится бесконечность
+                inputs[i] = (float)(1 / (distanceToWall - 0.5 + 1/**/)); //-0.5 потому что мы считаем расстояние из середины клетки, то есть оно получается на 0.5 больше. +1 потому что на расстоянии 0 значение активации должно быть 1, а для этого нужно прибавить 1, т.к. иначе будет деление на 0 и получится бесконечность
 
                 //расстояние до ближайшего яблока
                 double minDistanceToApple = 0;
@@ -390,6 +400,9 @@ namespace NeuralNetworkSnake
 
                         if (!isAppleReverseToVector) //если вектор и яблоко не в противоположных направлениях проверяем пересекает ли вектор яблоко, иначе пропускаем это яблоко, т.к. формула может дать пересечение с противоположной стороны
                         {
+                            double xVectorForY1 = (points[0].Y - InvertCoordinate(headCenterY)) / Math.Tan(Features.DegreeToRadian(angle)) + headCenterX; //x=(y-y0)/tan(angle)+x0  -  значение X для функции линии в точке Y
+                            double xVectorForY2 = (points[1].Y - InvertCoordinate(headCenterY)) / Math.Tan(Features.DegreeToRadian(angle)) + headCenterX;
+
                             double yVectorForX1 = Math.Tan(Features.DegreeToRadian(angle)) * (points[0].X - headCenterX) + InvertCoordinate(headCenterY); //y=tan(angle)*(x-x0)+y0  -  значение Y для функции линии в точке X
                             double yVectorForX2 = Math.Tan(Features.DegreeToRadian(angle)) * (points[2].X - headCenterX) + InvertCoordinate(headCenterY);
                             //если значения вектора для всех X квадрата всегда больше или всегда меньше значений Y квадрата, значит вектор не пересекает квадрат
@@ -400,9 +413,58 @@ namespace NeuralNetworkSnake
                             isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[1].Y ? isVectorDirectionDifferent : true;
                             if (isVectorDirectionDifferent) //пересекли квадрат
                             {
+                                //мы вычислили координаты точек вектора под углом angle, в которых этот вектор пересекает 4 линии квадрата: верхнюю горизонтальную линию (xVectorForY2), нижнюю горизонтальную (xVectorForY1), левую вертикальную (yVectorForX1) и правую вертиальную (yVectorForX2)
+                                //теперь нам нужно найти минимальную дистанцию от начала вектора до этих точек, среди тех точек которые лежат в координатах квадрата
+
+                                double xVectorForY1Distance = Math.Sqrt(Math.Pow(xVectorForY1 - headCenterX, 2) + Math.Pow(points[0].Y - InvertCoordinate(headCenterY), 2));
+                                double xVectorForY2Distance = Math.Sqrt(Math.Pow(xVectorForY2 - headCenterX, 2) + Math.Pow(points[1].Y - InvertCoordinate(headCenterY), 2));
+
                                 double yVectorForX1Distance = Math.Sqrt(Math.Pow(points[0].X - headCenterX, 2) + Math.Pow(yVectorForX1 - InvertCoordinate(headCenterY), 2));
                                 double yVectorForX2Distance = Math.Sqrt(Math.Pow(points[2].X - headCenterX, 2) + Math.Pow(yVectorForX2 - InvertCoordinate(headCenterY), 2));
-                                double distanceToApple = Math.Min(yVectorForX1Distance, yVectorForX2Distance);
+
+                                bool isDistanceInit = false;
+                                double distanceToApple = xVectorForY2Distance;
+                                if(xVectorForY2 >= points[0].X && xVectorForY2 <= points[2].X) //находится ли X координата на верхней горизонтальной линии в пределах координат квадрата
+                                {
+                                    isDistanceInit = true;
+                                }
+                                if (xVectorForY1 >= points[0].X && xVectorForY1 <= points[2].X) //находится ли X координата на нижней горизонтальной линии в пределах координат квадрата
+                                {
+                                    if (isDistanceInit)
+                                    {
+                                        distanceToApple = Math.Min(distanceToApple, xVectorForY1Distance);
+                                    }
+                                    else
+                                    {
+                                        distanceToApple = xVectorForY1Distance;
+                                        isDistanceInit = true;
+                                    }
+                                }
+                                if (yVectorForX1 >= points[0].Y && yVectorForX1 <= points[1].Y) //находится ли Y координата на левой вертикальной линии в пределах координат квадрата
+                                {
+                                    if (isDistanceInit)
+                                    {
+                                        distanceToApple = Math.Min(distanceToApple, yVectorForX1Distance);
+                                    }
+                                    else
+                                    {
+                                        distanceToApple = yVectorForX1Distance;
+                                        isDistanceInit = true;
+                                    }
+                                }
+                                if (yVectorForX2 >= points[0].Y && yVectorForX2 <= points[1].Y) //находится ли Y координата на правой вертикальной линии в пределах координат квадрата
+                                {
+                                    if (isDistanceInit)
+                                    {
+                                        distanceToApple = Math.Min(distanceToApple, yVectorForX2Distance);
+                                    }
+                                    else
+                                    {
+                                        distanceToApple = yVectorForX2Distance;
+                                        isDistanceInit = true;
+                                    }
+                                }
+
                                 if (isAppleWasFind)
                                 {
                                     minDistanceToApple = Math.Min(minDistanceToApple, distanceToApple);
@@ -421,9 +483,15 @@ namespace NeuralNetworkSnake
                 //расстояние до ближайшего хвоста
                 double minDistanceToTail = 0;
                 bool isTailWasFind = false;
-                for (int k = 0; k < SnakeCoordinates.Count; k++)
+
+                if (ViewModel.getInstance().RealtimeDelay == 500)
                 {
-                    //координаты 4 вершин квадрата яблока
+                    int y = 0;
+                }
+
+                for (int k = 0; k < SnakeCoordinates.Count - 1; k++)
+                {
+                    //координаты 4 вершин квадрата хвоста
                     Point[] points = new Point[4] { new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y + 1)), new Point(SnakeCoordinates[k].X, InvertCoordinate(SnakeCoordinates[k].Y)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y)), new Point(SnakeCoordinates[k].X + 1, InvertCoordinate(SnakeCoordinates[k].Y + 1)) };
                     bool isTailToRightHead = headCenterX < points[0].X; //хвост правее головы
                     bool isTailToUpHead = InvertCoordinate(headCenterY) < points[0].Y; //хвост выше головы
@@ -501,6 +569,9 @@ namespace NeuralNetworkSnake
 
                         if (!isTailReverseToVector) //если вектор и хвост не в противоположных направлениях проверяем пересекает ли вектор хвост, иначе пропускаем этот хвост, т.к. формула может дать пересечение с противоположной стороны
                         {
+                            double xVectorForY1 = (points[0].Y - InvertCoordinate(headCenterY)) / Math.Tan(Features.DegreeToRadian(angle)) + headCenterX; //x=(y-y0)/tan(angle)+x0  -  значение X для функции линии в точке Y
+                            double xVectorForY2 = (points[1].Y - InvertCoordinate(headCenterY)) / Math.Tan(Features.DegreeToRadian(angle)) + headCenterX;
+
                             double yVectorForX1 = Math.Tan(Features.DegreeToRadian(angle)) * (points[0].X - headCenterX) + InvertCoordinate(headCenterY); //y=tan(angle)*(x-x0)+y0  -  значение Y для функции линии в точке X
                             double yVectorForX2 = Math.Tan(Features.DegreeToRadian(angle)) * (points[2].X - headCenterX) + InvertCoordinate(headCenterY);
                             //если значения вектора для всех X квадрата всегда больше или всегда меньше значений Y квадрата, значит вектор не пересекает квадрат
@@ -511,9 +582,58 @@ namespace NeuralNetworkSnake
                             isVectorDirectionDifferent = vectorDirection == yVectorForX2 > points[1].Y ? isVectorDirectionDifferent : true;
                             if (isVectorDirectionDifferent) //пересекли квадрат
                             {
+                                //мы вычислили координаты точек вектора под углом angle, в которых этот вектор пересекает 4 линии квадрата: верхнюю горизонтальную линию (xVectorForY2), нижнюю горизонтальную (xVectorForY1), левую вертикальную (yVectorForX1) и правую вертиальную (yVectorForX2)
+                                //теперь нам нужно найти минимальную дистанцию от начала вектора до этих точек, среди тех точек которые лежат в координатах квадрата
+
+                                double xVectorForY1Distance = Math.Sqrt(Math.Pow(xVectorForY1 - headCenterX, 2) + Math.Pow(points[0].Y - InvertCoordinate(headCenterY), 2));
+                                double xVectorForY2Distance = Math.Sqrt(Math.Pow(xVectorForY2 - headCenterX, 2) + Math.Pow(points[1].Y - InvertCoordinate(headCenterY), 2));
+
                                 double yVectorForX1Distance = Math.Sqrt(Math.Pow(points[0].X - headCenterX, 2) + Math.Pow(yVectorForX1 - InvertCoordinate(headCenterY), 2));
                                 double yVectorForX2Distance = Math.Sqrt(Math.Pow(points[2].X - headCenterX, 2) + Math.Pow(yVectorForX2 - InvertCoordinate(headCenterY), 2));
-                                double distanceToTail = Math.Min(yVectorForX1Distance, yVectorForX2Distance);
+
+                                bool isDistanceInit = false;
+                                double distanceToTail = xVectorForY2Distance;
+                                if (xVectorForY2 >= points[0].X && xVectorForY2 <= points[2].X) //находится ли X координата на верхней горизонтальной линии в пределах координат квадрата
+                                {
+                                    isDistanceInit = true;
+                                }
+                                if (xVectorForY1 >= points[0].X && xVectorForY1 <= points[2].X) //находится ли X координата на нижней горизонтальной линии в пределах координат квадрата
+                                {
+                                    if (isDistanceInit)
+                                    {
+                                        distanceToTail = Math.Min(distanceToTail, xVectorForY1Distance);
+                                    }
+                                    else
+                                    {
+                                        distanceToTail = xVectorForY1Distance;
+                                        isDistanceInit = true;
+                                    }
+                                }
+                                if (yVectorForX1 >= points[0].Y && yVectorForX1 <= points[1].Y) //находится ли Y координата на левой вертикальной линии в пределах координат квадрата
+                                {
+                                    if (isDistanceInit)
+                                    {
+                                        distanceToTail = Math.Min(distanceToTail, yVectorForX1Distance);
+                                    }
+                                    else
+                                    {
+                                        distanceToTail = yVectorForX1Distance;
+                                        isDistanceInit = true;
+                                    }
+                                }
+                                if (yVectorForX2 >= points[0].Y && yVectorForX2 <= points[1].Y) //находится ли Y координата на правой вертикальной линии в пределах координат квадрата
+                                {
+                                    if (isDistanceInit)
+                                    {
+                                        distanceToTail = Math.Min(distanceToTail, yVectorForX2Distance);
+                                    }
+                                    else
+                                    {
+                                        distanceToTail = yVectorForX2Distance;
+                                        isDistanceInit = true;
+                                    }
+                                }
+
                                 if (isTailWasFind)
                                 {
                                     minDistanceToTail = Math.Min(minDistanceToTail, distanceToTail);

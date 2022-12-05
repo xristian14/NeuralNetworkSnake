@@ -69,6 +69,7 @@
     <Compile Include="Features.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="GeneticLearning.cs" />
+    <Compile Include="LeaderboardItem.cs" />
     <Compile Include="LightweightMatrixCSharp\Matrix.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="NeuralNetworkUnit.cs" />

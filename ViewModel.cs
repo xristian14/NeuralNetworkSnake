@@ -241,12 +241,35 @@ namespace NeuralNetworkSnake
         {
             BoardCells.Clear();
             int boardSize = int.Parse(BoardSize);
-            for(int i = 0; i < boardSize; i++)
+            for (int i = 0; i < boardSize; i++)
             {
-                for(int k = 0; k < boardSize; k++)
+                for (int k = 0; k < boardSize; k++)
                 {
                     BoardCells.Add(new BoardCell(BoardCellSize));
                 }
+            }
+        }
+
+        private ObservableCollection<string> _inputsInfo = new ObservableCollection<string>();
+        public ObservableCollection<string> InputsInfo
+        {
+            get { return _inputsInfo; }
+            set
+            {
+                _inputsInfo = value;
+                OnPropertyChanged();
+            }
+        }
+        public void UpdateInputsInfo(Vector<float> inputs)
+        {
+            InputsInfo.Clear();
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                if(i == 0 || i == inputs.Count / 3 || i== inputs.Count / 3 * 2)
+                {
+                    InputsInfo.Add("");
+                }
+                InputsInfo.Add(inputs[i].ToString());
             }
         }
 
@@ -267,6 +290,16 @@ namespace NeuralNetworkSnake
             set
             {
                 _applesForRenders = value;
+                OnPropertyChanged();
+            }
+        }
+        private ObservableCollection<LeaderboardItem> _leaderboard = new ObservableCollection<LeaderboardItem>();
+        public ObservableCollection<LeaderboardItem> Leaderboard
+        {
+            get { return _leaderboard; }
+            set
+            {
+                _leaderboard = value;
                 OnPropertyChanged();
             }
         }
