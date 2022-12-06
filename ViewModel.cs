@@ -29,7 +29,7 @@ namespace NeuralNetworkSnake
         }
         
         private Simulation _simulation;
-        private int _hiddenLayersCount = 1;
+        private int _hiddenLayersCount = 2;
         public int HiddenLayersCount
         {
             get { return _hiddenLayersCount; }
@@ -39,7 +39,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _firstHiddenLayerCountNeurons = "20";
+        private string _firstHiddenLayerCountNeurons = "26";
         public string FirstHiddenLayerCountNeurons
         {
             get { return _firstHiddenLayerCountNeurons; }
@@ -52,7 +52,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _secondHiddenLayerCountNeurons = "20";
+        private string _secondHiddenLayerCountNeurons = "13";
         public string SecondHiddenLayerCountNeurons
         {
             get { return _secondHiddenLayerCountNeurons; }
@@ -128,7 +128,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _boardSize = "13";
+        private string _boardSize = "10";
         public string BoardSize
         {
             get { return _boardSize; }

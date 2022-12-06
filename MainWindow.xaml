@@ -35,7 +35,7 @@
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="270"/>
+                <ColumnDefinition Width="280"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
@@ -66,7 +66,6 @@
                             </TabItem.Header>
                             <TabItem.Content>
                                 <StackPanel Orientation="Vertical">
-
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Размер популяции" Margin="6 0 0 0"/>
                                         <TextBox Text="{Binding PopulationSize}" Width="30" Margin="6 0 6 0"/>
@@ -76,7 +75,7 @@
                                         <TextBox Text="{Binding MutationPercent}" Width="30" Margin="6 0 6 0"/>
                                     </StackPanel>
                                     <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
-                                    <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="200" Margin="6 3 6 4">
+                                    <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="160" Margin="6 3 6 4">
                                         <ListView.ItemContainerStyle>
                                             <Style TargetType="ListViewItem">
                                                 <Setter Property="Focusable" Value="False"/>
@@ -84,7 +83,7 @@
                                         </ListView.ItemContainerStyle>
                                         <ListView.View>
                                             <GridView>
-                                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="75"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="85"/>
                                                 <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
                                                 <GridViewColumn DisplayMemberBinding="{Binding LostMoves}" Header="Остаток ходов" Width="83"/>
                                             </GridView>
@@ -130,12 +129,17 @@
                 </StackPanel>
                 <StackPanel Grid.Row="1" Orientation="Vertical" Background="#FFEBCEFF">
                     <TextBlock Text="Лучшие результаты" HorizontalAlignment="Center" Margin="0 2 0 0"/>
-                    <ListView Grid.Row="2" ItemsSource="{Binding AlgorithmParametersView, Mode=OneWay}" SelectedItem="{Binding SelectedAlgorithmParameterView, Mode=TwoWay}" SelectionMode="Single" Height="150" Margin="6 3 6 0">
+                    <ListView Grid.Row="2" ItemsSource="{Binding Leaderboardd}" Height="130" Margin="6 3 6 4">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Focusable" Value="False"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Счёт" Width="80"/>
-                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Яблок" Width="50"/>
-                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Поколение" Width="80"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="85"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding LostMoves}" Header="Поколение" Width="83"/>
                             </GridView>
                         </ListView.View>
                     </ListView>

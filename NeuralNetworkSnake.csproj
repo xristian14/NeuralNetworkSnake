@@ -68,6 +68,7 @@
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="Features.cs" />
     <Compile Include="GameBoard.cs" />
+    <Compile Include="GenerationLeaderboardItem.cs" />
     <Compile Include="GeneticLearning.cs" />
     <Compile Include="LeaderboardItem.cs" />
     <Compile Include="LightweightMatrixCSharp\Matrix.cs" />
