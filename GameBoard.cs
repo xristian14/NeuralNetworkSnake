@@ -25,13 +25,13 @@ namespace NeuralNetworkSnake
             CellsCount = boardSize * boardSize;
             AppleCount = appleCount;
             //генерируем начальную позицию змейки
-            Random random = new Random();
-            SnakeCoordinates.Add(new SnakeCoordinate(random.Next(1, boardSize - 1), random.Next(1, boardSize - 1))); //начальная координата
+            
+            SnakeCoordinates.Add(new SnakeCoordinate(_random.Next(1, boardSize - 1), _random.Next(1, boardSize - 1))); //начальная координата
 
             int nextX = SnakeCoordinates[0].X;
             int nextY = SnakeCoordinates[0].Y;
             BoardCellsInfo[nextX, nextY].IsSnake = true;
-            int direction = random.Next(0, 3);
+            int direction = _random.Next(0, 3);
             switch (direction) //направление от начальной координаты
             {
                 case 0: //направо
@@ -56,15 +56,24 @@ namespace NeuralNetworkSnake
                 AppleGenerate();
             }
             Score = _oneStepScore;
-            _appleScoreReduceMaxSteps = (int)Math.Round(boardSize * 2.5);
+            _appleScoreReduceMaxSteps = (int)Math.Round(boardSize * 3.0);
             _maxStepsWithoutApples = (int)Math.Round((double)boardSize * boardSize);
         }
-        private double _oneStepScore = 0.001;
+        Random _random = new Random();
+        private double _oneStepScore = 0.05;
         private int _stepsWithoutApples = 0;
+        public int StepsWithoutApples
+        {
+            get { return _stepsWithoutApples; }
+        }
         private int _maxStepsWithoutApples = 0;
+        public int MaxStepsWithoutApples
+        {
+            get { return _maxStepsWithoutApples; }
+        }
         private double _appleScore = 1; //базовая стоимость съеденного яблока
         private int _appleScoreReduceMaxSteps = 0; //количество шагов, на котором стоимость яблока будет максимально уменьшена
-        private double _appleScoreReduce = 0.4; //величина от стоимости яблока, на которое уменьшится его стоимость при количестве шагов _appleScoreReduceMaxSteps
+        private double _appleScoreReduce = 0.5; //величина от стоимости яблока, на которое уменьшится его стоимость при количестве шагов _appleScoreReduceMaxSteps
         private double _score;
         public double Score
         {
@@ -483,11 +492,6 @@ namespace NeuralNetworkSnake
                 //расстояние до ближайшего хвоста
                 double minDistanceToTail = 0;
                 bool isTailWasFind = false;
-
-                if (ViewModel.getInstance().RealtimeDelay == 500)
-                {
-                    int y = 0;
-                }
 
                 for (int k = 0; k < SnakeCoordinates.Count - 1; k++)
                 {

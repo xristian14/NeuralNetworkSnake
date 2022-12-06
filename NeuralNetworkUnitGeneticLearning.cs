@@ -15,5 +15,6 @@ namespace NeuralNetworkSnake
         }
         public NeuralNetworkUnit NeuralNetworkUnit;
         public double Rating;
+        public int ApplesCount;
     }
 }

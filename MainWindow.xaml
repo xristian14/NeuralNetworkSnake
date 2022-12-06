@@ -76,7 +76,7 @@
                                         <TextBox Text="{Binding MutationPercent}" Width="30" Margin="6 0 6 0"/>
                                     </StackPanel>
                                     <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
-                                    <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="100" Margin="6 3 6 4">
+                                    <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="200" Margin="6 3 6 4">
                                         <ListView.ItemContainerStyle>
                                             <Style TargetType="ListViewItem">
                                                 <Setter Property="Focusable" Value="False"/>
@@ -84,9 +84,9 @@
                                         </ListView.ItemContainerStyle>
                                         <ListView.View>
                                             <GridView>
-                                                <GridViewColumn DisplayMemberBinding="{Binding Score}" Header="Счёт" Width="80"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding ApplesCount}" Header="Яблок" Width="50"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding LostMoves}" Header="Остаток ходов" Width="85"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="75"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding LostMoves}" Header="Остаток ходов" Width="83"/>
                                             </GridView>
                                         </ListView.View>
                                     </ListView>

@@ -18,13 +18,13 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private int _applesCount;
-        public int ApplesCount
+        private int _eatenApples;
+        public int EatenApples
         {
-            get { return _applesCount; }
+            get { return _eatenApples; }
             set
             {
-                _applesCount = value;
+                _eatenApples = value;
                 OnPropertyChanged();
             }
         }

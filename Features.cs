@@ -66,5 +66,19 @@ namespace NeuralNetworkSnake
         {
             return Math.Max(0, value);
         }
+        public static int IndexOf<T>(IEnumerable<T> collection, T value)
+        {
+            int index = 0;
+            var comparer = EqualityComparer<T>.Default;
+            foreach(T item in collection)
+            {
+                if (comparer.Equals(item, value))
+                {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        }
     }
 }

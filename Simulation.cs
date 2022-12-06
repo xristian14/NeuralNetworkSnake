@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace NeuralNetworkSnake
 {
@@ -24,6 +25,9 @@ namespace NeuralNetworkSnake
                 ViewModel.getInstance().Age = Age;
             }));
             _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+            DispatcherInvoke((Action)(() => {
+                CreateLeaderBoard();
+            }));
         }
         private GeneticLearning _geneticLearning;
         private GameBoard[] _gameBoardsGeneticLearning;
@@ -86,6 +90,26 @@ namespace NeuralNetworkSnake
                 }
             }));
             return gameBoards;
+        }
+        private void CreateLeaderBoard()
+        {
+            ViewModel viewModel = ViewModel.getInstance();
+            viewModel.Leaderboard.Clear();
+            for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+            {
+                viewModel.Leaderboard.Add(new LeaderboardItem { Score = _gameBoardsGeneticLearning[i].Score, EatenApples = _gameBoardsGeneticLearning[i].EatenApples, LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples });
+            }
+        }
+        private void UpdateLeaderBoard()
+        {
+            ViewModel viewModel = ViewModel.getInstance();
+            for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+            {
+                viewModel.Leaderboard[i].Score = _gameBoardsGeneticLearning[i].Score;
+                viewModel.Leaderboard[i].EatenApples = _gameBoardsGeneticLearning[i].EatenApples;
+                viewModel.Leaderboard[i].LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples;
+            }
+            viewModel.Leaderboard = new ObservableCollection<LeaderboardItem>(viewModel.Leaderboard.OrderByDescending(a => a.Score));
         }
         private void UpdateViewModelSnakeAppleCoordinates()
         {
@@ -245,7 +269,14 @@ namespace NeuralNetworkSnake
                     _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
                     Age++;
                     DispatcherInvoke((Action)(() => {
+                        CreateLeaderBoard();
                         ViewModel.getInstance().Age = Age;
+                    }));
+                }
+                else
+                {
+                    DispatcherInvoke((Action)(() => {
+                        UpdateLeaderBoard();
                     }));
                 }
 
