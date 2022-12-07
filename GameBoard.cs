@@ -62,7 +62,7 @@ namespace NeuralNetworkSnake
             _nextAppleScore = _baseAppleScore;
         }
         Random _random = new Random();
-        private double _baseOneStepScore = 0.01; //базовая стоимость шага змейки
+        private double _baseOneStepScore = 0.005; //базовая стоимость шага змейки
         private double _oneStepScoreMultiply = 0.15; //множитель, на который увеличивается стоимость одного шага змейки, при съедении яблока
         private double _nextOneStepScore = 0; //стоимость следующего шага змейки
         private int _stepsWithoutApples = 0; //количество шагов, с момента съедения последнего яблока

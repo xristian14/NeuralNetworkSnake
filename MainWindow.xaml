@@ -69,6 +69,7 @@
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Размер популяции" Margin="6 0 0 0"/>
                                         <TextBox Text="{Binding PopulationSize}" Width="30" Margin="6 0 6 0"/>
+                                        <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
@@ -76,8 +77,12 @@
                                         <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                        <TextBlock Text="Количество тестов для одной нейросети" Margin="6 0 0 0"/>
+                                        <TextBlock Text="Количество тестов в одном поколоении" Margin="6 0 0 0"/>
                                         <TextBox Text="{Binding TestsCount}" Width="30" Margin="6 0 6 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                        <TextBlock Text="Номер теста в текущем поколении" Margin="6 0 0 0"/>
+                                        <TextBlock Text="{Binding CurrentTestNumber}" Margin="6 0 0 0"/>
                                     </StackPanel>
                                     <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
                                     <ListView Grid.Row="2" ItemsSource="{Binding GenerationLeaderboard}" Height="160" Margin="6 3 6 4">
@@ -133,7 +138,7 @@
                     <RadioButton IsChecked="{Binding IsRealtimeSimulation}" GroupName="simulationType" Content="В режиме реального времени" Margin="6 0 6 0"/>
                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                         <TextBlock Text="Задержка между ходами, мс" Margin="6 0 0 0"/>
-                        <Slider Minimum="1" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
+                        <Slider Minimum="10" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
                         <TextBlock Text="{Binding RealtimeDelay}" Margin="4 0 6 0"/>
                     </StackPanel>
                     <RadioButton GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>

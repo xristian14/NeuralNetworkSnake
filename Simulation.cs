@@ -97,7 +97,7 @@ namespace NeuralNetworkSnake
             viewModel.GenerationLeaderboard.Clear();
             for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
             {
-                viewModel.GenerationLeaderboard.Add(new GenerationLeaderboardItem { Score = _gameBoardsGeneticLearning[i].Score, EatenApples = _gameBoardsGeneticLearning[i].EatenApples, LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples });
+                viewModel.GenerationLeaderboard.Add(new GenerationLeaderboardItem { TotalScore = _geneticLearning.Population[i].TotalRating, Score = _gameBoardsGeneticLearning[i].Score, EatenApples = _gameBoardsGeneticLearning[i].EatenApples, LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples });
             }
         }
         private void UpdateGenerationLeaderBoard()
@@ -105,11 +105,17 @@ namespace NeuralNetworkSnake
             ViewModel viewModel = ViewModel.getInstance();
             for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
             {
+                viewModel.GenerationLeaderboard[i].TotalScore = _geneticLearning.Population[i].TotalRating;
                 viewModel.GenerationLeaderboard[i].Score = _gameBoardsGeneticLearning[i].Score;
                 viewModel.GenerationLeaderboard[i].EatenApples = _gameBoardsGeneticLearning[i].EatenApples;
                 viewModel.GenerationLeaderboard[i].LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples;
             }
             viewModel.GenerationLeaderboard = new ObservableCollection<GenerationLeaderboardItem>(viewModel.GenerationLeaderboard.OrderByDescending(a => a.Score));
+        }
+        private void UpdateCurrentTestNumber() //обновляет номер текущего теста для представления
+        {
+            ViewModel viewModel = ViewModel.getInstance();
+            viewModel.CurrentTestNumber = _geneticLearning.CurrentTestNumber.ToString() + "/" + _geneticLearning.TestsCount.ToString();
         }
         private void UpdateViewModelSnakeAppleCoordinates()
         {
@@ -163,7 +169,7 @@ namespace NeuralNetworkSnake
         {
             for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
             {
-                _geneticLearning.Population[i].Rating = _gameBoardsGeneticLearning[i].Score;
+                _geneticLearning.Population[i].TotalRating += _gameBoardsGeneticLearning[i].Score;
             }
         }
         private bool SimulateOneStep()
@@ -247,6 +253,9 @@ namespace NeuralNetworkSnake
         }
         public void RealTimeSimulate()
         {
+            DispatcherInvoke((Action)(() => {
+                UpdateCurrentTestNumber();
+            }));
             IsRunning = true;
             while (IsRunning)
             {
@@ -264,13 +273,24 @@ namespace NeuralNetworkSnake
                 }
                 if (SimulateOneStep())
                 {
+                    _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
                     SetGeneticLearningRating();
-                    _geneticLearning.SpawnNewGeneration();
-                    _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
-                    Age++;
+                    if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                    {
+                        _geneticLearning.SpawnNewGeneration();
+                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                        Age++;
+                        DispatcherInvoke((Action)(() => {
+                            ViewModel.getInstance().Age = Age;
+                        }));
+                    }
+                    else //иначе создаем новые поля для нейронных сетей
+                    {
+                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                    }
                     DispatcherInvoke((Action)(() => {
                         CreateGenerationLeaderBoard();
-                        ViewModel.getInstance().Age = Age;
+                        UpdateCurrentTestNumber();
                     }));
                 }
                 else
@@ -279,8 +299,6 @@ namespace NeuralNetworkSnake
                         UpdateGenerationLeaderBoard();
                     }));
                 }
-
-
 
                 /*for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++) //вывод inputs
                 {
@@ -296,14 +314,15 @@ namespace NeuralNetworkSnake
                     }
                 }*/
 
-
-
                 UpdateViewModelSnakeAppleCoordinates();
                 Thread.Sleep(PauseMillisecDelay);
             }
         }
         public void FixedTimeSimulate()
         {
+            DispatcherInvoke((Action)(() => {
+                UpdateCurrentTestNumber();
+            }));
             IsRunning = true;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -312,15 +331,31 @@ namespace NeuralNetworkSnake
             {
                 if (SimulateOneStep())
                 {
+                    _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
                     SetGeneticLearningRating();
-                    _geneticLearning.SpawnNewGeneration();
-                    _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
-                    Age++;
+                    if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                    {
+                        _geneticLearning.SpawnNewGeneration();
+                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                        Age++;
+                        DispatcherInvoke((Action)(() => {
+                            ViewModel.getInstance().Age = Age;
+                        }));
+                    }
+                    else //иначе создаем новые поля для нейронных сетей
+                    {
+                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                    }
                     DispatcherInvoke((Action)(() => {
-                        ViewModel.getInstance().Age = Age;
+                        UpdateCurrentTestNumber();
                     }));
                 }
-                if(FixedDuration - stopwatch.ElapsedMilliseconds / 1000 != lastRemaining)
+                else
+                {
+
+                }
+
+                if (FixedDuration - stopwatch.ElapsedMilliseconds / 1000 != lastRemaining)
                 {
                     lastRemaining = FixedDuration - stopwatch.ElapsedMilliseconds / 1000;
                     DispatcherInvoke((Action)(() => {

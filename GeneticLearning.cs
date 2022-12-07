@@ -15,7 +15,8 @@ namespace NeuralNetworkSnake
             MutationPercent = mutationPercent;
             NewPopulationSize = populationSize;
             _populationSize = populationSize;
-            _testsCount = testsCount;
+            TestsCount = testsCount;
+            CurrentTestNumber = 1;
             Population = new NeuralNetworkUnitGeneticLearning[_populationSize];
             for(int i = 0; i < _populationSize; i++)
             {
@@ -38,7 +39,22 @@ namespace NeuralNetworkSnake
             get { lock (locker) { return _newPopulationSize; } }
             private set { lock (locker) { _newPopulationSize = value; } }
         }
-        private int _testsCount;
+        private int _testsCount; //количество тестов для одной нейросети, нужно чтобы провести несколько тестов для одной змейки, и на основе общего результата за все тесты выбирать пары для скрещивания. Один удачный тест может лишить потомства более совершенную нейронную сеть, у которой тест сложился неудачно
+        public int TestsCount
+        {
+            get { return _testsCount; }
+            private set { _testsCount = value; }
+        }
+        private int _currentTestNumber; //номер текущего теста
+        public int CurrentTestNumber
+        {
+            get { return _currentTestNumber; }
+            private set { _currentTestNumber = value; }
+        }
+        public void CurrentTestNumberIncrement()
+        {
+            CurrentTestNumber++;
+        }
         public NeuralNetworkUnitGeneticLearning[] Population;
         public int GetPopulationSize()
         {
@@ -58,7 +74,7 @@ namespace NeuralNetworkSnake
             double[] populationRatings = new double[_populationSize];
             for(int i = 0; i < _populationSize; i++)
             {
-                populationRatings[i] = Population[i].Rating;
+                populationRatings[i] = Population[i].TotalRating;
             }
             double[] softMaxRatings = Features.SoftMaxVector(populationRatings);
             //генерируем новую популяцию
@@ -86,6 +102,7 @@ namespace NeuralNetworkSnake
                 newPopulation[i] = new NeuralNetworkUnitGeneticLearning(Crossing(Population[indexFirstParent].NeuralNetworkUnit, Population[indexSecondParent].NeuralNetworkUnit));
             }
             Population = newPopulation;
+            CurrentTestNumber = 1;
         }
         private NeuralNetworkUnit Crossing(NeuralNetworkUnit parent1, NeuralNetworkUnit parent2)
         {

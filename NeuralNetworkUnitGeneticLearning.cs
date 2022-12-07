@@ -11,10 +11,9 @@ namespace NeuralNetworkSnake
         public NeuralNetworkUnitGeneticLearning(NeuralNetworkUnit neuralNetworkUnit)
         {
             NeuralNetworkUnit = neuralNetworkUnit;
-            Rating = 0;
+            TotalRating = 0;
         }
         public NeuralNetworkUnit NeuralNetworkUnit;
-        public double Rating;
-        public int ApplesCount;
+        public double TotalRating; //общий счет за все тесты
     }
 }

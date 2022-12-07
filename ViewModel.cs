@@ -323,7 +323,14 @@ namespace NeuralNetworkSnake
             {
                 if(int.TryParse(value, out int res))
                 {
-                    _populationSize = value;
+                    if(res > 0)
+                    {
+                        _populationSize = value;
+                        if (_simulation != null)
+                        {
+                            _simulation.SetPopulationSize(res);
+                        }
+                    }
                 }
                 OnPropertyChanged();
             }
@@ -336,10 +343,13 @@ namespace NeuralNetworkSnake
             {
                 if (double.TryParse(value, out double res))
                 {
-                    _mutationPercent = value;
-                    if(_simulation != null)
+                    if(res >= 0 && res <= 100)
                     {
-                        _simulation.SetMutationPercent(res);
+                        _mutationPercent = value;
+                        if (_simulation != null)
+                        {
+                            _simulation.SetMutationPercent(res);
+                        }
                     }
                 }
                 OnPropertyChanged();
@@ -353,8 +363,21 @@ namespace NeuralNetworkSnake
             {
                 if (int.TryParse(value, out int res))
                 {
-                    _testsCount = value;
+                    if(res > 0)
+                    {
+                        _testsCount = value;
+                    }
                 }
+                OnPropertyChanged();
+            }
+        }
+        private string _сurrentTestNumber = "0";
+        public string CurrentTestNumber //номер теста в текущем поколении
+        {
+            get { return _сurrentTestNumber; }
+            set
+            {
+                _сurrentTestNumber = value;
                 OnPropertyChanged();
             }
         }
