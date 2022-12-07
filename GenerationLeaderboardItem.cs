@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,16 @@ namespace NeuralNetworkSnake
 {
     class GenerationLeaderboardItem : ViewModelBase
     {
+        private double _totalScore;
+        public double TotalScore
+        {
+            get { return _totalScore; }
+            set
+            {
+                _totalScore = value;
+                OnPropertyChanged();
+            }
+        }
         private double _score;
         public double Score
         {

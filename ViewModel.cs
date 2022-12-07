@@ -39,7 +39,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _firstHiddenLayerCountNeurons = "26";
+        private string _firstHiddenLayerCountNeurons = "24";
         public string FirstHiddenLayerCountNeurons
         {
             get { return _firstHiddenLayerCountNeurons; }
@@ -52,7 +52,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _secondHiddenLayerCountNeurons = "13";
+        private string _secondHiddenLayerCountNeurons = "24";
         public string SecondHiddenLayerCountNeurons
         {
             get { return _secondHiddenLayerCountNeurons; }
@@ -65,7 +65,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _thirdHiddenLayerCountNeurons = "20";
+        private string _thirdHiddenLayerCountNeurons = "24";
         public string ThirdHiddenLayerCountNeurons
         {
             get { return _thirdHiddenLayerCountNeurons; }
@@ -293,6 +293,16 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
+        private ObservableCollection<GenerationLeaderboardItem> _generationLeaderboard = new ObservableCollection<GenerationLeaderboardItem>();
+        public ObservableCollection<GenerationLeaderboardItem> GenerationLeaderboard
+        {
+            get { return _generationLeaderboard; }
+            set
+            {
+                _generationLeaderboard = value;
+                OnPropertyChanged();
+            }
+        }
         private ObservableCollection<LeaderboardItem> _leaderboard = new ObservableCollection<LeaderboardItem>();
         public ObservableCollection<LeaderboardItem> Leaderboard
         {
@@ -305,7 +315,7 @@ namespace NeuralNetworkSnake
         }
 
         /*генетический алгоритм*/
-        private string _populationSize = "50";
+        private string _populationSize = "100";
         public string PopulationSize
         {
             get { return _populationSize; }
@@ -331,6 +341,19 @@ namespace NeuralNetworkSnake
                     {
                         _simulation.SetMutationPercent(res);
                     }
+                }
+                OnPropertyChanged();
+            }
+        }
+        private string _testsCount = "10";
+        public string TestsCount //количество тестов для одной нейросети, нужно чтобы провести несколько тестов для одной змейки, и на основе общего результата за все тесты выбирать пары для скрещивания. Один удачный тест может лишить потомства более совершенную нейронную сеть, у которой тест сложился неудачно
+        {
+            get { return _testsCount; }
+            set
+            {
+                if (int.TryParse(value, out int res))
+                {
+                    _testsCount = value;
                 }
                 OnPropertyChanged();
             }
@@ -362,7 +385,7 @@ namespace NeuralNetworkSnake
 
                     SnakesForRenders.Clear();
                     ApplesForRenders.Clear();
-                    GeneticLearning geneticLearning = new GeneticLearning(populationSize, layers);
+                    GeneticLearning geneticLearning = new GeneticLearning(populationSize, int.Parse(MutationPercent), int.Parse(TestsCount), layers);
                     _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, BoardSizeInt, int.Parse(ApplesCount));
 
                     LayersText = layers[0].ToString();

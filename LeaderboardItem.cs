@@ -6,36 +6,49 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworkSnake
 {
-    class LeaderboardItem : ViewModelBase
+    class LeaderboardItem
     {
+        public LeaderboardItem(double score, int eatenApples, int age, NeuralNetworkUnit neuralNetworkUnit)
+        {
+            Score = score;
+            EatenApples = eatenApples;
+            Age = age;
+            NeuralNetworkUnit = neuralNetworkUnit;
+        }
         private double _score;
         public double Score
         {
             get { return _score; }
-            set
+            private set
             {
                 _score = value;
-                OnPropertyChanged();
             }
         }
         private int _eatenApples;
         public int EatenApples
         {
             get { return _eatenApples; }
-            set
+            private set
             {
                 _eatenApples = value;
-                OnPropertyChanged();
             }
         }
-        private int _lostMoves;
-        public int LostMoves
+        private int _age;
+        public int Age
         {
-            get { return _lostMoves; }
-            set
+            get { return _age; }
+            private set
             {
-                _lostMoves = value;
-                OnPropertyChanged();
+                _age = value;
+            }
+        }
+        private NeuralNetworkUnit _neuralNetworkUnit;
+        public NeuralNetworkUnit NeuralNetworkUnit
+        {
+            get { return _neuralNetworkUnit; }
+            private set
+{
+                _neuralNetworkUnit = value;
             }
         }
     }

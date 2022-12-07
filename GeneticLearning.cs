@@ -9,12 +9,13 @@ namespace NeuralNetworkSnake
 {
     class GeneticLearning
     {
-        public GeneticLearning(int populationSize, int[] layers)
+        public GeneticLearning(int populationSize, int mutationPercent, int testsCount, int[] layers)
         {
             Layers = layers;
-            MutationPercent = 0;
+            MutationPercent = mutationPercent;
             NewPopulationSize = populationSize;
             _populationSize = populationSize;
+            _testsCount = testsCount;
             Population = new NeuralNetworkUnitGeneticLearning[_populationSize];
             for(int i = 0; i < _populationSize; i++)
             {
@@ -37,6 +38,7 @@ namespace NeuralNetworkSnake
             get { lock (locker) { return _newPopulationSize; } }
             private set { lock (locker) { _newPopulationSize = value; } }
         }
+        private int _testsCount;
         public NeuralNetworkUnitGeneticLearning[] Population;
         public int GetPopulationSize()
         {

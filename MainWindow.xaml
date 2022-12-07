@@ -35,7 +35,7 @@
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="365"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
@@ -73,9 +73,14 @@
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
                                         <TextBox Text="{Binding MutationPercent}" Width="30" Margin="6 0 6 0"/>
+                                        <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                        <TextBlock Text="Количество тестов для одной нейросети" Margin="6 0 0 0"/>
+                                        <TextBox Text="{Binding TestsCount}" Width="30" Margin="6 0 6 0"/>
                                     </StackPanel>
                                     <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
-                                    <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="160" Margin="6 3 6 4">
+                                    <ListView Grid.Row="2" ItemsSource="{Binding GenerationLeaderboard}" Height="160" Margin="6 3 6 4">
                                         <ListView.ItemContainerStyle>
                                             <Style TargetType="ListViewItem">
                                                 <Setter Property="Focusable" Value="False"/>
@@ -83,12 +88,31 @@
                                         </ListView.ItemContainerStyle>
                                         <ListView.View>
                                             <GridView>
+                                                <GridViewColumn DisplayMemberBinding="{Binding TotalScore, StringFormat={}{0:0.000}}" Header="Общий счёт" Width="85"/>
                                                 <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="85"/>
                                                 <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
                                                 <GridViewColumn DisplayMemberBinding="{Binding LostMoves}" Header="Остаток ходов" Width="83"/>
                                             </GridView>
                                         </ListView.View>
                                     </ListView>
+                                    <StackPanel Orientation="Vertical" Background="#FFEBCEFF">
+                                        <TextBlock Text="Лучшие результаты" HorizontalAlignment="Center" Margin="0 2 0 0"/>
+                                        <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="130" Margin="6 3 6 4">
+                                            <ListView.ItemContainerStyle>
+                                                <Style TargetType="ListViewItem">
+                                                    <Setter Property="Focusable" Value="False"/>
+                                                </Style>
+                                            </ListView.ItemContainerStyle>
+                                            <ListView.View>
+                                                <GridView>
+                                                    <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:#.###}}" Header="Средний счёт" Width="85"/>
+                                                    <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
+                                                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Поколение" Width="83"/>
+                                                </GridView>
+                                            </ListView.View>
+                                        </ListView>
+                                        <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 4"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </TabItem.Content>
                         </TabItem>
@@ -127,26 +151,8 @@
                         <TextBlock Text="{Binding RemainingTime}" Margin="6 0 6 0" Width="35"/>
                     </StackPanel>
                 </StackPanel>
-                <StackPanel Grid.Row="1" Orientation="Vertical" Background="#FFEBCEFF">
-                    <TextBlock Text="Лучшие результаты" HorizontalAlignment="Center" Margin="0 2 0 0"/>
-                    <ListView Grid.Row="2" ItemsSource="{Binding Leaderboardd}" Height="130" Margin="6 3 6 4">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="Focusable" Value="False"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="85"/>
-                                <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
-                                <GridViewColumn DisplayMemberBinding="{Binding LostMoves}" Header="Поколение" Width="83"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                    <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 0"/>
-                </StackPanel>
             </Grid>
-            <!--Входы нейросети-->
+            <!--Входы нейросети
             <Grid Grid.Column="1" Margin="300 5 0 0" Width="140" HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
@@ -208,7 +214,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </Grid>
+            </Grid>-->
             <!--Поле-->
             <ItemsControl Grid.Column="1" Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
                 <ItemsControl.ItemsPanel>

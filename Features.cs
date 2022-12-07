@@ -36,9 +36,9 @@ namespace NeuralNetworkSnake
             }
             return outputVector;
         }
-        public static double[] SoftMaxVector(double[] inputVector)
+        public static double[] SoftMaxVector(double[] inputVector) //возвращает вектор, сумма значений которого равняется 1
         {
-            double[] outputVector = new double[inputVector.Length];
+            /*double[] outputVector = new double[inputVector.Length];
             double vectorSum = 0;
             for (int i = 0; i < inputVector.Length; i++)
             {
@@ -47,6 +47,13 @@ namespace NeuralNetworkSnake
             for (int i = 0; i < inputVector.Length; i++)
             {
                 outputVector[i] = Math.Pow(Math.E, inputVector[i]) / vectorSum;
+            }
+            return outputVector;*/
+            double[] outputVector = new double[inputVector.Length];
+            double inputVectorSum = inputVector.Sum();
+            for (int i = 0; i < inputVector.Length; i++)
+            {
+                outputVector[i] = inputVector[i] / inputVectorSum;
             }
             return outputVector;
         }
@@ -65,20 +72,6 @@ namespace NeuralNetworkSnake
         public static float ReLuFloat(float value)
         {
             return Math.Max(0, value);
-        }
-        public static int IndexOf<T>(IEnumerable<T> collection, T value)
-        {
-            int index = 0;
-            var comparer = EqualityComparer<T>.Default;
-            foreach(T item in collection)
-            {
-                if (comparer.Equals(item, value))
-                {
-                    return index;
-                }
-                index++;
-            }
-            return -1;
         }
     }
 }

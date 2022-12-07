@@ -26,7 +26,7 @@ namespace NeuralNetworkSnake
             }));
             _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
             DispatcherInvoke((Action)(() => {
-                CreateLeaderBoard();
+                CreateGenerationLeaderBoard();
             }));
         }
         private GeneticLearning _geneticLearning;
@@ -91,25 +91,25 @@ namespace NeuralNetworkSnake
             }));
             return gameBoards;
         }
-        private void CreateLeaderBoard()
+        private void CreateGenerationLeaderBoard()
         {
             ViewModel viewModel = ViewModel.getInstance();
-            viewModel.Leaderboard.Clear();
+            viewModel.GenerationLeaderboard.Clear();
             for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
             {
-                viewModel.Leaderboard.Add(new LeaderboardItem { Score = _gameBoardsGeneticLearning[i].Score, EatenApples = _gameBoardsGeneticLearning[i].EatenApples, LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples });
+                viewModel.GenerationLeaderboard.Add(new GenerationLeaderboardItem { Score = _gameBoardsGeneticLearning[i].Score, EatenApples = _gameBoardsGeneticLearning[i].EatenApples, LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples });
             }
         }
-        private void UpdateLeaderBoard()
+        private void UpdateGenerationLeaderBoard()
         {
             ViewModel viewModel = ViewModel.getInstance();
             for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
             {
-                viewModel.Leaderboard[i].Score = _gameBoardsGeneticLearning[i].Score;
-                viewModel.Leaderboard[i].EatenApples = _gameBoardsGeneticLearning[i].EatenApples;
-                viewModel.Leaderboard[i].LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples;
+                viewModel.GenerationLeaderboard[i].Score = _gameBoardsGeneticLearning[i].Score;
+                viewModel.GenerationLeaderboard[i].EatenApples = _gameBoardsGeneticLearning[i].EatenApples;
+                viewModel.GenerationLeaderboard[i].LostMoves = _gameBoardsGeneticLearning[i].MaxStepsWithoutApples - _gameBoardsGeneticLearning[i].StepsWithoutApples;
             }
-            viewModel.Leaderboard = new ObservableCollection<LeaderboardItem>(viewModel.Leaderboard.OrderByDescending(a => a.Score));
+            viewModel.GenerationLeaderboard = new ObservableCollection<GenerationLeaderboardItem>(viewModel.GenerationLeaderboard.OrderByDescending(a => a.Score));
         }
         private void UpdateViewModelSnakeAppleCoordinates()
         {
@@ -269,24 +269,24 @@ namespace NeuralNetworkSnake
                     _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
                     Age++;
                     DispatcherInvoke((Action)(() => {
-                        CreateLeaderBoard();
+                        CreateGenerationLeaderBoard();
                         ViewModel.getInstance().Age = Age;
                     }));
                 }
                 else
                 {
                     DispatcherInvoke((Action)(() => {
-                        UpdateLeaderBoard();
+                        UpdateGenerationLeaderBoard();
                     }));
                 }
 
 
 
-                for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+                /*for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++) //вывод inputs
                 {
                     if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
                     {
-                        if (ViewModel.getInstance().IsRealtimeSimulation) //вывод inputs
+                        if (ViewModel.getInstance().IsRealtimeSimulation)
                         {
                             DispatcherInvoke((Action)(() => {
                                 ViewModel.getInstance().UpdateInputsInfo(_gameBoardsGeneticLearning[i].GetInputs());
@@ -294,7 +294,7 @@ namespace NeuralNetworkSnake
                             break;
                         }
                     }
-                }
+                }*/
 
 
 
