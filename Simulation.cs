@@ -26,6 +26,7 @@ namespace NeuralNetworkSnake
             }));
             _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
             DispatcherInvoke((Action)(() => {
+                CreateGameBoardForRender();
                 CreateGenerationLeaderBoard();
             }));
         }
@@ -116,6 +117,63 @@ namespace NeuralNetworkSnake
         {
             ViewModel viewModel = ViewModel.getInstance();
             viewModel.CurrentTestNumber = _geneticLearning.CurrentTestNumber.ToString() + "/" + _geneticLearning.TestsCount.ToString();
+        }
+        private void CreateGameBoardForRender()
+        {
+            ViewModel viewModel = ViewModel.getInstance();
+            viewModel.GameBoardsForRender.Clear();
+            viewModel.CreateBoardCells(_gameBoardsGeneticLearning[0].BoardSize);
+            for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+            {
+                viewModel.GameBoardsForRender.Add(new GameBoardForRender(viewModel.BoardCells, new SnakesForRender(), new ApplesForRender()));
+            }
+        }
+        private void UpdateGameBoardForRender()
+        {
+            ViewModel viewModel = ViewModel.getInstance();
+            for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+            {
+                if (!viewModel.GameBoardsForRender[i].SnakesForRender.IsGameOver)
+                {
+                    //viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.Clear();
+                    //viewModel.GameBoardsForRender[i].ApplesForRender.ApplesCoordinates.Clear();
+                    if (_gameBoardsGeneticLearning[i].GetIsGameOver())
+                    {
+                        viewModel.GameBoardsForRender[i].SnakesForRender.IsGameOver = true;
+                    }
+                    //положение змейки
+                    if (_gameBoardsGeneticLearning[i].SnakeCoordinates.Count == viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.Count)
+                    {
+                        int newTop = (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates.Last().Y * viewModel.BoardCellSize);
+                        int newLeft = (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates.Last().X * viewModel.BoardCellSize);
+                        viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.RemoveAt(0);
+                        SnakeForRender snakeForRender = new SnakeForRender(newTop, newLeft, (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
+                        viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.Add(snakeForRender);
+                    }
+                    else
+                    {
+                        while (_gameBoardsGeneticLearning[i].SnakeCoordinates.Count > viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.Count)
+                        {
+                            int index = viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.Count;
+                            SnakeForRender snakeForRender = new SnakeForRender((int)(_gameBoardsGeneticLearning[i].SnakeCoordinates[index].Y * viewModel.BoardCellSize), (int)(_gameBoardsGeneticLearning[i].SnakeCoordinates[index].X * viewModel.BoardCellSize), (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
+                            viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.Add(snakeForRender);
+                        }
+                    }
+                    //положение яблока
+                    viewModel.GameBoardsForRender[i].ApplesForRender.ApplesCoordinates.Clear();
+                    while (_gameBoardsGeneticLearning[i].AppleCoordinates.Count > viewModel.GameBoardsForRender[i].ApplesForRender.ApplesCoordinates.Count)
+                    {
+                        int index = viewModel.GameBoardsForRender[i].ApplesForRender.ApplesCoordinates.Count;
+                        SnakeForRender snakeForRender = new SnakeForRender((int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].Y * viewModel.BoardCellSize), (int)(_gameBoardsGeneticLearning[i].AppleCoordinates[index].X * viewModel.BoardCellSize), (int)viewModel.BoardCellSize, (int)viewModel.BoardCellSize);
+                        viewModel.GameBoardsForRender[i].ApplesForRender.ApplesCoordinates.Add(snakeForRender);
+                    }
+                    if (viewModel.GameBoardsForRender[i].SnakesForRender.IsGameOver)
+                    {
+                        viewModel.GameBoardsForRender[i].SnakesForRender.SnakesCoordinate.Clear();
+                        viewModel.GameBoardsForRender[i].ApplesForRender.ApplesCoordinates.Clear();
+                    }
+                }
+            }
         }
         private void UpdateViewModelSnakeAppleCoordinates()
         {
@@ -289,6 +347,7 @@ namespace NeuralNetworkSnake
                         _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
                     }
                     DispatcherInvoke((Action)(() => {
+                        CreateGameBoardForRender();
                         CreateGenerationLeaderBoard();
                         UpdateCurrentTestNumber();
                     }));
@@ -313,7 +372,9 @@ namespace NeuralNetworkSnake
                         }
                     }
                 }*/
-
+                DispatcherInvoke((Action)(() => {
+                    UpdateGameBoardForRender();
+                }));
                 UpdateViewModelSnakeAppleCoordinates();
                 Thread.Sleep(PauseMillisecDelay);
             }

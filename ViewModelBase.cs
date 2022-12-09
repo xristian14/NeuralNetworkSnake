@@ -19,10 +19,11 @@ namespace NeuralNetworkSnake
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {
-            DispatcherInvoke((Action)(() =>
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-            }));
+            /*DispatcherInvoke((Action)(() =>
+             {
+                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+             }));*/
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
         public Dispatcher _dispatcher;

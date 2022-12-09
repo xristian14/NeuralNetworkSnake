@@ -8,6 +8,8 @@ using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows;
+using System.ComponentModel;
+using System.Collections.Specialized;
 
 namespace NeuralNetworkSnake
 {
@@ -16,8 +18,7 @@ namespace NeuralNetworkSnake
         private static ViewModel _instance;
         private ViewModel()
         {
-            BoardSizeInt = int.Parse(BoardSize);
-            UpdateBoardCells();
+
         }
         public static ViewModel getInstance()
         {
@@ -118,7 +119,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private double _boardCellSize = 14;
+        private double _boardCellSize = 11;
         public double BoardCellSize
         {
             get { return _boardCellSize; }
@@ -148,19 +149,7 @@ namespace NeuralNetworkSnake
                     {
                         _boardSize = 3.ToString();
                     }
-                    BoardSizeInt = int.Parse(_boardSize);
-                    UpdateBoardCells();
                 }
-                OnPropertyChanged();
-            }
-        }
-        private int _boardSizeInt;
-        public int BoardSizeInt
-        {
-            get { return _boardSizeInt; }
-            set
-            {
-                _boardSizeInt = value;
                 OnPropertyChanged();
             }
         }
@@ -237,10 +226,9 @@ namespace NeuralNetworkSnake
             }
         }
 
-        private void UpdateBoardCells()
+        public void CreateBoardCells(int boardSize)
         {
             BoardCells.Clear();
-            int boardSize = int.Parse(BoardSize);
             for (int i = 0; i < boardSize; i++)
             {
                 for (int k = 0; k < boardSize; k++)
@@ -273,6 +261,16 @@ namespace NeuralNetworkSnake
             }
         }
 
+        private ObservableCollection<GameBoardForRender> _gameBoardsForRender = new ObservableCollection<GameBoardForRender>();
+        public ObservableCollection<GameBoardForRender> GameBoardsForRender
+        {
+            get { return _gameBoardsForRender; }
+            set
+            {
+                _gameBoardsForRender = value;
+                OnPropertyChanged();
+            }
+        }
         private ObservableCollection<SnakesForRender> _snakesForRenders = new ObservableCollection<SnakesForRender>();
         public ObservableCollection<SnakesForRender> SnakesForRenders
         {
@@ -409,7 +407,7 @@ namespace NeuralNetworkSnake
                     SnakesForRenders.Clear();
                     ApplesForRenders.Clear();
                     GeneticLearning geneticLearning = new GeneticLearning(populationSize, int.Parse(MutationPercent), int.Parse(TestsCount), layers);
-                    _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, BoardSizeInt, int.Parse(ApplesCount));
+                    _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
 
                     LayersText = layers[0].ToString();
                     for (int i = 1; i < layers.Length; i++)

@@ -219,8 +219,107 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </Grid>-->
-            <!--Поле-->
+            </Grid>
+            <WrapPanel Grid.Column="1" HorizontalAlignment="Left">
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
+            </WrapPanel>-->
+            <Grid Grid.Column="1" Visibility="Visible">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="18"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" x:Name="helper0"/>
+            </Grid>
+            <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
+                <ItemsControl ItemsSource="{Binding GameBoardsForRender}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="5 5 0 0">
+                                <!--Поле-->
+                                <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <!--Змейки-->
+                                <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRender.SnakesCoordinate}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl>
+                                                <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#FF494949"/>
+                                            </ItemsControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                </ItemsControl>
+                                <!--Яблоки-->
+                                <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRender.ApplesCoordinates}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl>
+                                                <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="#FFFF6565"/>
+                                            </ItemsControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                </ItemsControl>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Width="{Binding ElementName=helper0, Path=ActualWidth}"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ScrollViewer>
+            
+            <!--Поле
             <ItemsControl Grid.Column="1" Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -232,8 +331,8 @@
                         <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <!--Змейки-->
+            </ItemsControl>-->
+            <!--Змейки
             <ItemsControl Grid.Column="1" Margin="10 10 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRenders}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -264,8 +363,8 @@
                         </ItemsControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <!--Яблоки-->
+            </ItemsControl>-->
+            <!--Яблоки
             <ItemsControl Grid.Column="1" Margin="10 10 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRenders}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -296,7 +395,7 @@
                         </ItemsControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            </ItemsControl>-->
         </Grid>
     </Grid>
 </Window>

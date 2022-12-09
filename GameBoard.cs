@@ -63,7 +63,7 @@ namespace NeuralNetworkSnake
         }
         Random _random = new Random();
         private double _baseOneStepScore = 0.005; //базовая стоимость шага змейки
-        private double _oneStepScoreMultiply = 0.15; //множитель, на который увеличивается стоимость одного шага змейки, при съедении яблока
+        private double _oneStepScoreMultiply = 0.1; //множитель, на который увеличивается стоимость одного шага змейки, при съедении яблока
         private double _nextOneStepScore = 0; //стоимость следующего шага змейки
         private int _stepsWithoutApples = 0; //количество шагов, с момента съедения последнего яблока
         public int StepsWithoutApples
@@ -76,7 +76,7 @@ namespace NeuralNetworkSnake
             get { return _maxStepsWithoutApples; }
         }
         private double _baseAppleScore = 1; //базовая стоимость съеденного яблока
-        private double _appleScoreMultiply = 0.15; //множитель, на который увеличивается стоимость следующего яблока
+        private double _appleScoreMultiply = 0.1; //множитель, на который увеличивается стоимость следующего яблока
         private double _nextAppleScore = 0; //стоимость следующего съеденного яблока
         private int _appleScoreReduceMaxSteps = 0; //количество шагов, на котором стоимость яблока будет максимально уменьшена
         private double _appleScoreReduce = 0; //величина от стоимости яблока, на которое уменьшится его стоимость при количестве шагов _appleScoreReduceMaxSteps
@@ -93,7 +93,12 @@ namespace NeuralNetworkSnake
             private set { _eatenApples = value; }
         }
         private bool IsGameOver = false;
-        private int BoardSize;
+        private int _boardSize;
+        public int BoardSize
+        {
+            get { return _boardSize; }
+            private set { _boardSize = value; }
+        }
         private int CellsCount;
         private int AppleCount;
         public BoardCellInfo[,] BoardCellsInfo;
@@ -695,10 +700,8 @@ namespace NeuralNetworkSnake
                     Score += Math.Round(_nextAppleScore - _nextAppleScore * ((double)_stepsWithoutApples / _appleScoreReduceMaxSteps * _appleScoreReduce), 3); //чем быстрее добрались до яблока, тем больше счета получим
                     _nextOneStepScore += _nextOneStepScore * _oneStepScoreMultiply; //увеличиваем стоимость следующего шага змейки
                     _nextAppleScore += _nextAppleScore * _appleScoreMultiply; //увеличиваем стоимость следующего яблока
-                    BoardCellsInfo[newX, newY].IsApple = false;
                     _stepsWithoutApples = 0;
                     AppleCoordinates.Remove(AppleCoordinates.Where(a => a.X == newX && a.Y == newY).First()); //удаляем съеденное яблоко
-                    AppleGenerate(); //генерируем новое яблоко
                 }
                 if (BoardCellsInfo[newX, newY].IsSnake) //если врезались в хвост
                 {
@@ -709,6 +712,11 @@ namespace NeuralNetworkSnake
                     IsGameOver = true;
                 }
                 BoardCellsInfo[newX, newY].IsSnake = true;
+                if(BoardCellsInfo[newX, newY].IsApple) //генерируем новое яблоко, если съели. И делаем это после того как установим что в новой позиции есть тело змейки, т.к. иначе яблоко может быть сгенерировано в этой позиции
+                {
+                    BoardCellsInfo[newX, newY].IsApple = false;
+                    AppleGenerate(); //генерируем новое яблоко
+                }
             }
         }
     }
