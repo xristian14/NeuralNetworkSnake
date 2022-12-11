@@ -77,6 +77,13 @@
                                         <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                        <TextBlock Text="Количество лучших результатов, передаваемых в новое" Margin="6 0 0 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                                        <TextBlock Text="поколение без изменений" Margin="6 0 0 0"/>
+                                        <TextBox Text="{Binding PassedToNewGenerationCount}" Width="30" Margin="6 0 6 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Количество тестов в одном поколоении" Margin="6 0 0 0"/>
                                         <TextBox Text="{Binding TestsCount}" Width="30" Margin="6 0 6 0"/>
                                     </StackPanel>
@@ -93,13 +100,26 @@
                                         </ListView.ItemContainerStyle>
                                         <ListView.View>
                                             <GridView>
-                                                <GridViewColumn DisplayMemberBinding="{Binding TotalScore, StringFormat={}{0:0.000}}" Header="Общий счёт" Width="85"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="85"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding LostMoves}" Header="Остаток ходов" Width="83"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" Width="{Binding ElementName=helperGenerationLeaderboard0, Path=ActualWidth}"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding TotalScore, StringFormat={}{0:0.000}}" Header="Общий счёт" Width="{Binding ElementName=helperGenerationLeaderboard1, Path=ActualWidth}"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="{Binding ElementName=helperGenerationLeaderboard2, Path=ActualWidth}"/>
+                                                <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="{Binding ElementName=helperGenerationLeaderboard3, Path=ActualWidth}"/>
                                             </GridView>
                                         </ListView.View>
                                     </ListView>
+                                    <Grid Grid.Row="2" Visibility="Visible" Margin="6 0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="30"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0" x:Name="helperGenerationLeaderboard0"/>
+                                        <Grid Grid.Column="1" x:Name="helperGenerationLeaderboard1"/>
+                                        <Grid Grid.Column="2" x:Name="helperGenerationLeaderboard2"/>
+                                        <Grid Grid.Column="3" x:Name="helperGenerationLeaderboard3"/>
+                                    </Grid>
                                     <StackPanel Orientation="Vertical" Background="#FFEBCEFF">
                                         <TextBlock Text="Лучшие результаты" HorizontalAlignment="Center" Margin="0 2 0 0"/>
                                         <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="130" Margin="6 3 6 4">
@@ -110,12 +130,23 @@
                                             </ListView.ItemContainerStyle>
                                             <ListView.View>
                                                 <GridView>
-                                                    <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:#.###}}" Header="Средний счёт" Width="85"/>
-                                                    <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="45"/>
-                                                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Поколение" Width="83"/>
+                                                    <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:#.###}}" Header="Средний счёт" Width="{Binding ElementName=helperLeaderboard0, Path=ActualWidth}"/>
+                                                    <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Макс. яблок" Width="{Binding ElementName=helperLeaderboard1, Path=ActualWidth}"/>
+                                                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Поколение" Width="{Binding ElementName=helperLeaderboard2, Path=ActualWidth}"/>
                                                 </GridView>
                                             </ListView.View>
                                         </ListView>
+                                        <Grid Grid.Row="2" Visibility="Visible" Margin="6 0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1*"/>
+                                                <ColumnDefinition Width="1*"/>
+                                                <ColumnDefinition Width="70"/>
+                                                <ColumnDefinition Width="30"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid Grid.Column="0" x:Name="helperLeaderboard0"/>
+                                            <Grid Grid.Column="1" x:Name="helperLeaderboard1"/>
+                                            <Grid Grid.Column="2" x:Name="helperLeaderboard2"/>
+                                        </Grid>
                                         <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 4"/>
                                     </StackPanel>
                                 </StackPanel>
@@ -219,28 +250,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </Grid>
-            <WrapPanel Grid.Column="1" HorizontalAlignment="Left">
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-                <TextBlock Text="OooooooooooooooooooooooooooooooooooooooooO"/>
-            </WrapPanel>-->
+            </Grid>-->
             <Grid Grid.Column="1" Visibility="Visible">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
@@ -318,84 +328,6 @@
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
             </ScrollViewer>
-            
-            <!--Поле
-            <ItemsControl Grid.Column="1" Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Rows="{Binding BoardSizeInt}" Columns="{Binding BoardSizeInt}"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>-->
-            <!--Змейки
-            <ItemsControl Grid.Column="1" Margin="10 10 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRenders}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesCoordinate}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Canvas/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <ItemsControl>
-                                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#FF494949"/>
-                                    </ItemsControl>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemContainerStyle>
-                                <Style TargetType="ContentPresenter">
-                                    <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
-                                    <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                        </ItemsControl>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>-->
-            <!--Яблоки
-            <ItemsControl Grid.Column="1" Margin="10 10 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRenders}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesCoordinates}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Canvas/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <ItemsControl>
-                                        <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="#FFFF6565"/>
-                                    </ItemsControl>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemContainerStyle>
-                                <Style TargetType="ContentPresenter">
-                                    <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
-                                    <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                        </ItemsControl>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>-->
         </Grid>
     </Grid>
 </Window>

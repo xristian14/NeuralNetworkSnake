@@ -271,26 +271,6 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private ObservableCollection<SnakesForRender> _snakesForRenders = new ObservableCollection<SnakesForRender>();
-        public ObservableCollection<SnakesForRender> SnakesForRenders
-        {
-            get { return _snakesForRenders; }
-            set
-            {
-                _snakesForRenders = value;
-                OnPropertyChanged();
-            }
-        }
-        private ObservableCollection<ApplesForRender> _applesForRenders = new ObservableCollection<ApplesForRender>();
-        public ObservableCollection<ApplesForRender> ApplesForRenders
-        {
-            get { return _applesForRenders; }
-            set
-            {
-                _applesForRenders = value;
-                OnPropertyChanged();
-            }
-        }
         private ObservableCollection<GenerationLeaderboardItem> _generationLeaderboard = new ObservableCollection<GenerationLeaderboardItem>();
         public ObservableCollection<GenerationLeaderboardItem> GenerationLeaderboard
         {
@@ -369,6 +349,22 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
+        private string _passedToNewGenerationCount = "3";
+        public string PassedToNewGenerationCount //Количество лучших результатов, передаваемых в новое поколение без изменений
+        {
+            get { return _passedToNewGenerationCount; }
+            set
+            {
+                if (int.TryParse(value, out int res))
+                {
+                    if(res > 0 && res < int.Parse(PopulationSize))
+                    {
+                        _passedToNewGenerationCount = value;
+                    }
+                }
+                OnPropertyChanged();
+            }
+        }
         private string _сurrentTestNumber = "0";
         public string CurrentTestNumber //номер теста в текущем поколении
         {
@@ -404,9 +400,7 @@ namespace NeuralNetworkSnake
                     layers[layers.Length - 1] = 3;
                     int populationSize = int.Parse(PopulationSize);
 
-                    SnakesForRenders.Clear();
-                    ApplesForRenders.Clear();
-                    GeneticLearning geneticLearning = new GeneticLearning(populationSize, int.Parse(MutationPercent), int.Parse(TestsCount), layers);
+                    GeneticLearning geneticLearning = new GeneticLearning(populationSize, int.Parse(MutationPercent), int.Parse(TestsCount), int.Parse(PassedToNewGenerationCount), layers);
                     _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
 
                     LayersText = layers[0].ToString();

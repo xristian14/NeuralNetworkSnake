@@ -79,6 +79,7 @@
     <Compile Include="Simulation.cs" />
     <Compile Include="SnakeCoordinate.cs" />
     <Compile Include="SnakeForRender.cs" />
+    <Compile Include="SnakeHistory.cs" />
     <Compile Include="SnakesForRender.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelBase.cs" />

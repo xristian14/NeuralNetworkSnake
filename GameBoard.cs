@@ -48,7 +48,7 @@ namespace NeuralNetworkSnake
                     break;
             }
             SnakeCoordinates.Add(new SnakeCoordinate(nextX, nextY));
-
+            AddSnakeHistories(SnakeCoordinates);
             BoardCellsInfo[nextX, nextY].IsSnake = true;
             //генерируем яблоки
             for(int i = 0; i < appleCount; i++)
@@ -63,8 +63,9 @@ namespace NeuralNetworkSnake
         }
         Random _random = new Random();
         private double _baseOneStepScore = 0.005; //базовая стоимость шага змейки
-        private double _oneStepScoreMultiply = 0.1; //множитель, на который увеличивается стоимость одного шага змейки, при съедении яблока
+        private double _oneStepScoreMultiply = 0; //множитель, на который увеличивается стоимость одного шага змейки, при съедении яблока
         private double _nextOneStepScore = 0; //стоимость следующего шага змейки
+        private List<SnakeHistory> _snakeHistories = new List<SnakeHistory>(); //история позиций змейки. Нужно чтобы при повторении позиции, указать что игра окончена, т.к. змейка зациклилась
         private int _stepsWithoutApples = 0; //количество шагов, с момента съедения последнего яблока
         public int StepsWithoutApples
         {
@@ -92,7 +93,7 @@ namespace NeuralNetworkSnake
             get { return _eatenApples; }
             private set { _eatenApples = value; }
         }
-        private bool IsGameOver = false;
+        private bool _isGameOver = false;
         private int _boardSize;
         public int BoardSize
         {
@@ -121,6 +122,33 @@ namespace NeuralNetworkSnake
                 _appleCoordinates = value;
                 OnPropertyChanged();
             }
+        }
+        private void AddSnakeHistories(ObservableCollection<SnakeCoordinate> snakeCoordinates)
+        {
+            SnakeHistory snakeHistory = new SnakeHistory();
+            snakeHistory.SnakeCoordinates.AddRange(snakeCoordinates);
+            _snakeHistories.Add(snakeHistory);
+        }
+        private bool FindSnakeHistory(ObservableCollection<SnakeCoordinate> snakeCoordinates)
+        {
+            bool isEqual = false;
+            foreach(SnakeHistory snakeHistory in _snakeHistories)
+            {
+                isEqual = true;
+                for(int i = 0; i < snakeHistory.SnakeCoordinates.Count; i++)
+                {
+                    if(!(snakeCoordinates[i].X == snakeHistory.SnakeCoordinates[i].X && snakeCoordinates[i].Y == snakeHistory.SnakeCoordinates[i].Y)) //если координаты не совпадают, выходим из цикла сравнения координат
+                    {
+                        isEqual = false;
+                        break;
+                    }
+                }
+                if (isEqual)
+                {
+                    return true;
+                }
+            }
+            return isEqual;
         }
         private void AppleGenerate()
         {
@@ -219,7 +247,7 @@ namespace NeuralNetworkSnake
         }
         public bool GetIsGameOver()
         {
-            return IsGameOver;
+            return _isGameOver;
         }
         public Vector<float> GetInputs()
         {
@@ -681,7 +709,7 @@ namespace NeuralNetworkSnake
             int newY = SnakeCoordinates[SnakeCoordinates.Count - 1].Y + yOffset;
             if(newX >= BoardCellsInfo.GetLength(0) || newX < 0 || newY >= BoardCellsInfo.GetLength(1) || newY < 0) //если врезались в стенку
             {
-                IsGameOver = true;
+                _isGameOver = true;
             }
             else
             {
@@ -696,6 +724,11 @@ namespace NeuralNetworkSnake
                 }
                 else //съели яблоко
                 {
+                    _snakeHistories.Clear();
+                    if(SnakeCoordinates.Count == BoardSize * BoardSize) //если после съедения яблока, змейка заполняет все игровое поле, игра закончилась
+                    {
+                        _isGameOver = true;
+                    }
                     EatenApples++;
                     Score += Math.Round(_nextAppleScore - _nextAppleScore * ((double)_stepsWithoutApples / _appleScoreReduceMaxSteps * _appleScoreReduce), 3); //чем быстрее добрались до яблока, тем больше счета получим
                     _nextOneStepScore += _nextOneStepScore * _oneStepScoreMultiply; //увеличиваем стоимость следующего шага змейки
@@ -705,12 +738,20 @@ namespace NeuralNetworkSnake
                 }
                 if (BoardCellsInfo[newX, newY].IsSnake) //если врезались в хвост
                 {
-                    IsGameOver = true;
+                    _isGameOver = true;
                 }
-                if(_stepsWithoutApples >= _maxStepsWithoutApples)
+                else if (FindSnakeHistory(SnakeCoordinates))
                 {
-                    IsGameOver = true;
+                    _isGameOver = true;
                 }
+                else
+                {
+                    AddSnakeHistories(SnakeCoordinates);
+                }
+                /*if(_stepsWithoutApples >= _maxStepsWithoutApples)
+                {
+                    _isGameOver = true;
+                }*/
                 BoardCellsInfo[newX, newY].IsSnake = true;
                 if(BoardCellsInfo[newX, newY].IsApple) //генерируем новое яблоко, если съели. И делаем это после того как установим что в новой позиции есть тело змейки, т.к. иначе яблоко может быть сгенерировано в этой позиции
                 {

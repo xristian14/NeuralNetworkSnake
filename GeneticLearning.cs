@@ -9,7 +9,7 @@ namespace NeuralNetworkSnake
 {
     class GeneticLearning
     {
-        public GeneticLearning(int populationSize, int mutationPercent, int testsCount, int[] layers)
+        public GeneticLearning(int populationSize, int mutationPercent, int testsCount, int passedToNewGenerationCount, int[] layers)
         {
             Layers = layers;
             MutationPercent = mutationPercent;
@@ -17,12 +17,15 @@ namespace NeuralNetworkSnake
             _populationSize = populationSize;
             TestsCount = testsCount;
             CurrentTestNumber = 1;
+            PassedToNewGenerationCount = passedToNewGenerationCount;
             Population = new NeuralNetworkUnitGeneticLearning[_populationSize];
             for(int i = 0; i < _populationSize; i++)
             {
-                Population[i] = new NeuralNetworkUnitGeneticLearning(NeuralNetworkUnit.CreateNeuralNetworkUnitRandomly(layers));
+                Population[i] = new NeuralNetworkUnitGeneticLearning(NeuralNetworkUnit.CreateNeuralNetworkUnitRandomly(layers), _currentId);
+                _currentId++;
             }
         }
+        private int _currentId = 1;
         private int[] Layers;
         private readonly object locker = new object();
         private double _mutationPercent { get; set; }
@@ -55,6 +58,12 @@ namespace NeuralNetworkSnake
         {
             CurrentTestNumber++;
         }
+        private int _passedToNewGenerationCount; //Количество лучших результатов, передаваемых в новое поколение без изменений
+        public int PassedToNewGenerationCount
+        {
+            get { return _passedToNewGenerationCount; }
+            private set { _passedToNewGenerationCount = value; }
+        }
         public NeuralNetworkUnitGeneticLearning[] Population;
         public int GetPopulationSize()
         {
@@ -70,7 +79,7 @@ namespace NeuralNetworkSnake
         }
         public void SpawnNewGeneration()
         {
-            _populationSize = NewPopulationSize;
+            List<NeuralNetworkUnitGeneticLearning> sortedPopulation = new List<NeuralNetworkUnitGeneticLearning>(Population.OrderByDescending(a => a.TotalRating));
             double[] populationRatings = new double[_populationSize];
             for(int i = 0; i < _populationSize; i++)
             {
@@ -78,28 +87,37 @@ namespace NeuralNetworkSnake
             }
             double[] softMaxRatings = Features.SoftMaxVector(populationRatings);
             //генерируем новую популяцию
+            _populationSize = NewPopulationSize;
             NeuralNetworkUnitGeneticLearning[] newPopulation = new NeuralNetworkUnitGeneticLearning[_populationSize];
             for (int i = 0; i < _populationSize; i++)
             {
-                double softMaxRatingParent = Features.GetRandDouble(0, 1);
-                int k = 0;
-                double sum = 0;
-                while(k < _populationSize && sum < softMaxRatingParent)
+                if(i < PassedToNewGenerationCount) //если не все лучшие результаты прошлого поколения добавлены, добавляем
                 {
-                    sum += softMaxRatings[k];
-                    k++;
+                    newPopulation[i] = new NeuralNetworkUnitGeneticLearning(sortedPopulation[i].NeuralNetworkUnit, sortedPopulation[i].Id);
                 }
-                int indexFirstParent = k - 1;
-                softMaxRatingParent = Features.GetRandDouble(0, 1);
-                k = 0;
-                sum = 0;
-                while (k < _populationSize && sum < softMaxRatingParent)
+                else //иначе создаем потомка
                 {
-                    sum += softMaxRatings[k];
-                    k++;
+                    double softMaxRatingParent = Features.GetRandDouble(0, 1);
+                    int k = 0;
+                    double sum = 0;
+                    while (k < _populationSize && sum < softMaxRatingParent)
+                    {
+                        sum += softMaxRatings[k];
+                        k++;
+                    }
+                    int indexFirstParent = k - 1;
+                    softMaxRatingParent = Features.GetRandDouble(0, 1);
+                    k = 0;
+                    sum = 0;
+                    while (k < _populationSize && sum < softMaxRatingParent)
+                    {
+                        sum += softMaxRatings[k];
+                        k++;
+                    }
+                    int indexSecondParent = k - 1;
+                    newPopulation[i] = new NeuralNetworkUnitGeneticLearning(Crossing(Population[indexFirstParent].NeuralNetworkUnit, Population[indexSecondParent].NeuralNetworkUnit), _currentId);
+                    _currentId++;
                 }
-                int indexSecondParent = k - 1;
-                newPopulation[i] = new NeuralNetworkUnitGeneticLearning(Crossing(Population[indexFirstParent].NeuralNetworkUnit, Population[indexSecondParent].NeuralNetworkUnit));
             }
             Population = newPopulation;
             CurrentTestNumber = 1;

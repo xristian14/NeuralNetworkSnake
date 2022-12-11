@@ -9,6 +9,16 @@ namespace NeuralNetworkSnake
 {
     class GenerationLeaderboardItem : ViewModelBase
     {
+        private int _id;
+        public int Id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
         private double _totalScore;
         public double TotalScore
         {
@@ -36,16 +46,6 @@ namespace NeuralNetworkSnake
             set
             {
                 _eatenApples = value;
-                OnPropertyChanged();
-            }
-        }
-        private int _lostMoves;
-        public int LostMoves
-        {
-            get { return _lostMoves; }
-            set
-            {
-                _lostMoves = value;
                 OnPropertyChanged();
             }
         }
