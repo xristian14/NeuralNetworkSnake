@@ -384,7 +384,7 @@ namespace NeuralNetworkSnake
                 return new DelegateCommand((obj) =>
                 {
                     int[] layers = new int[2 + HiddenLayersCount];
-                    layers[0] = 39;
+                    layers[0] = 40;
                     if(HiddenLayersCount >= 1)
                     {
                         layers[1] = int.Parse(FirstHiddenLayerCountNeurons);
@@ -449,38 +449,106 @@ namespace NeuralNetworkSnake
         private NeuralNetworkUnit _neuralNetworkUnitTest;
         Matrix<float> _matrix3;
         Vector<float> _vector1;
+        AForge.Neuro.ActivationNetwork network;
+        AForge.Neuro.ActivationNetwork network2;
+        AForge.Neuro.ActivationNetwork network3;
+        double[] array1;
         public void testFunc()
         {
+            int[] a = new int[3] { 10, 10, 3 };
             if (_isFirstTest)
             {
                 _isFirstTest = false;
-                int[] a = new int[3] { 440000, 100, 1 };
+                //create neural network
+                //network = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), a[0], a[1], a[2], a[3]);
+                network = new AForge.Neuro.ActivationNetwork(new ReLuFunction(), a[0], a[1], a[2]);
+                network2 = new AForge.Neuro.ActivationNetwork(new ReLuFunction(), a[0], a[1], a[2]);
+                //create teacher
+                AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(network);
+                // loop
+                /*while (!needToStop)
+                {
+                    // run epoch of learning procedure
+                    double error = backPropagationLearning.RunEpoch(input, output);
+                    // check error value to see if we need to stop
+                    // ...
+                }*/
+
+
+
+
+
+
                 _neuralNetworkUnitTest = NeuralNetworkUnit.CreateNeuralNetworkUnitRandomly(a);
 
-                _matrix3 = Matrix<float>.Build.Random(a[0], a[1]);
-                _vector1 = Vector<float>.Build.Random(a[1]);
+                for(int i = 0; i < network.Layers.Length; i++)
+                {
+                    for(int k = 0; k < a[i + 1]; k++)
+                    {
+                        int neuonCount = network.Layers[i].Neurons[k].Weights.Length;
+                        for(int u = 0; u < neuonCount; u++)
+                        {
+                            network.Layers[i].Neurons[k].Weights[u] = _neuralNetworkUnitTest.Weights[i][k, u];
+                            network2.Layers[i].Neurons[k].Weights[u] = _neuralNetworkUnitTest.Weights[i][k, u];
+                        }
+                        ((AForge.Neuro.ActivationNeuron)network.Layers[i].Neurons[k]).Threshold = _neuralNetworkUnitTest.Biases[i][k];
+                        ((AForge.Neuro.ActivationNeuron)network2.Layers[i].Neurons[k]).Threshold = _neuralNetworkUnitTest.Biases[i][k];
+                    }
+                }
+
+                array1 = new double[a[1]];
+                float[] array2 = new float[a[1]];
+                for(int i = 0; i < a[1]; i++)
+                {
+                    array1[i] = Features.GetRandDouble(0, 1);
+                    array2[i] = (float)array1[i];
+                }
+                _vector1 = Vector<float>.Build.Dense(array2);
             }
 
-            int iteration = 1;
+            int iteration = 100;
             
             Stopwatch stopwatch1 = new Stopwatch();
             stopwatch1.Start();
-            /*for (int i = 0; i < iteration; i++)
+            for (int i = 0; i < iteration; i++)
             {
-                _ = _neuralNetworkUnitTest.Weights[0] * _neuralNetworkUnitTest.Weights[1];
-            }*/
+                _ = _neuralNetworkUnitTest.ForwardPropagation(_vector1);
+            }
             stopwatch1.Stop();
 
             Stopwatch stopwatch4 = new Stopwatch();
             stopwatch4.Start();
             for (int i = 0; i < iteration; i++)
             {
-                _ = _matrix3 * _vector1;
+                _ = network.Compute(array1);
             }
             stopwatch4.Stop();
 
-            FirstHiddenLayerCountNeurons = "stopwatch1=" + stopwatch1.ElapsedMilliseconds + "мс  stopwatch4 = " + stopwatch4.ElapsedMilliseconds + "мс";
-            int y = 0;
+            //LayersText = "stopwatch1=" + stopwatch1.ElapsedMilliseconds + "мс  stopwatch4 = " + stopwatch4.ElapsedMilliseconds + "мс";
+            LayersText = "_neuralNetworkUnitTest.ForwardPropagation(_vector1)= " + Environment.NewLine + _neuralNetworkUnitTest.ForwardPropagation(_vector1);
+            for (int i = 0; i < network.Layers.Length; i++)
+            {
+                for (int k = 0; k < a[i + 1]; k++)
+                {
+                    int neuonCount = network.Layers[i].Neurons[k].Weights.Length;
+                    if(i == network.Layers.Length - 1)
+                    {
+                        ((AForge.Neuro.ActivationNeuron)network2.Layers[i].Neurons[k]).ActivationFunction = new SameActivationFunction();
+                    }
+                }
+            }
+            double[] rr = network.Compute(array1);
+            LayersText += "network2.Compute(array1)= ";
+            for(int i = 0; i < rr.Length; i++)
+            {
+                LayersText += Environment.NewLine + "," + rr[i];
+            }
+            rr = network2.Compute(array1);
+            LayersText += Environment.NewLine + "network2.Compute(array1)= ";
+            for(int i = 0; i < rr.Length; i++)
+            {
+                LayersText += Environment.NewLine + "," + rr[i];
+            }
         }
 
         public ICommand ButtonTest_Click
