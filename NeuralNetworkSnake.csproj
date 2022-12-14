@@ -73,6 +73,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AForgeMachineLearningExtensions\QLearning.cs" />
+    <Compile Include="AForgeMachineLearningExtensions\QLearningMap.cs" />
     <Compile Include="AForgeNeuroExtensions\ActivationNetwork.cs" />
     <Compile Include="AForgeNeuroExtensions\ReLuActivationFunction.cs" />
     <Compile Include="AForgeNeuroExtensions\SameActivationFunction.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="Matrix.cs" />
     <Compile Include="NeuralNetworkUnit.cs" />
     <Compile Include="NeuralNetworkUnitGeneticLearning.cs" />
+    <Compile Include="QLearningCellsView.cs" />
     <Compile Include="Simulation.cs" />
     <Compile Include="SnakeCoordinate.cs" />
     <Compile Include="SnakeForRender.cs" />

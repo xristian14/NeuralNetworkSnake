@@ -7,7 +7,13 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        Title="Нейронная сеть управления змейкой" Height="750" Width="1020">
+        Title="Нейронная сеть управления змейкой" Height="1020" Width="1020">
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="qlearningCellText">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <TabControl  VerticalAlignment="Top">
             <TabItem>
@@ -353,80 +359,78 @@
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                    <TextBlock Text="Размер поля" Margin="6 0 0 0"/>
-                                    <TextBox Text="{Binding BoardSize}" Width="30" Margin="6 0 6 0"/>
-                                    <TextBlock Text="Количество яблок" Margin="6 0 0 0"/>
-                                    <TextBox Text="{Binding ApplesCount}" Width="30" Margin="6 0 6 0"/>
+                                    <TextBlock Text="Задержка между ходами, мс" Margin="6 0 0 0"/>
+                                    <Slider Minimum="10" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
+                                    <TextBlock Text="{Binding RealtimeDelay}" Width="30" Margin="4 0 6 0"/>
+                                    <Button Content="Запустить" Command="{Binding StartQlearning_Click}" Width="72" Padding="0 2" Margin="2 0"/>
+                                    <Button Content="Остановить" Command="{Binding StopQlearning_Click}" Width="72" Padding="0 2" Margin="2 0"/>
                                 </StackPanel>
                             </StackPanel>
-                            <ItemsControl Grid.Row="1" ItemsSource="{Binding GameBoardsForRender}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="5 5 0 0">
-                                            <!--Поле-->
-                                            <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="1">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <UniformGrid/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
+                            <Grid Grid.Row="1" Margin="5 5 0 0">
+                                <!--Ячейки поля-->
+                                <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="#FF787878" BorderThickness="1" ItemsSource="{Binding QLearningCells}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl>
+                                                <Grid>
+                                                    <Rectangle Width="57" Height="57" Fill="#FFFFC2C2"/>
+                                                    <TextBlock Text="{Binding Reward}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#B2FFFFFF" FontWeight="Bold"/>
+                                                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                            <TextBlock Text="U:" Style="{StaticResource qlearningCellText}"/>
+                                                            <TextBlock Text="{Binding UpQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                            <TextBlock Text="R:" Style="{StaticResource qlearningCellText}"/>
+                                                            <TextBlock Text="{Binding RightQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                            <TextBlock Text="L:" Style="{StaticResource qlearningCellText}"/>
+                                                            <TextBlock Text="{Binding LeftQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                            <TextBlock Text="D:" Style="{StaticResource qlearningCellText}"/>
+                                                            <TextBlock Text="{Binding DownQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Grid>
                                             </ItemsControl>
-                                            <!--Змейки-->
-                                            <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRender.SnakesCoordinate}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <Canvas/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <ItemsControl>
-                                                            <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#FF494949"/>
-                                                        </ItemsControl>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                                <ItemsControl.ItemContainerStyle>
-                                                    <Style TargetType="ContentPresenter">
-                                                        <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
-                                                        <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
-                                                    </Style>
-                                                </ItemsControl.ItemContainerStyle>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                </ItemsControl>
+                                <!--Выделение ячейки-->
+                                <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRender.ApplesCoordinates}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl>
+                                                <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="#FFFF6565"/>
                                             </ItemsControl>
-                                            <!--Яблоки-->
-                                            <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRender.ApplesCoordinates}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <Canvas/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <ItemsControl>
-                                                            <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="#FFFF6565"/>
-                                                        </ItemsControl>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                                <ItemsControl.ItemContainerStyle>
-                                                    <Style TargetType="ContentPresenter">
-                                                        <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
-                                                        <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
-                                                    </Style>
-                                                </ItemsControl.ItemContainerStyle>
-                                            </ItemsControl>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Width="{Binding ElementName=helper0, Path=ActualWidth}"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                </ItemsControl>
+                            </Grid>
                         </Grid>
                     </StackPanel>
                 </TabItem.Content>
