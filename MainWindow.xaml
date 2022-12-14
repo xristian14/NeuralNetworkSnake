@@ -9,187 +9,194 @@
         WindowState="Maximized"
         Title="Нейронная сеть управления змейкой" Height="750" Width="1020">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Margin="0 3 0 3">
-                <TextBlock Text="Количество скрытых слоёв" Margin="6 0 0 0"/>
-                <Slider Value="{Binding HiddenLayersCount}" Minimum="1" Maximum="3" Width="30" Margin="6 0 0 0"/>
-                <TextBlock Text="{Binding HiddenLayersCount}" Margin="3 0 0 0"/>
-                <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
-                <TextBlock Text="Размер скрытых слоёв:" Margin="6 0 0 0"/>
-                <TextBlock Text="1-й слой" Margin="6 0 0 0"/>
-                <TextBox Text="{Binding FirstHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
-                <TextBlock Text="2-й слой" Margin="6 0 0 0"/>
-                <TextBox Text="{Binding SecondHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
-                <TextBlock Text="3-й слой" Margin="6 0 0 0"/>
-                <TextBox Text="{Binding ThirdHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
-                <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
-                <TextBlock Text="Алгоритм обучения" Margin="6 0 0 0"/>
-                <ComboBox ItemsSource="{Binding AlgorithmLearningCombobox}" SelectedItem="SelectedAlgorithmLearningCombobox" SelectedIndex="0" Margin="6 0 0 0"/>
-                <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
-                <Button Content="Создать нейросеть" Command="{Binding CreateNeuralNetwork_Click}" Margin="6 0 0 0" Padding="4 1"/>
-                <Button Content="Тестовая функция" Command="{Binding ButtonTest_Click}" Margin="6 0 0 0" Padding="4 1"/>
-            </StackPanel>
-        </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="365"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="1*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Vertical" Background="#FFB2FFE5">
-                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                        <TextBlock Text="Слои" Margin="6 0 0 0"/>
-                        <TextBlock Text="{Binding LayersText}" Margin="6 0 0 0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
-                        <TextBlock Text="Поколение" Margin="6 0 0 0"/>
-                        <TextBlock Text="{Binding Age, StringFormat={}{0:N0}}" Margin="6 0 6 0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                        <TextBlock Text="Размер поля" Margin="6 0 0 0"/>
-                        <TextBox Text="{Binding BoardSize}" Width="30" Margin="6 0 6 0"/>
-                        <TextBlock Text="Количество яблок" Margin="6 0 0 0"/>
-                        <TextBox Text="{Binding ApplesCount}" Width="30" Margin="6 0 6 0"/>
-                    </StackPanel>
-                    <TextBlock Text="Алгоритм обучения" Margin="6 6 6 0"/>
-                    <TabControl  VerticalAlignment="Top" Margin="6 2 6 0">
-                        <TabItem>
-                            <TabItem.Header>
-                                <TextBlock Text="Генетический алгоритм"/>
-                            </TabItem.Header>
-                            <TabItem.Content>
-                                <StackPanel Orientation="Vertical">
+        <TabControl  VerticalAlignment="Top">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="Змейка"/>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Margin="0 3 0 3">
+                                <TextBlock Text="Количество скрытых слоёв" Margin="6 0 0 0"/>
+                                <Slider Value="{Binding HiddenLayersCount}" Minimum="1" Maximum="3" Width="30" Margin="6 0 0 0"/>
+                                <TextBlock Text="{Binding HiddenLayersCount}" Margin="3 0 0 0"/>
+                                <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
+                                <TextBlock Text="Размер скрытых слоёв:" Margin="6 0 0 0"/>
+                                <TextBlock Text="1-й слой" Margin="6 0 0 0"/>
+                                <TextBox Text="{Binding FirstHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
+                                <TextBlock Text="2-й слой" Margin="6 0 0 0"/>
+                                <TextBox Text="{Binding SecondHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
+                                <TextBlock Text="3-й слой" Margin="6 0 0 0"/>
+                                <TextBox Text="{Binding ThirdHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
+                                <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
+                                <TextBlock Text="Алгоритм обучения" Margin="6 0 0 0"/>
+                                <ComboBox ItemsSource="{Binding AlgorithmLearningCombobox}" SelectedItem="SelectedAlgorithmLearningCombobox" SelectedIndex="0" Margin="6 0 0 0"/>
+                                <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
+                                <Button Content="Создать нейросеть" Command="{Binding CreateNeuralNetwork_Click}" Margin="6 0 0 0" Padding="4 1"/>
+                                <Button Content="Тестовая функция" Command="{Binding ButtonTest_Click}" Margin="6 0 0 0" Padding="4 1"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="365"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0" Orientation="Vertical" Background="#FFB2FFE5">
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                        <TextBlock Text="Размер популяции" Margin="6 0 0 0"/>
-                                        <TextBox Text="{Binding PopulationSize}" Width="30" Margin="6 0 6 0"/>
-                                        <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
+                                        <TextBlock Text="Слои" Margin="6 0 0 0"/>
+                                        <TextBlock Text="{Binding LayersText}" Margin="6 0 0 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                                        <TextBlock Text="Поколение" Margin="6 0 0 0"/>
+                                        <TextBlock Text="{Binding Age, StringFormat={}{0:N0}}" Margin="6 0 6 0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                        <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
-                                        <TextBox Text="{Binding MutationPercent}" Width="30" Margin="6 0 6 0"/>
-                                        <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
+                                        <TextBlock Text="Размер поля" Margin="6 0 0 0"/>
+                                        <TextBox Text="{Binding BoardSize}" Width="30" Margin="6 0 6 0"/>
+                                        <TextBlock Text="Количество яблок" Margin="6 0 0 0"/>
+                                        <TextBox Text="{Binding ApplesCount}" Width="30" Margin="6 0 6 0"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                        <TextBlock Text="Количество лучших результатов, передаваемых в новое" Margin="6 0 0 0"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-                                        <TextBlock Text="поколение без изменений" Margin="6 0 0 0"/>
-                                        <TextBox Text="{Binding PassedToNewGenerationCount}" Width="30" Margin="6 0 6 0"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                        <TextBlock Text="Количество тестов в одном поколоении" Margin="6 0 0 0"/>
-                                        <TextBox Text="{Binding TestsCount}" Width="30" Margin="6 0 6 0"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                        <TextBlock Text="Номер теста в текущем поколении" Margin="6 0 0 0"/>
-                                        <TextBlock Text="{Binding CurrentTestNumber}" Margin="6 0 0 0"/>
-                                    </StackPanel>
-                                    <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
-                                    <ListView Grid.Row="2" ItemsSource="{Binding GenerationLeaderboard}" Height="160" Margin="6 3 6 4">
-                                        <ListView.ItemContainerStyle>
-                                            <Style TargetType="ListViewItem">
-                                                <Setter Property="Focusable" Value="False"/>
-                                            </Style>
-                                        </ListView.ItemContainerStyle>
-                                        <ListView.View>
-                                            <GridView>
-                                                <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" Width="{Binding ElementName=helperGenerationLeaderboard0, Path=ActualWidth}"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding TotalScore, StringFormat={}{0:0.000}}" Header="Общий счёт" Width="{Binding ElementName=helperGenerationLeaderboard1, Path=ActualWidth}"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="{Binding ElementName=helperGenerationLeaderboard2, Path=ActualWidth}"/>
-                                                <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="{Binding ElementName=helperGenerationLeaderboard3, Path=ActualWidth}"/>
-                                            </GridView>
-                                        </ListView.View>
-                                    </ListView>
-                                    <Grid Grid.Row="2" Visibility="Visible" Margin="6 0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="60"/>
-                                            <ColumnDefinition Width="1*"/>
-                                            <ColumnDefinition Width="1*"/>
-                                            <ColumnDefinition Width="50"/>
-                                            <ColumnDefinition Width="30"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid Grid.Column="0" x:Name="helperGenerationLeaderboard0"/>
-                                        <Grid Grid.Column="1" x:Name="helperGenerationLeaderboard1"/>
-                                        <Grid Grid.Column="2" x:Name="helperGenerationLeaderboard2"/>
-                                        <Grid Grid.Column="3" x:Name="helperGenerationLeaderboard3"/>
-                                    </Grid>
-                                    <StackPanel Orientation="Vertical" Background="#FFEBCEFF">
-                                        <TextBlock Text="Лучшие результаты" HorizontalAlignment="Center" Margin="0 2 0 0"/>
-                                        <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="130" Margin="6 3 6 4">
-                                            <ListView.ItemContainerStyle>
-                                                <Style TargetType="ListViewItem">
-                                                    <Setter Property="Focusable" Value="False"/>
-                                                </Style>
-                                            </ListView.ItemContainerStyle>
-                                            <ListView.View>
-                                                <GridView>
-                                                    <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:#.###}}" Header="Средний счёт" Width="{Binding ElementName=helperLeaderboard0, Path=ActualWidth}"/>
-                                                    <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Макс. яблок" Width="{Binding ElementName=helperLeaderboard1, Path=ActualWidth}"/>
-                                                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Поколение" Width="{Binding ElementName=helperLeaderboard2, Path=ActualWidth}"/>
-                                                </GridView>
-                                            </ListView.View>
-                                        </ListView>
-                                        <Grid Grid.Row="2" Visibility="Visible" Margin="6 0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="70"/>
-                                                <ColumnDefinition Width="30"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid Grid.Column="0" x:Name="helperLeaderboard0"/>
-                                            <Grid Grid.Column="1" x:Name="helperLeaderboard1"/>
-                                            <Grid Grid.Column="2" x:Name="helperLeaderboard2"/>
-                                        </Grid>
-                                        <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 4"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </TabItem.Content>
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <TextBlock Text="Deep Q-Learning"/>
-                            </TabItem.Header>
-                            <TabItem.Content>
-                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="Алгоритм обучения" Margin="6 6 6 0"/>
+                                    <TabControl  VerticalAlignment="Top" Margin="6 2 6 0">
+                                        <TabItem>
+                                            <TabItem.Header>
+                                                <TextBlock Text="Генетический алгоритм"/>
+                                            </TabItem.Header>
+                                            <TabItem.Content>
+                                                <StackPanel Orientation="Vertical">
+                                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                                        <TextBlock Text="Размер популяции" Margin="6 0 0 0"/>
+                                                        <TextBox Text="{Binding PopulationSize}" Width="30" Margin="6 0 6 0"/>
+                                                        <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                                        <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
+                                                        <TextBox Text="{Binding MutationPercent}" Width="30" Margin="6 0 6 0"/>
+                                                        <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                                        <TextBlock Text="Количество лучших результатов, передаваемых в новое" Margin="6 0 0 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                                                        <TextBlock Text="поколение без изменений" Margin="6 0 0 0"/>
+                                                        <TextBox Text="{Binding PassedToNewGenerationCount}" Width="30" Margin="6 0 6 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                                        <TextBlock Text="Количество тестов в одном поколоении" Margin="6 0 0 0"/>
+                                                        <TextBox Text="{Binding TestsCount}" Width="30" Margin="6 0 6 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                                        <TextBlock Text="Номер теста в текущем поколении" Margin="6 0 0 0"/>
+                                                        <TextBlock Text="{Binding CurrentTestNumber}" Margin="6 0 0 0"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="Топ поколения" HorizontalAlignment="Center" Margin="0 4 0 0"/>
+                                                    <ListView Grid.Row="2" ItemsSource="{Binding GenerationLeaderboard}" Height="160" Margin="6 3 6 4">
+                                                        <ListView.ItemContainerStyle>
+                                                            <Style TargetType="ListViewItem">
+                                                                <Setter Property="Focusable" Value="False"/>
+                                                            </Style>
+                                                        </ListView.ItemContainerStyle>
+                                                        <ListView.View>
+                                                            <GridView>
+                                                                <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" Width="{Binding ElementName=helperGenerationLeaderboard0, Path=ActualWidth}"/>
+                                                                <GridViewColumn DisplayMemberBinding="{Binding TotalScore, StringFormat={}{0:0.000}}" Header="Общий счёт" Width="{Binding ElementName=helperGenerationLeaderboard1, Path=ActualWidth}"/>
+                                                                <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:0.000}}" Header="Счёт" Width="{Binding ElementName=helperGenerationLeaderboard2, Path=ActualWidth}"/>
+                                                                <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Яблок" Width="{Binding ElementName=helperGenerationLeaderboard3, Path=ActualWidth}"/>
+                                                            </GridView>
+                                                        </ListView.View>
+                                                    </ListView>
+                                                    <Grid Grid.Row="2" Visibility="Visible" Margin="6 0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="60"/>
+                                                            <ColumnDefinition Width="1*"/>
+                                                            <ColumnDefinition Width="1*"/>
+                                                            <ColumnDefinition Width="50"/>
+                                                            <ColumnDefinition Width="30"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid Grid.Column="0" x:Name="helperGenerationLeaderboard0"/>
+                                                        <Grid Grid.Column="1" x:Name="helperGenerationLeaderboard1"/>
+                                                        <Grid Grid.Column="2" x:Name="helperGenerationLeaderboard2"/>
+                                                        <Grid Grid.Column="3" x:Name="helperGenerationLeaderboard3"/>
+                                                    </Grid>
+                                                    <StackPanel Orientation="Vertical" Background="#FFEBCEFF">
+                                                        <TextBlock Text="Лучшие результаты" HorizontalAlignment="Center" Margin="0 2 0 0"/>
+                                                        <ListView Grid.Row="2" ItemsSource="{Binding Leaderboard}" Height="130" Margin="6 3 6 4">
+                                                            <ListView.ItemContainerStyle>
+                                                                <Style TargetType="ListViewItem">
+                                                                    <Setter Property="Focusable" Value="False"/>
+                                                                </Style>
+                                                            </ListView.ItemContainerStyle>
+                                                            <ListView.View>
+                                                                <GridView>
+                                                                    <GridViewColumn DisplayMemberBinding="{Binding Score, StringFormat={}{0:#.###}}" Header="Средний счёт" Width="{Binding ElementName=helperLeaderboard0, Path=ActualWidth}"/>
+                                                                    <GridViewColumn DisplayMemberBinding="{Binding EatenApples}" Header="Макс. яблок" Width="{Binding ElementName=helperLeaderboard1, Path=ActualWidth}"/>
+                                                                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Поколение" Width="{Binding ElementName=helperLeaderboard2, Path=ActualWidth}"/>
+                                                                </GridView>
+                                                            </ListView.View>
+                                                        </ListView>
+                                                        <Grid Grid.Row="2" Visibility="Visible" Margin="6 0">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="1*"/>
+                                                                <ColumnDefinition Width="1*"/>
+                                                                <ColumnDefinition Width="70"/>
+                                                                <ColumnDefinition Width="30"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Grid Grid.Column="0" x:Name="helperLeaderboard0"/>
+                                                            <Grid Grid.Column="1" x:Name="helperLeaderboard1"/>
+                                                            <Grid Grid.Column="2" x:Name="helperLeaderboard2"/>
+                                                        </Grid>
+                                                        <Button Content="Запустить змейку выбранного результата" Width="237" Margin="0 2 0 4"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </TabItem.Content>
+                                        </TabItem>
+                                        <TabItem>
+                                            <TabItem.Header>
+                                                <TextBlock Text="Deep Q-Learning"/>
+                                            </TabItem.Header>
+                                            <TabItem.Content>
+                                                <StackPanel Orientation="Vertical">
 
+                                                </StackPanel>
+                                            </TabItem.Content>
+                                        </TabItem>
+                                    </TabControl>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 4 0 0">
+                                        <TextBlock Text="Симуляция"/>
+                                    </StackPanel>
+                                    <RadioButton IsChecked="{Binding IsRealtimeSimulation}" GroupName="simulationType" Content="В режиме реального времени" Margin="6 0 6 0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                        <TextBlock Text="Задержка между ходами, мс" Margin="6 0 0 0"/>
+                                        <Slider Minimum="10" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
+                                        <TextBlock Text="{Binding RealtimeDelay}" Margin="4 0 6 0"/>
+                                    </StackPanel>
+                                    <RadioButton GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                        <TextBlock Text="Длительность, сек" Margin="6 0 0 0"/>
+                                        <Slider Minimum="5" Maximum="3600" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
+                                        <TextBlock Text="{Binding FixedDuration}" Margin="4 0 6 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 6 0 0">
+                                        <Button Content="Запустить" Command="{Binding StartSimulation_Click}" Width="72" Padding="0 2" Margin="2 0"/>
+                                        <Button Content="Остановить" Command="{Binding StopSimulation_Click}" Width="72" Padding="0 2" Margin="2 0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0 2 0 2" HorizontalAlignment="Center">
+                                        <TextBlock Text="Осталось, сек"/>
+                                        <TextBlock Text="{Binding RemainingTime}" Margin="6 0 6 0" Width="35"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </TabItem.Content>
-                        </TabItem>
-                    </TabControl>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 4 0 0">
-                        <TextBlock Text="Симуляция"/>
-                    </StackPanel>
-                    <RadioButton IsChecked="{Binding IsRealtimeSimulation}" GroupName="simulationType" Content="В режиме реального времени" Margin="6 0 6 0"/>
-                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                        <TextBlock Text="Задержка между ходами, мс" Margin="6 0 0 0"/>
-                        <Slider Minimum="10" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
-                        <TextBlock Text="{Binding RealtimeDelay}" Margin="4 0 6 0"/>
-                    </StackPanel>
-                    <RadioButton GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>
-                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                        <TextBlock Text="Длительность, сек" Margin="6 0 0 0"/>
-                        <Slider Minimum="5" Maximum="3600" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
-                        <TextBlock Text="{Binding FixedDuration}" Margin="4 0 6 0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 6 0 0">
-                        <Button Content="Запустить" Command="{Binding StartSimulation_Click}" Width="72" Padding="0 2" Margin="2 0"/>
-                        <Button Content="Остановить" Command="{Binding StopSimulation_Click}" Width="72" Padding="0 2" Margin="2 0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0 2 0 2" HorizontalAlignment="Center">
-                        <TextBlock Text="Осталось, сек"/>
-                        <TextBlock Text="{Binding RemainingTime}" Margin="6 0 6 0" Width="35"/>
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-            <!--Входы нейросети
+                            </Grid>
+                            <!--Входы нейросети
             <Grid Grid.Column="1" Margin="300 5 0 0" Width="140" HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
@@ -252,83 +259,179 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>-->
-            <Grid Grid.Column="1" Visibility="Visible">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="18"/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" x:Name="helper0"/>
-            </Grid>
-            <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
-                <ItemsControl ItemsSource="{Binding GameBoardsForRender}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="5 5 0 0">
-                                <!--Поле-->
-                                <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <UniformGrid/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <!--Змейки-->
-                                <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRender.SnakesCoordinate}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <ItemsControl>
-                                                <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#FF494949"/>
-                                            </ItemsControl>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemContainerStyle>
-                                        <Style TargetType="ContentPresenter">
-                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
-                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
-                                        </Style>
-                                    </ItemsControl.ItemContainerStyle>
-                                </ItemsControl>
-                                <!--Яблоки-->
-                                <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRender.ApplesCoordinates}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <ItemsControl>
-                                                <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="#FFFF6565"/>
-                                            </ItemsControl>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemContainerStyle>
-                                        <Style TargetType="ContentPresenter">
-                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
-                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
-                                        </Style>
-                                    </ItemsControl.ItemContainerStyle>
-                                </ItemsControl>
+                            <Grid Grid.Column="1" Visibility="Visible">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="18"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0" x:Name="helper0"/>
                             </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Width="{Binding ElementName=helper0, Path=ActualWidth}"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </ScrollViewer>
-        </Grid>
+                            <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
+                                <ItemsControl ItemsSource="{Binding GameBoardsForRender}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="5 5 0 0">
+                                                <!--Поле-->
+                                                <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="5">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <UniformGrid/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                                <!--Змейки-->
+                                                <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRender.SnakesCoordinate}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <Canvas/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <ItemsControl>
+                                                                <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#FF494949"/>
+                                                            </ItemsControl>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemContainerStyle>
+                                                        <Style TargetType="ContentPresenter">
+                                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                                        </Style>
+                                                    </ItemsControl.ItemContainerStyle>
+                                                </ItemsControl>
+                                                <!--Яблоки-->
+                                                <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRender.ApplesCoordinates}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <Canvas/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <ItemsControl>
+                                                                <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="#FFFF6565"/>
+                                                            </ItemsControl>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemContainerStyle>
+                                                        <Style TargetType="ContentPresenter">
+                                                            <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                                            <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                                        </Style>
+                                                    </ItemsControl.ItemContainerStyle>
+                                                </ItemsControl>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Width="{Binding ElementName=helper0, Path=ActualWidth}"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Grid>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="Q-Learning"/>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                    <TextBlock Text="Размер поля" Margin="6 0 0 0"/>
+                                    <TextBox Text="{Binding BoardSize}" Width="30" Margin="6 0 6 0"/>
+                                    <TextBlock Text="Количество яблок" Margin="6 0 0 0"/>
+                                    <TextBox Text="{Binding ApplesCount}" Width="30" Margin="6 0 6 0"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding GameBoardsForRender}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="5 5 0 0">
+                                            <!--Поле-->
+                                            <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding BoardCells}" BorderBrush="#FF787878" BorderThickness="1">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <UniformGrid/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Rectangle Width="{Binding CellSize, Mode=OneWay}" Height="{Binding CellSize, Mode=OneWay}" StrokeThickness="1" Stroke="#FFF8F8F8" Fill="#FFFCFCFC"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <!--Змейки-->
+                                            <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding SnakesForRender.SnakesCoordinate}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <Canvas/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ItemsControl>
+                                                            <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#FF494949"/>
+                                                        </ItemsControl>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                                <ItemsControl.ItemContainerStyle>
+                                                    <Style TargetType="ContentPresenter">
+                                                        <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                                        <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                                    </Style>
+                                                </ItemsControl.ItemContainerStyle>
+                                            </ItemsControl>
+                                            <!--Яблоки-->
+                                            <ItemsControl Margin="5 5 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding ApplesForRender.ApplesCoordinates}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <Canvas/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ItemsControl>
+                                                            <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="#FFFF6565"/>
+                                                        </ItemsControl>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                                <ItemsControl.ItemContainerStyle>
+                                                    <Style TargetType="ContentPresenter">
+                                                        <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                                                        <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
+                                                    </Style>
+                                                </ItemsControl.ItemContainerStyle>
+                                            </ItemsControl>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Width="{Binding ElementName=helper0, Path=ActualWidth}"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Grid>
+                    </StackPanel>
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
+        
     </Grid>
 </Window>

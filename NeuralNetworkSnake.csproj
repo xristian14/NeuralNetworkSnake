@@ -73,6 +73,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AForgeNeuroExtensions\ActivationNetwork.cs" />
+    <Compile Include="AForgeNeuroExtensions\ReLuActivationFunction.cs" />
+    <Compile Include="AForgeNeuroExtensions\SameActivationFunction.cs" />
     <Compile Include="AppleCoordinate.cs" />
     <Compile Include="ApplesForRender.cs" />
     <Compile Include="BoardCell.cs" />
@@ -88,8 +91,6 @@
     <Compile Include="Matrix.cs" />
     <Compile Include="NeuralNetworkUnit.cs" />
     <Compile Include="NeuralNetworkUnitGeneticLearning.cs" />
-    <Compile Include="ReLuFunction.cs" />
-    <Compile Include="SameActivationFunction.cs" />
     <Compile Include="Simulation.cs" />
     <Compile Include="SnakeCoordinate.cs" />
     <Compile Include="SnakeForRender.cs" />
@@ -137,5 +138,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

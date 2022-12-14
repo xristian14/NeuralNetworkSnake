@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetworkSnake
+namespace AForgeNeuroExtensions
 {
-    class ReLuFunction : AForge.Neuro.IActivationFunction, ICloneable
+    class SameActivationFunction : AForge.Neuro.IActivationFunction, ICloneable
     {
-        public ReLuFunction()
+        public SameActivationFunction()
         {
 
         }
         public object Clone()
         {
-            return new ReLuFunction();
+            return new SameActivationFunction();
         }
         public double Derivative(double x)
         {
@@ -26,7 +26,7 @@ namespace NeuralNetworkSnake
         }
         public double Function(double value)
         {
-            return Math.Max(0, value);
+            return value;
         }
     }
 }

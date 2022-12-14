@@ -461,8 +461,9 @@ namespace NeuralNetworkSnake
                 _isFirstTest = false;
                 //create neural network
                 //network = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), a[0], a[1], a[2], a[3]);
-                network = new AForge.Neuro.ActivationNetwork(new ReLuFunction(), a[0], a[1], a[2]);
-                network2 = new AForge.Neuro.ActivationNetwork(new ReLuFunction(), a[0], a[1], a[2]);
+                //network = new AForge.Neuro.ActivationNetwork(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
+                network = AForgeNeuroExtensions.ActivationNetwork.BuildRandFromNegativeOneToOne(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
+                network2 = new AForge.Neuro.ActivationNetwork(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
                 //create teacher
                 AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(network);
                 // loop
@@ -533,12 +534,12 @@ namespace NeuralNetworkSnake
                     int neuonCount = network.Layers[i].Neurons[k].Weights.Length;
                     if(i == network.Layers.Length - 1)
                     {
-                        ((AForge.Neuro.ActivationNeuron)network2.Layers[i].Neurons[k]).ActivationFunction = new SameActivationFunction();
+                        ((AForge.Neuro.ActivationNeuron)network2.Layers[i].Neurons[k]).ActivationFunction = new AForgeNeuroExtensions.SameActivationFunction();
                     }
                 }
             }
             double[] rr = network.Compute(array1);
-            LayersText += "network2.Compute(array1)= ";
+            LayersText += "network.Compute(array1)= ";
             for(int i = 0; i < rr.Length; i++)
             {
                 LayersText += Environment.NewLine + "," + rr[i];
