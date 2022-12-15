@@ -444,7 +444,23 @@ namespace NeuralNetworkSnake
 
 
 
-        private AForgeMachineLearningExtensions.QLearning _qLearning;
+
+
+
+
+
+
+        private int _qLearningCellWidth = 61;
+        private QLearningCellView _qLearningSelectedCellView;
+        public QLearningCellView QLearningSelectedCellView
+        {
+            get { return _qLearningSelectedCellView; }
+            set
+            {
+                _qLearningSelectedCellView = value;
+                OnPropertyChanged();
+            }
+        }
         private ObservableCollection<QLearningCellView> _qLearningCellsView = new ObservableCollection<QLearningCellView>();
         public ObservableCollection<QLearningCellView> QLearningCellsView
         {
@@ -458,11 +474,11 @@ namespace NeuralNetworkSnake
         private void CreateQLearningCellsView(AForgeMachineLearningExtensions.QLearningMap[,] qLearningMap, PointInt destinationPoint)
         {
             QLearningCellsView.Clear();
-            int cellWidth = 57;
             System.Windows.Media.Brush ordinaryBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 172, 255, 168));
             System.Windows.Media.Brush wallBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 226, 216, 114));
             System.Windows.Media.Brush cliffBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 128, 163, 255));
             System.Windows.Media.Brush destinationBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 135, 135));
+            QLearningSelectedCellView = new QLearningCellView(ordinaryBrush, 0, 0, 0, 0, 0, 0, 0);
             for (int i = 0; i < qLearningMap.GetLength(0); i++)
             {
                 for (int k = 0; k < qLearningMap.GetLength(1); k++)
@@ -480,62 +496,115 @@ namespace NeuralNetworkSnake
                     {
                         brush = destinationBrush;
                     }
-                    QLearningCellsView.Add(new QLearningCellView(brush, qLearningMap[i, k].Reward, 0, 0, 0, 0, cellWidth * i, cellWidth * k));
+                    QLearningCellsView.Add(new QLearningCellView(brush, qLearningMap[i, k].Reward, 0, 0, 0, 0, _qLearningCellWidth * i, _qLearningCellWidth * k));
                 }
             }
         }
         private void UpdateQLearningCellView(PointInt updateCellPoint)
         {
-
+            int state = PointIntToState(updateCellPoint, _qLearningMapProcessing.MapColumnCount);
+            QLearningCellsView[state].UpQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][0];
+            QLearningCellsView[state].RightQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][1];
+            QLearningCellsView[state].LeftQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][2];
+            QLearningCellsView[state].DownQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][3];
         }
-        private CancellationToken _qLearningCancellationToken;
+        private void UpdateQLearningSelectedCellView(PointInt updateCellPoint)
+        {
+            QLearningSelectedCellView.Left = _qLearningCellWidth * updateCellPoint.Y;
+            QLearningSelectedCellView.Top = _qLearningCellWidth * updateCellPoint.X;
+        }
+        private int PointIntToState(PointInt pointInt, int mapColumnCount)
+        {
+            return mapColumnCount * pointInt.X + pointInt.Y;
+        }
+        private AForgeMachineLearningExtensions.QLearningMapProcessing _qLearningMapProcessing;
+        private void CreateQLearningMapProcessing()
+        {
+            AForgeMachineLearningExtensions.QLearningMap[,] qLearningMap = new AForgeMachineLearningExtensions.QLearningMap[6, 12];
+            PointInt destinationPoint = new PointInt(qLearningMap.GetLength(0) - 2, qLearningMap.GetLength(1) - 2);
+            for (int i = 0; i < qLearningMap.GetLength(0); i++)
+            {
+                for (int k = 0; k < qLearningMap.GetLength(1); k++)
+                {
+                    if (i == 0 || i == qLearningMap.GetLength(0) - 1) //стена слева и справа от поля
+                    {
+                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
+                    }
+                    else if (k == 0 || k == qLearningMap.GetLength(1) - 1) //стена сверху и снизу от поля
+                    {
+                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
+                    }
+                    else if (i == qLearningMap.GetLength(0) - 2 && k > 1 && k < qLearningMap.GetLength(1) - 1) //обрыв
+                    {
+                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, true, -50);
+                    }
+                    else //обычная клетка
+                    {
+                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, -1);
+                    }
+
+                    if (i == destinationPoint.X && k == destinationPoint.Y) //клетка назначения
+                    {
+                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, 0);
+                    }
+                }
+            }
+            CreateQLearningCellsView(qLearningMap, destinationPoint);
+
+            AForge.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForge.MachineLearning.EpsilonGreedyExploration(0/*.1*/);
+            AForge.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForge.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
+            AForge.MachineLearning.QLearning qLearning = new AForge.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration, false);
+            AForgeMachineLearningExtensions.QLearning myqLearning = new AForgeMachineLearningExtensions.QLearning(12 * 6, 4, tabuSearchExploration);
+            _qLearningMapProcessing = new AForgeMachineLearningExtensions.QLearningMapProcessing(qLearningMap, new PointInt(qLearningMap.GetLength(0) - 2, 1), destinationPoint, qLearning, myqLearning, true);
+        }
+        private CancellationTokenSource _qLearningCancellationTokenSource;
 
         private void QLearningRun(CancellationToken token)
         {
-            if(_qLearning == null)
-            {
-                AForgeMachineLearningExtensions.QLearningMap[,] qLearningMap = new AForgeMachineLearningExtensions.QLearningMap[12, 6];
-                PointInt destinationPoint = new PointInt(qLearningMap.GetLength(0) - 2, qLearningMap.GetLength(1) - 2);
-                for(int i = 0; i < qLearningMap.GetLength(0); i++)
-                {
-                    for(int k = 0; k < qLearningMap.GetLength(1); k++)
-                    {
-                        if(i == 0 || i == qLearningMap.GetLength(0) - 1) //стена слева и справа от поля
-                        {
-                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
-                        }
-                        else if(k == 0 || k == qLearningMap.GetLength(1) - 1) //стена сверху и снизу от поля
-                        {
-                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
-                        }
-                        else if(i > 0 && i < qLearningMap.GetLength(0) - 1 && k == qLearningMap.GetLength(1) - 2) //обрыв
-                        {
-                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, true, -50);
-                        }
-                        else //обычная клетка
-                        {
-                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, -1);
-                        }
-
-                        if(i == destinationPoint.X && k == destinationPoint.Y) //клетка назначения
-                        {
-                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, 0);
-                        }
-                    }
-                }
-                DispatcherInvoke((Action)(() => {
-                    CreateQLearningCellsView(qLearningMap, destinationPoint);
-                }));
-                AForge.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForge.MachineLearning.EpsilonGreedyExploration(0.1);
-                AForge.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForge.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
-                AForge.MachineLearning.QLearning qLearning = new AForge.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration);
-                //_qLearning = new AForgeMachineLearningExtensions.QLearning(qLearningMap, qLearning);
-            }
             while (!token.IsCancellationRequested)
             {
-
+                PointInt previousPoint = _qLearningMapProcessing.CurrentPoint;
+                PointInt nextPoint = _qLearningMapProcessing.Move();
+                DispatcherInvoke((Action)(() => {
+                    UpdateQLearningCellView(previousPoint);
+                    UpdateQLearningSelectedCellView(nextPoint);
+                }));
+                Thread.Sleep(RealtimeDelay);
             }
         }
+
+        public ICommand StartQlearning_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    if(_qLearningMapProcessing == null)
+                    {
+                        CreateQLearningMapProcessing();
+                    }
+                    _qLearningCancellationTokenSource = new CancellationTokenSource();
+                    CancellationToken token = _qLearningCancellationTokenSource.Token;
+                    Task.Run(() => QLearningRun(token)); //запускаем в отдельном потоке чтобы форма обновлялась
+                }, (obj) => true);
+            }
+        }
+        public ICommand StopQlearning_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    _qLearningCancellationTokenSource.Cancel();
+                }, (obj) => true);
+            }
+        }
+
+
+
+
+
+
 
 
 
@@ -647,8 +716,6 @@ namespace NeuralNetworkSnake
             {
                 LayersText += Environment.NewLine + "," + rr[i];
             }
-
-            QLearningRun(_qLearningCancellationToken);
         }
 
         public ICommand ButtonTest_Click
