@@ -6,17 +6,34 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworkSnake
 {
-    class QLearningCellsView : ViewModelBase
+    /// <summary>
+    /// Класс описывает экземпляр ячейки для отображения в представлении, из которых состоит поле для алгоритма QLearning
+    /// </summary>
+    class QLearningCellView : ViewModelBase
     {
-        public QLearningCellsView(int top, int left, int width, int height)
+        public QLearningCellView(System.Windows.Media.Brush backgroundBrush, double reward, double upQvalue, double rightQvalue, double leftQvalue, double downQvalue, int top, int left)
         {
+            BackgroundBrush = backgroundBrush;
+            Reward = reward;
+            UpQvalue = upQvalue;
+            RightQvalue = rightQvalue;
+            LeftQvalue = leftQvalue;
+            DownQvalue = downQvalue;
             Top = top;
             Left = left;
-            Width = width;
-            Height = height;
         }
-        private int _reward = 0;
-        public int Reward
+        private System.Windows.Media.Brush _backgroundBrush;
+        public System.Windows.Media.Brush BackgroundBrush
+        {
+            get { return _backgroundBrush; }
+            set
+            {
+                _backgroundBrush = value;
+                OnPropertyChanged();
+            }
+        }
+        private double _reward;
+        public double Reward
         {
             get { return _reward; }
             set
@@ -25,7 +42,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private double _upQvalue = 0;
+        private double _upQvalue;
         public double UpQvalue
         {
             get { return _upQvalue; }
@@ -35,7 +52,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private double _rightQvalue = 0;
+        private double _rightQvalue;
         public double RightQvalue
         {
             get { return _rightQvalue; }
@@ -45,7 +62,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private double _leftQvalue = 0;
+        private double _leftQvalue;
         public double LeftQvalue
         {
             get { return _leftQvalue; }
@@ -55,7 +72,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private double _downQvalue = 0;
+        private double _downQvalue;
         public double DownQvalue
         {
             get { return _downQvalue; }
@@ -65,7 +82,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private int _top = 0;
+        private int _top;
         public int Top
         {
             get { return _top; }
@@ -75,33 +92,13 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        public int _left { get; set; }
+        private int _left;
         public int Left
         {
             get { return _left; }
             set
             {
                 _left = value;
-                OnPropertyChanged();
-            }
-        }
-        public int _width { get; set; }
-        public int Width
-        {
-            get { return _width; }
-            set
-            {
-                _width = value;
-                OnPropertyChanged();
-            }
-        }
-        public int _height { get; set; }
-        public int Height
-        {
-            get { return _height; }
-            set
-            {
-                _height = value;
                 OnPropertyChanged();
             }
         }

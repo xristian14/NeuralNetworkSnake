@@ -364,11 +364,33 @@
                                     <TextBlock Text="{Binding RealtimeDelay}" Width="30" Margin="4 0 6 0"/>
                                     <Button Content="Запустить" Command="{Binding StartQlearning_Click}" Width="72" Padding="0 2" Margin="2 0"/>
                                     <Button Content="Остановить" Command="{Binding StopQlearning_Click}" Width="72" Padding="0 2" Margin="2 0"/>
+                                    <Grid>
+                                        <Rectangle Width="57" Height="57" Fill="#FFFF8787"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#B2FFFFFF" FontWeight="Bold"/>
+                                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                <TextBlock Text="U:" Style="{StaticResource qlearningCellText}"/>
+                                                <TextBlock Text="{Binding UpQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                <TextBlock Text="R:" Style="{StaticResource qlearningCellText}"/>
+                                                <TextBlock Text="{Binding RightQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                <TextBlock Text="L:" Style="{StaticResource qlearningCellText}"/>
+                                                <TextBlock Text="{Binding LeftQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                <TextBlock Text="D:" Style="{StaticResource qlearningCellText}"/>
+                                                <TextBlock Text="{Binding DownQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
                                 </StackPanel>
                             </StackPanel>
                             <Grid Grid.Row="1" Margin="5 5 0 0">
                                 <!--Ячейки поля-->
-                                <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="#FF787878" BorderThickness="1" ItemsSource="{Binding QLearningCells}">
+                                <ItemsControl HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="#FF787878" BorderThickness="1" ItemsSource="{Binding QLearningCellsView}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <Canvas/>
@@ -376,30 +398,28 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <ItemsControl>
-                                                <Grid>
-                                                    <Rectangle Width="57" Height="57" Fill="#FFFFC2C2"/>
-                                                    <TextBlock Text="{Binding Reward}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#B2FFFFFF" FontWeight="Bold"/>
-                                                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
-                                                            <TextBlock Text="U:" Style="{StaticResource qlearningCellText}"/>
-                                                            <TextBlock Text="{Binding UpQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
-                                                            <TextBlock Text="R:" Style="{StaticResource qlearningCellText}"/>
-                                                            <TextBlock Text="{Binding RightQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
-                                                            <TextBlock Text="L:" Style="{StaticResource qlearningCellText}"/>
-                                                            <TextBlock Text="{Binding LeftQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
-                                                            <TextBlock Text="D:" Style="{StaticResource qlearningCellText}"/>
-                                                            <TextBlock Text="{Binding DownQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
-                                                        </StackPanel>
+                                            <Grid>
+                                                <Rectangle Width="57" Height="57" Fill="{Binding BackgroundBrush}"/>
+                                                <TextBlock Text="{Binding Reward}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#B2FFFFFF" FontWeight="Bold"/>
+                                                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                        <TextBlock Text="U:" Style="{StaticResource qlearningCellText}"/>
+                                                        <TextBlock Text="{Binding UpQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
                                                     </StackPanel>
-                                                </Grid>
-                                            </ItemsControl>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                        <TextBlock Text="R:" Style="{StaticResource qlearningCellText}"/>
+                                                        <TextBlock Text="{Binding RightQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                        <TextBlock Text="L:" Style="{StaticResource qlearningCellText}"/>
+                                                        <TextBlock Text="{Binding LeftQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
+                                                        <TextBlock Text="D:" Style="{StaticResource qlearningCellText}"/>
+                                                        <TextBlock Text="{Binding DownQvalue, StringFormat={}{0:0.000}}" Style="{StaticResource qlearningCellText}" Margin="2 0 0 0"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                     <ItemsControl.ItemContainerStyle>

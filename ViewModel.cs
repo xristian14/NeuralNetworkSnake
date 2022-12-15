@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows;
 using System.ComponentModel;
 using System.Collections.Specialized;
+using System.Threading;
 
 namespace NeuralNetworkSnake
 {
@@ -443,6 +444,102 @@ namespace NeuralNetworkSnake
 
 
 
+        private AForgeMachineLearningExtensions.QLearning _qLearning;
+        private ObservableCollection<QLearningCellView> _qLearningCellsView = new ObservableCollection<QLearningCellView>();
+        public ObservableCollection<QLearningCellView> QLearningCellsView
+        {
+            get { return _qLearningCellsView; }
+            set
+            {
+                _qLearningCellsView = value;
+                OnPropertyChanged();
+            }
+        }
+        private void CreateQLearningCellsView(AForgeMachineLearningExtensions.QLearningMap[,] qLearningMap, PointInt destinationPoint)
+        {
+            QLearningCellsView.Clear();
+            int cellWidth = 57;
+            System.Windows.Media.Brush ordinaryBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 172, 255, 168));
+            System.Windows.Media.Brush wallBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 226, 216, 114));
+            System.Windows.Media.Brush cliffBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 128, 163, 255));
+            System.Windows.Media.Brush destinationBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 135, 135));
+            for (int i = 0; i < qLearningMap.GetLength(0); i++)
+            {
+                for (int k = 0; k < qLearningMap.GetLength(1); k++)
+                {
+                    System.Windows.Media.Brush brush = ordinaryBrush;
+                    if (qLearningMap[i, k].IsWall)
+                    {
+                        brush = wallBrush;
+                    }
+                    else if(qLearningMap[i, k].IsCliff)
+                    {
+                        brush = cliffBrush;
+                    }
+                    if(i == destinationPoint.X && k == destinationPoint.Y)
+                    {
+                        brush = destinationBrush;
+                    }
+                    QLearningCellsView.Add(new QLearningCellView(brush, qLearningMap[i, k].Reward, 0, 0, 0, 0, cellWidth * i, cellWidth * k));
+                }
+            }
+        }
+        private void UpdateQLearningCellView(PointInt updateCellPoint)
+        {
+
+        }
+        private CancellationToken _qLearningCancellationToken;
+
+        private void QLearningRun(CancellationToken token)
+        {
+            if(_qLearning == null)
+            {
+                AForgeMachineLearningExtensions.QLearningMap[,] qLearningMap = new AForgeMachineLearningExtensions.QLearningMap[12, 6];
+                PointInt destinationPoint = new PointInt(qLearningMap.GetLength(0) - 2, qLearningMap.GetLength(1) - 2);
+                for(int i = 0; i < qLearningMap.GetLength(0); i++)
+                {
+                    for(int k = 0; k < qLearningMap.GetLength(1); k++)
+                    {
+                        if(i == 0 || i == qLearningMap.GetLength(0) - 1) //стена слева и справа от поля
+                        {
+                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
+                        }
+                        else if(k == 0 || k == qLearningMap.GetLength(1) - 1) //стена сверху и снизу от поля
+                        {
+                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
+                        }
+                        else if(i > 0 && i < qLearningMap.GetLength(0) - 1 && k == qLearningMap.GetLength(1) - 2) //обрыв
+                        {
+                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, true, -50);
+                        }
+                        else //обычная клетка
+                        {
+                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, -1);
+                        }
+
+                        if(i == destinationPoint.X && k == destinationPoint.Y) //клетка назначения
+                        {
+                            qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, 0);
+                        }
+                    }
+                }
+                DispatcherInvoke((Action)(() => {
+                    CreateQLearningCellsView(qLearningMap, destinationPoint);
+                }));
+                AForge.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForge.MachineLearning.EpsilonGreedyExploration(0.1);
+                AForge.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForge.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
+                AForge.MachineLearning.QLearning qLearning = new AForge.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration);
+                //_qLearning = new AForgeMachineLearningExtensions.QLearning(qLearningMap, qLearning);
+            }
+            while (!token.IsCancellationRequested)
+            {
+
+            }
+        }
+
+
+
+
 
 
         private bool _isFirstTest = true;
@@ -550,6 +647,8 @@ namespace NeuralNetworkSnake
             {
                 LayersText += Environment.NewLine + "," + rr[i];
             }
+
+            QLearningRun(_qLearningCancellationToken);
         }
 
         public ICommand ButtonTest_Click
