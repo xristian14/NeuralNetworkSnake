@@ -22,7 +22,7 @@ namespace AForgeExtensions.MachineLearning
             {
                 if (_random.NextDouble() < _epsilon)
                 {
-                    int randAction = _random.Next(0, actionEstimates.Length - 2);
+                    int randAction = _random.Next(0, actionEstimates.Length - 1);
                     if(bestAction <= randAction)
                     {
                         randAction++;

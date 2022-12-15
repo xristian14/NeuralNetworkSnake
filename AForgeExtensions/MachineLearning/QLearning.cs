@@ -10,6 +10,7 @@ namespace AForgeExtensions.MachineLearning
     {
         public QLearning(int states, int actions, AForge.MachineLearning.IExplorationPolicy explorationPolicy)
         {
+            Random random = new Random();
             StatesCount = states;
             _actions = actions;
             ExplorationPolicy = explorationPolicy;
@@ -21,7 +22,8 @@ namespace AForgeExtensions.MachineLearning
                 _qvalues[i] = new double[actions];
                 for (int k = 0; k < actions; k++)
                 {
-                    _qvalues[i][k] = 0;
+                    //_qvalues[i][k] = 0;
+                    _qvalues[i][k] = random.NextDouble();
                 }
             }
         }

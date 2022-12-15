@@ -554,7 +554,13 @@ namespace NeuralNetworkSnake
             AForge.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForge.MachineLearning.EpsilonGreedyExploration(0.1/**/);
             AForge.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForge.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
             AForge.MachineLearning.QLearning qLearning = new AForge.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration, false);
-            AForgeExtensions.MachineLearning.QLearning myqLearning = new AForgeExtensions.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration);
+
+            AForgeExtensions.MachineLearning.EpsilonGreedyExploration myepsilonGreedyExploration = new AForgeExtensions.MachineLearning.EpsilonGreedyExploration(0.3);
+            AForgeExtensions.MachineLearning.TabuSearchExploration mytabuSearchExploration = new AForgeExtensions.MachineLearning.TabuSearchExploration(4, myepsilonGreedyExploration);
+            AForgeExtensions.MachineLearning.QLearning myqLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, mytabuSearchExploration);
+
+
+
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, new PointInt(qLearningMap.GetLength(0) - 2, 1), destinationPoint, qLearning, myqLearning, false);
         }
         private CancellationTokenSource _qLearningCancellationTokenSource;
