@@ -503,10 +503,10 @@ namespace NeuralNetworkSnake
         private void UpdateQLearningCellView(PointInt updateCellPoint)
         {
             int state = PointIntToState(updateCellPoint, _qLearningMapProcessing.MapColumnCount);
-            QLearningCellsView[state].UpQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][0];
-            QLearningCellsView[state].RightQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][1];
-            QLearningCellsView[state].LeftQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][2];
-            QLearningCellsView[state].DownQvalue = _qLearningMapProcessing.MyqLearning.Qvalues[state][3];
+            QLearningCellsView[state].UpQvalue = _qLearningMapProcessing.QLearning.Qvalues[state][0];
+            QLearningCellsView[state].RightQvalue = _qLearningMapProcessing.QLearning.Qvalues[state][1];
+            QLearningCellsView[state].LeftQvalue = _qLearningMapProcessing.QLearning.Qvalues[state][2];
+            QLearningCellsView[state].DownQvalue = _qLearningMapProcessing.QLearning.Qvalues[state][3];
         }
         private void UpdateQLearningSelectedCellView(PointInt updateCellPoint)
         {
@@ -551,17 +551,11 @@ namespace NeuralNetworkSnake
             }
             CreateQLearningCellsView(qLearningMap, destinationPoint);
 
-            AForge.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForge.MachineLearning.EpsilonGreedyExploration(0.1/**/);
-            AForge.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForge.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
-            AForge.MachineLearning.QLearning qLearning = new AForge.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration, false);
+            AForgeExtensions.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForgeExtensions.MachineLearning.EpsilonGreedyExploration(0.1);
+            AForgeExtensions.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForgeExtensions.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
+            AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
 
-            AForgeExtensions.MachineLearning.EpsilonGreedyExploration myepsilonGreedyExploration = new AForgeExtensions.MachineLearning.EpsilonGreedyExploration(0.3);
-            AForgeExtensions.MachineLearning.TabuSearchExploration mytabuSearchExploration = new AForgeExtensions.MachineLearning.TabuSearchExploration(4, myepsilonGreedyExploration);
-            AForgeExtensions.MachineLearning.QLearning myqLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, mytabuSearchExploration);
-
-
-
-            _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, new PointInt(qLearningMap.GetLength(0) - 2, 1), destinationPoint, qLearning, myqLearning, false);
+            _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, new PointInt(qLearningMap.GetLength(0) - 2, 1), destinationPoint, qLearning);
         }
         private CancellationTokenSource _qLearningCancellationTokenSource;
 

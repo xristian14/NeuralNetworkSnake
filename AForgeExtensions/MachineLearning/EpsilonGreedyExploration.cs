@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AForgeExtensions.MachineLearning
 {
-    public class EpsilonGreedyExploration : AForge.MachineLearning.IExplorationPolicy
+    public class EpsilonGreedyExploration : AForgeExtensions.MachineLearning.IExplorationPolicy
     {
         public EpsilonGreedyExploration(double epsilon)
         {
@@ -15,6 +15,12 @@ namespace AForgeExtensions.MachineLearning
         private Random _random = new Random();
         private double _epsilon;
         public double Epsilon { get { return _epsilon; } set { _epsilon = value; } }
+        public double SetEpsilon(double epsilon)
+        {
+            double previousEpsilon = Epsilon;
+            Epsilon = epsilon;
+            return previousEpsilon;
+        }
         public int ChooseAction(double[] actionEstimates)
         {
             int bestAction = AForgeExtensions.Features.MaxIndex(actionEstimates);

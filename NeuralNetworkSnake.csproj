@@ -81,6 +81,7 @@
     </ApplicationDefinition>
     <Compile Include="AForgeExtensions\Features.cs" />
     <Compile Include="AForgeExtensions\MachineLearning\EpsilonGreedyExploration.cs" />
+    <Compile Include="AForgeExtensions\MachineLearning\IExplorationPolicy.cs" />
     <Compile Include="AForgeExtensions\MachineLearning\QLearning.cs" />
     <Compile Include="AForgeExtensions\MachineLearning\TabuSearchExploration.cs" />
     <Compile Include="AForgeExtensions\Neuro\ActivationNetwork.cs" />

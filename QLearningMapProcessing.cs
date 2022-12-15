@@ -8,7 +8,7 @@ namespace NeuralNetworkSnake
 {
     class QLearningMapProcessing
     {
-        public QLearningMapProcessing(QLearningMap[,] map, NeuralNetworkSnake.PointInt startPoint, NeuralNetworkSnake.PointInt destinationPoint, AForge.MachineLearning.QLearning qLearning, AForgeExtensions.MachineLearning.QLearning myqLearning, bool isMyqLearning)
+        public QLearningMapProcessing(QLearningMap[,] map, NeuralNetworkSnake.PointInt startPoint, NeuralNetworkSnake.PointInt destinationPoint, AForgeExtensions.MachineLearning.QLearning qLearning)
         {
             _map = map;
             _mapRowsCount = map.GetLength(0);
@@ -17,14 +17,10 @@ namespace NeuralNetworkSnake
             _currentPoint = startPoint;
             _destinationPoint = destinationPoint;
             _qLearning = qLearning;
-            _myqLearning = myqLearning;
-            _isMyqLearning = isMyqLearning;
+            UpdateTabuActions();
         }
-        private bool _isMyqLearning;
-        private AForge.MachineLearning.QLearning _qLearning;
-        public AForge.MachineLearning.QLearning QLearning { get { return _qLearning; } }
-        private AForgeExtensions.MachineLearning.QLearning _myqLearning;
-        public AForgeExtensions.MachineLearning.QLearning MyqLearning { get { return _myqLearning; } }
+        private AForgeExtensions.MachineLearning.QLearning _qLearning;
+        public AForgeExtensions.MachineLearning.QLearning QLearning { get { return _qLearning; } }
         private int _mapRowsCount;
         public int MapRowsCoun { get { return _mapRowsCount; } }
         private int _mapColumnCount;
@@ -50,42 +46,43 @@ namespace NeuralNetworkSnake
         /// </summary>
         private void UpdateTabuActions()
         {
-            int time = 1;
+            ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).ResetTabuList();
+            int time = 2;
             //up
             if (_currentPoint.X == 0)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
             }
             else if (_map[_currentPoint.X - 1, _currentPoint.Y].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
             }
             //right
             if (_currentPoint.Y == _mapColumnCount - 1)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
             }
             else if (_map[_currentPoint.X, _currentPoint.Y + 1].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
             }
             //left
             if (_currentPoint.Y == 0)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
             }
             else if (_map[_currentPoint.X, _currentPoint.Y - 1].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
             }
             //down
             if (_currentPoint.X == _mapRowsCount - 1)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
             }
             else if (_map[_currentPoint.X + 1, _currentPoint.Y].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
+                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
             }
 
         }
@@ -118,23 +115,17 @@ namespace NeuralNetworkSnake
             if (_map[_currentPoint.X, _currentPoint.Y].IsCliff || (_currentPoint.X == _destinationPoint.X && _currentPoint.Y == _destinationPoint.Y)) //если попали в обрыв или в точку назначения, переходим в начало
             {
                 _currentPoint = _startPoint;
+                UpdateTabuActions();
             }
             else
             {
-                UpdateTabuActions();
                 int previousState = PointIntToState(_currentPoint);
-                int previousAction = _isMyqLearning ? _myqLearning.GetAction(previousState) : _qLearning.GetAction(previousState);
+                int previousAction = _qLearning.GetAction(previousState);
                 int nextState = GetNextState(_currentPoint, previousAction);
                 NeuralNetworkSnake.PointInt nextPoint = StateToPointInt(nextState);
-                if (_isMyqLearning)
-                {
-                    _myqLearning.UpdateState(previousState, previousAction, Map[nextPoint.X, nextPoint.Y].Reward, nextState);
-                }
-                else
-                {
-                    _qLearning.UpdateState(previousState, previousAction, Map[nextPoint.X, nextPoint.Y].Reward, nextState);
-                }
                 _currentPoint = nextPoint;
+                UpdateTabuActions();
+                _qLearning.UpdateState(previousState, previousAction, Map[nextPoint.X, nextPoint.Y].Reward, nextState);
             }
             return _currentPoint;
         }

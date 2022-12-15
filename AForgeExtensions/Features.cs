@@ -28,5 +28,10 @@ namespace AForgeExtensions
             }
             return maxIndex;
         }
+        public static Random _random = new Random();
+        public static double GetRandDouble(double min, double max)
+        {
+            return _random.NextDouble() * (max - min) + min;
+        }
     }
 }

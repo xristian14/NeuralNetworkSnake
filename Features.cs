@@ -18,7 +18,7 @@ namespace NeuralNetworkSnake
         {
             return (float)_random.NextDouble() * (max - min) + min;
         }
-        public static double GetRandDouble(float min, float max)
+        public static double GetRandDouble(double min, double max)
         {
             return _random.NextDouble() * (max - min) + min;
         }
