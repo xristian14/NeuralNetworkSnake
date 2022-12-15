@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AForgeMachineLearningExtensions
+namespace NeuralNetworkSnake
 {
     class QLearningMapProcessing
     {
-        public QLearningMapProcessing(QLearningMap[,] map, NeuralNetworkSnake.PointInt startPoint, NeuralNetworkSnake.PointInt destinationPoint, AForge.MachineLearning.QLearning qLearning, AForgeMachineLearningExtensions.QLearning myqLearning, bool isMyqLearning)
+        public QLearningMapProcessing(QLearningMap[,] map, NeuralNetworkSnake.PointInt startPoint, NeuralNetworkSnake.PointInt destinationPoint, AForge.MachineLearning.QLearning qLearning, AForgeExtensions.MachineLearning.QLearning myqLearning, bool isMyqLearning)
         {
             _map = map;
             _mapRowsCount = map.GetLength(0);
@@ -23,8 +23,8 @@ namespace AForgeMachineLearningExtensions
         private bool _isMyqLearning;
         private AForge.MachineLearning.QLearning _qLearning;
         public AForge.MachineLearning.QLearning QLearning { get { return _qLearning; } }
-        private AForgeMachineLearningExtensions.QLearning _myqLearning;
-        public AForgeMachineLearningExtensions.QLearning MyqLearning { get { return _myqLearning; } }
+        private AForgeExtensions.MachineLearning.QLearning _myqLearning;
+        public AForgeExtensions.MachineLearning.QLearning MyqLearning { get { return _myqLearning; } }
         private int _mapRowsCount;
         public int MapRowsCoun { get { return _mapRowsCount; } }
         private int _mapColumnCount;
@@ -50,50 +50,72 @@ namespace AForgeMachineLearningExtensions
         /// </summary>
         private void UpdateTabuActions()
         {
+            int time = 1;
             //up
-            if(_currentPoint.X == 0)
+            if (_currentPoint.X == 0)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
             }
-            else if(_map[_currentPoint.X - 1, _currentPoint.Y].IsWall)
+            else if (_map[_currentPoint.X - 1, _currentPoint.Y].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
             }
             //right
             if (_currentPoint.Y == _mapColumnCount - 1)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
             }
             else if (_map[_currentPoint.X, _currentPoint.Y + 1].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
             }
             //left
             if (_currentPoint.Y == 0)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
             }
             else if (_map[_currentPoint.X, _currentPoint.Y - 1].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
             }
             //down
             if (_currentPoint.X == _mapRowsCount - 1)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
             }
             else if (_map[_currentPoint.X + 1, _currentPoint.Y].IsWall)
             {
-                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, 1);
+                ((AForge.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
             }
 
+        }
+        private int GetNextState(NeuralNetworkSnake.PointInt previousPoint, int action)
+        {
+            int nextState = 0;
+            if (action == 0)
+            {
+                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X - 1, previousPoint.Y)); //up
+            }
+            else if (action == 1)
+            {
+                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X, previousPoint.Y + 1)); //right
+            }
+            else if (action == 2)
+            {
+                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X, previousPoint.Y - 1)); //left
+            }
+            else if (action == 3)
+            {
+                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X + 1, previousPoint.Y)); //down
+            }
+            return nextState;
         }
         /// <summary>
         /// Возвращает точку, на которую перешел.
         /// </summary>
         public NeuralNetworkSnake.PointInt Move()
         {
-            if(_map[_currentPoint.X, _currentPoint.Y].IsCliff || (_currentPoint.X == _destinationPoint.X && _currentPoint.Y == _destinationPoint.Y)) //если попали в обрыв или в точку назначения, переходим в начало
+            if (_map[_currentPoint.X, _currentPoint.Y].IsCliff || (_currentPoint.X == _destinationPoint.X && _currentPoint.Y == _destinationPoint.Y)) //если попали в обрыв или в точку назначения, переходим в начало
             {
                 _currentPoint = _startPoint;
             }
@@ -102,27 +124,7 @@ namespace AForgeMachineLearningExtensions
                 UpdateTabuActions();
                 int previousState = PointIntToState(_currentPoint);
                 int previousAction = _isMyqLearning ? _myqLearning.GetAction(previousState) : _qLearning.GetAction(previousState);
-                int nextState = 0;
-                if (previousAction == 0)
-                {
-                    nextState = PointIntToState(new NeuralNetworkSnake.PointInt(_currentPoint.X - 1, _currentPoint.Y)); //up
-                }
-                else if (previousAction == 1)
-                {
-                    nextState = PointIntToState(new NeuralNetworkSnake.PointInt(_currentPoint.X, _currentPoint.Y + 1)); //right
-                }
-                else if (previousAction == 2)
-                {
-                    nextState = PointIntToState(new NeuralNetworkSnake.PointInt(_currentPoint.X, _currentPoint.Y - 1)); //left
-                }
-                else if (previousAction == 3)
-                {
-                    nextState = PointIntToState(new NeuralNetworkSnake.PointInt(_currentPoint.X + 1, _currentPoint.Y)); //down
-                }
-                if (nextState == 0)
-                {
-                    int y = 0;
-                }
+                int nextState = GetNextState(_currentPoint, previousAction);
                 NeuralNetworkSnake.PointInt nextPoint = StateToPointInt(nextState);
                 if (_isMyqLearning)
                 {

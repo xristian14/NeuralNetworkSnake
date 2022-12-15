@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AForgeMachineLearningExtensions
+namespace NeuralNetworkSnake
 {
     /// <summary>
     /// Класс описывает экземпляр карты
     /// </summary>
-    class QLearningMap
+    public class QLearningMap
     {
         public QLearningMap(bool isWall, bool isCliff, double reward)
         {

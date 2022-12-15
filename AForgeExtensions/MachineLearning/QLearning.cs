@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AForgeMachineLearningExtensions
+namespace AForgeExtensions.MachineLearning
 {
-    class QLearning
+    public class QLearning
     {
         public QLearning(int states, int actions, AForge.MachineLearning.IExplorationPolicy explorationPolicy)
         {

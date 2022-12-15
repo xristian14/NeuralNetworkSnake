@@ -471,7 +471,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private void CreateQLearningCellsView(AForgeMachineLearningExtensions.QLearningMap[,] qLearningMap, PointInt destinationPoint)
+        private void CreateQLearningCellsView(QLearningMap[,] qLearningMap, PointInt destinationPoint)
         {
             QLearningCellsView.Clear();
             System.Windows.Media.Brush ordinaryBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 172, 255, 168));
@@ -517,10 +517,10 @@ namespace NeuralNetworkSnake
         {
             return mapColumnCount * pointInt.X + pointInt.Y;
         }
-        private AForgeMachineLearningExtensions.QLearningMapProcessing _qLearningMapProcessing;
+        private QLearningMapProcessing _qLearningMapProcessing;
         private void CreateQLearningMapProcessing()
         {
-            AForgeMachineLearningExtensions.QLearningMap[,] qLearningMap = new AForgeMachineLearningExtensions.QLearningMap[6, 12];
+            QLearningMap[,] qLearningMap = new QLearningMap[6, 12];
             PointInt destinationPoint = new PointInt(qLearningMap.GetLength(0) - 2, qLearningMap.GetLength(1) - 2);
             for (int i = 0; i < qLearningMap.GetLength(0); i++)
             {
@@ -528,34 +528,34 @@ namespace NeuralNetworkSnake
                 {
                     if (i == 0 || i == qLearningMap.GetLength(0) - 1) //стена слева и справа от поля
                     {
-                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
+                        qLearningMap[i, k] = new QLearningMap(true, false, 0);
                     }
                     else if (k == 0 || k == qLearningMap.GetLength(1) - 1) //стена сверху и снизу от поля
                     {
-                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(true, false, 0);
+                        qLearningMap[i, k] = new QLearningMap(true, false, 0);
                     }
                     else if (i == qLearningMap.GetLength(0) - 2 && k > 1 && k < qLearningMap.GetLength(1) - 1) //обрыв
                     {
-                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, true, -50);
+                        qLearningMap[i, k] = new QLearningMap(false, true, -50);
                     }
                     else //обычная клетка
                     {
-                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, -1);
+                        qLearningMap[i, k] = new QLearningMap(false, false, -1);
                     }
 
                     if (i == destinationPoint.X && k == destinationPoint.Y) //клетка назначения
                     {
-                        qLearningMap[i, k] = new AForgeMachineLearningExtensions.QLearningMap(false, false, 0);
+                        qLearningMap[i, k] = new QLearningMap(false, false, 0);
                     }
                 }
             }
             CreateQLearningCellsView(qLearningMap, destinationPoint);
 
-            AForge.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForge.MachineLearning.EpsilonGreedyExploration(0/*.1*/);
+            AForge.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForge.MachineLearning.EpsilonGreedyExploration(0.1/**/);
             AForge.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForge.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
             AForge.MachineLearning.QLearning qLearning = new AForge.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration, false);
-            AForgeMachineLearningExtensions.QLearning myqLearning = new AForgeMachineLearningExtensions.QLearning(12 * 6, 4, tabuSearchExploration);
-            _qLearningMapProcessing = new AForgeMachineLearningExtensions.QLearningMapProcessing(qLearningMap, new PointInt(qLearningMap.GetLength(0) - 2, 1), destinationPoint, qLearning, myqLearning, true);
+            AForgeExtensions.MachineLearning.QLearning myqLearning = new AForgeExtensions.MachineLearning.QLearning(12 * 6, 4, tabuSearchExploration);
+            _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, new PointInt(qLearningMap.GetLength(0) - 2, 1), destinationPoint, qLearning, myqLearning, false);
         }
         private CancellationTokenSource _qLearningCancellationTokenSource;
 
@@ -628,8 +628,8 @@ namespace NeuralNetworkSnake
                 //create neural network
                 //network = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), a[0], a[1], a[2], a[3]);
                 //network = new AForge.Neuro.ActivationNetwork(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
-                network = AForgeNeuroExtensions.ActivationNetwork.BuildRandFromNegativeOneToOne(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
-                network2 = new AForge.Neuro.ActivationNetwork(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
+                network = AForgeExtensions.Neuro.ActivationNetwork.BuildRandFromNegativeOneToOne(new AForgeExtensions.Neuro.ReLuActivationFunction(), a[0], a[1], a[2]);
+                network2 = new AForge.Neuro.ActivationNetwork(new AForgeExtensions.Neuro.ReLuActivationFunction(), a[0], a[1], a[2]);
                 //create teacher
                 AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(network);
                 // loop
@@ -700,7 +700,7 @@ namespace NeuralNetworkSnake
                     int neuonCount = network.Layers[i].Neurons[k].Weights.Length;
                     if(i == network.Layers.Length - 1)
                     {
-                        ((AForge.Neuro.ActivationNeuron)network2.Layers[i].Neurons[k]).ActivationFunction = new AForgeNeuroExtensions.SameActivationFunction();
+                        ((AForge.Neuro.ActivationNeuron)network2.Layers[i].Neurons[k]).ActivationFunction = new AForgeExtensions.Neuro.SameActivationFunction();
                     }
                 }
             }

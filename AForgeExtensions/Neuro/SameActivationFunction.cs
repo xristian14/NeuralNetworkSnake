@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AForgeNeuroExtensions
+namespace AForgeExtensions.Neuro
 {
-    class SameActivationFunction : AForge.Neuro.IActivationFunction, ICloneable
+    public class SameActivationFunction : AForge.Neuro.IActivationFunction, ICloneable
     {
         public SameActivationFunction()
         {
