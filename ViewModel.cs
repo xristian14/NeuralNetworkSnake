@@ -19,7 +19,9 @@ namespace NeuralNetworkSnake
         private static ViewModel _instance;
         private ViewModel()
         {
-
+            MapSelection.Add("Карта Обрыв");
+            MapSelection.Add("Карта Приключение");
+            SelectedMapSelection = MapSelection[0];
         }
         public static ViewModel getInstance()
         {
@@ -449,6 +451,26 @@ namespace NeuralNetworkSnake
 
 
 
+        private ObservableCollection<string> _mapSelection = new ObservableCollection<string>();
+        public ObservableCollection<string> MapSelection
+        {
+            get { return _mapSelection; }
+            set
+            {
+                _mapSelection = value;
+                OnPropertyChanged();
+            }
+        }
+        private string _selectedMapSelection;
+        public string SelectedMapSelection
+        {
+            get { return _selectedMapSelection; }
+            set
+            {
+                _selectedMapSelection = value;
+                OnPropertyChanged();
+            }
+        }
 
         private int _qLearningCellWidth = 61;
         private QLearningCellView _qLearningSelectedCellView;
@@ -474,7 +496,8 @@ namespace NeuralNetworkSnake
         private void CreateQLearningCellsView(QLearningMap[,] qLearningMap, PointInt destinationPoint)
         {
             QLearningCellsView.Clear();
-            System.Windows.Media.Brush ordinaryBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 172, 255, 168));
+            //System.Windows.Media.Brush ordinaryBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 201, 255, 201));
+            System.Windows.Media.Brush ordinaryBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 255, 255));
             System.Windows.Media.Brush wallBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 226, 216, 114));
             System.Windows.Media.Brush cliffBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 128, 163, 255));
             System.Windows.Media.Brush destinationBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 135, 135));
@@ -520,42 +543,158 @@ namespace NeuralNetworkSnake
         private QLearningMapProcessing _qLearningMapProcessing;
         private void CreateQLearningMapProcessing()
         {
-            QLearningMap[,] qLearningMap = new QLearningMap[6, 12];
-            PointInt destinationPoint = new PointInt(qLearningMap.GetLength(0) - 2, qLearningMap.GetLength(1) - 2);
-            for (int i = 0; i < qLearningMap.GetLength(0); i++)
+            QLearningMap[,] qLearningMap = new QLearningMap[1, 1];
+            PointInt startPoint = new PointInt(0, 0);
+            PointInt destinationPoint = new PointInt(0, 0);
+            if (MapSelection.IndexOf(SelectedMapSelection) == 0)
             {
-                for (int k = 0; k < qLearningMap.GetLength(1); k++)
+                qLearningMap = new QLearningMap[6, 12];
+                startPoint = new PointInt(qLearningMap.GetLength(0) - 2, 1);
+                destinationPoint = new PointInt(qLearningMap.GetLength(0) - 2, qLearningMap.GetLength(1) - 2);
+                for (int i = 0; i < qLearningMap.GetLength(0); i++)
                 {
-                    if (i == 0 || i == qLearningMap.GetLength(0) - 1) //стена слева и справа от поля
+                    for (int k = 0; k < qLearningMap.GetLength(1); k++)
                     {
-                        qLearningMap[i, k] = new QLearningMap(true, false, 0);
-                    }
-                    else if (k == 0 || k == qLearningMap.GetLength(1) - 1) //стена сверху и снизу от поля
-                    {
-                        qLearningMap[i, k] = new QLearningMap(true, false, 0);
-                    }
-                    else if (i == qLearningMap.GetLength(0) - 2 && k > 1 && k < qLearningMap.GetLength(1) - 1) //обрыв
-                    {
-                        qLearningMap[i, k] = new QLearningMap(false, true, -50);
-                    }
-                    else //обычная клетка
-                    {
-                        qLearningMap[i, k] = new QLearningMap(false, false, -1);
-                    }
+                        if (i == 0 || i == qLearningMap.GetLength(0) - 1) //стена слева и справа от поля
+                        {
+                            qLearningMap[i, k] = new QLearningMap(true, false, 0);
+                        }
+                        else if (k == 0 || k == qLearningMap.GetLength(1) - 1) //стена сверху и снизу от поля
+                        {
+                            qLearningMap[i, k] = new QLearningMap(true, false, 0);
+                        }
+                        else if (i == qLearningMap.GetLength(0) - 2 && k > 1 && k < qLearningMap.GetLength(1) - 1) //обрыв
+                        {
+                            qLearningMap[i, k] = new QLearningMap(false, true, -50);
+                        }
+                        else //обычная клетка
+                        {
+                            qLearningMap[i, k] = new QLearningMap(false, false, -1);
+                        }
 
-                    if (i == destinationPoint.X && k == destinationPoint.Y) //клетка назначения
-                    {
-                        qLearningMap[i, k] = new QLearningMap(false, false, 0);
+                        if (i == destinationPoint.X && k == destinationPoint.Y) //клетка назначения
+                        {
+                            qLearningMap[i, k] = new QLearningMap(false, false, 0);
+                        }
                     }
                 }
             }
+            else
+            {
+                qLearningMap = new QLearningMap[12, 26];
+                startPoint = new PointInt(qLearningMap.GetLength(0) - 1, 2);
+                destinationPoint = new PointInt(qLearningMap.GetLength(0) - 1, qLearningMap.GetLength(1) - 7);
+                List<PointInt> wallsList = new List<PointInt>();
+                wallsList.Add(new PointInt(0, 1));
+                wallsList.Add(new PointInt(0, 2));
+                wallsList.Add(new PointInt(0, 3));
+                wallsList.Add(new PointInt(0, 4));
+                wallsList.Add(new PointInt(0, 5));
+                wallsList.Add(new PointInt(1, 5));
+                wallsList.Add(new PointInt(1, 19));
+                wallsList.Add(new PointInt(1, 20));
+                wallsList.Add(new PointInt(1, 21));
+                wallsList.Add(new PointInt(2, 0));
+                wallsList.Add(new PointInt(2, 1));
+                wallsList.Add(new PointInt(2, 2));
+                wallsList.Add(new PointInt(2, 3));
+                wallsList.Add(new PointInt(2, 5));
+                wallsList.Add(new PointInt(2, 7));
+                wallsList.Add(new PointInt(2, 8));
+                wallsList.Add(new PointInt(2, 19));
+                wallsList.Add(new PointInt(2, 21));
+                wallsList.Add(new PointInt(3, 7));
+                wallsList.Add(new PointInt(4, 4));
+                wallsList.Add(new PointInt(4, 12));
+                wallsList.Add(new PointInt(4, 13));
+                wallsList.Add(new PointInt(5, 2));
+                wallsList.Add(new PointInt(5, 4));
+                wallsList.Add(new PointInt(5, 16));
+                wallsList.Add(new PointInt(6, 2));
+                wallsList.Add(new PointInt(6, 3));
+                wallsList.Add(new PointInt(6, 4));
+                wallsList.Add(new PointInt(6, 21));
+                wallsList.Add(new PointInt(6, 22));
+                wallsList.Add(new PointInt(6, 23));
+                wallsList.Add(new PointInt(7, 2));
+                wallsList.Add(new PointInt(7, 3));
+                wallsList.Add(new PointInt(7, 16));
+                wallsList.Add(new PointInt(8, 3));
+                wallsList.Add(new PointInt(8, 16));
+                wallsList.Add(new PointInt(8, 23));
+                wallsList.Add(new PointInt(8, 24));
+                wallsList.Add(new PointInt(8, 25));
+                wallsList.Add(new PointInt(9, 16));
+                wallsList.Add(new PointInt(10, 16));
+                wallsList.Add(new PointInt(11, 16));
+                List<PointInt> cliffList = new List<PointInt>();
+                cliffList.Add(new PointInt(0, 0));
+                cliffList.Add(new PointInt(1, 16));
+                cliffList.Add(new PointInt(1, 17));
+                cliffList.Add(new PointInt(1, 8));
+                cliffList.Add(new PointInt(1, 9));
+                cliffList.Add(new PointInt(2, 9));
+                cliffList.Add(new PointInt(2, 12));
+                cliffList.Add(new PointInt(2, 16));
+                cliffList.Add(new PointInt(2, 17));
+                cliffList.Add(new PointInt(3, 12));
+                cliffList.Add(new PointInt(5, 17));
+                cliffList.Add(new PointInt(5, 18));
+                cliffList.Add(new PointInt(5, 19));
+                cliffList.Add(new PointInt(5, 20));
+                cliffList.Add(new PointInt(6, 9));
+                cliffList.Add(new PointInt(6, 20));
+                cliffList.Add(new PointInt(7, 8));
+                cliffList.Add(new PointInt(7, 9));
+                cliffList.Add(new PointInt(7, 10));
+                cliffList.Add(new PointInt(7, 17));
+                cliffList.Add(new PointInt(7, 18));
+                cliffList.Add(new PointInt(7, 20));
+                cliffList.Add(new PointInt(8, 6));
+                cliffList.Add(new PointInt(8, 7));
+                cliffList.Add(new PointInt(8, 8));
+                cliffList.Add(new PointInt(8, 9));
+                cliffList.Add(new PointInt(8, 20));
+                cliffList.Add(new PointInt(9, 7));
+                cliffList.Add(new PointInt(9, 8));
+                cliffList.Add(new PointInt(9, 9));
+                cliffList.Add(new PointInt(9, 18));
+                cliffList.Add(new PointInt(9, 19));
+                cliffList.Add(new PointInt(9, 20));
+                cliffList.Add(new PointInt(10, 13));
+                cliffList.Add(new PointInt(11, 13));
+                for (int i = 0; i < qLearningMap.GetLength(0); i++)
+                {
+                    for (int k = 0; k < qLearningMap.GetLength(1); k++)
+                    {
+                        if(wallsList.Exists(a => a.X == i && a.Y == k)) //стена
+                        {
+                            qLearningMap[i, k] = new QLearningMap(true, false, 0);
+                        }
+                        else if(cliffList.Exists(a => a.X == i && a.Y == k)) //обрыв
+                        {
+                            qLearningMap[i, k] = new QLearningMap(false, true, -50);
+                        }
+                        else //обычная клетка
+                        {
+                            qLearningMap[i, k] = new QLearningMap(false, false, -1);
+                        }
+
+                        if (i == destinationPoint.X && k == destinationPoint.Y) //клетка назначения
+                        {
+                            qLearningMap[i, k] = new QLearningMap(false, false, 0);
+                        }
+                    }
+                }
+            }
+            
             CreateQLearningCellsView(qLearningMap, destinationPoint);
 
             AForgeExtensions.MachineLearning.EpsilonGreedyExploration epsilonGreedyExploration = new AForgeExtensions.MachineLearning.EpsilonGreedyExploration(0.1);
             AForgeExtensions.MachineLearning.TabuSearchExploration tabuSearchExploration = new AForgeExtensions.MachineLearning.TabuSearchExploration(4, epsilonGreedyExploration);
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
 
-            _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, new PointInt(qLearningMap.GetLength(0) - 2, 1), destinationPoint, qLearning);
+            _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoint, qLearning);
         }
         private CancellationTokenSource _qLearningCancellationTokenSource;
 
@@ -596,6 +735,27 @@ namespace NeuralNetworkSnake
                 return new DelegateCommand((obj) =>
                 {
                     _qLearningCancellationTokenSource.Cancel();
+                }, (obj) => true);
+            }
+        }
+        public ICommand CreateMapQlearning_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    CreateQLearningMapProcessing();
+                }, (obj) => true);
+            }
+        }
+        private double _previousEpsilon;
+        public ICommand EpsilonOnOffQlearning_Click
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    _previousEpsilon = ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearningMapProcessing.QLearning.ExplorationPolicy).BasePolicy.SetEpsilon(_previousEpsilon);
                 }, (obj) => true);
             }
         }

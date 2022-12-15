@@ -363,11 +363,14 @@
                                     <TextBlock Text="Задержка между ходами, мс" Margin="6 0 0 0"/>
                                     <Slider Minimum="10" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
                                     <TextBlock Text="{Binding RealtimeDelay}" Width="30" Margin="4 0 6 0"/>
+                                    <ComboBox ItemsSource="{Binding MapSelection}" SelectedItem="{Binding SelectedMapSelection}" Margin="4 0 6 0"/>
+                                    <Button Content="Создать карту" Command="{Binding CreateMapQlearning_Click}" Padding="0 2" Margin="2 0"/>
+                                    <Button Content="Включить/Отключить случайное действие" Command="{Binding EpsilonOnOffQlearning_Click}" Padding="0 2" Margin="2 0"/>
                                     <Button Content="Запустить" Command="{Binding StartQlearning_Click}" Width="72" Padding="0 2" Margin="2 0"/>
                                     <Button Content="Остановить" Command="{Binding StopQlearning_Click}" Width="72" Padding="0 2" Margin="2 0"/>
                                     <!--<Grid>
-                                        <Rectangle Width="57" Height="57" Fill="#FFFF8787"/>
-                                        <TextBlock Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#B2FFFFFF" FontWeight="Bold"/>
+                                        <Rectangle Width="57" Height="57" Fill="White"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#FFF1F1F1" FontWeight="Bold"/>
                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
                                                 <TextBlock Text="U:" Style="{StaticResource qlearningCellText}"/>
@@ -404,7 +407,7 @@
                                                 <Border BorderThickness="1" BorderBrush="#FFBFBFBF">
                                                     <Rectangle Width="59" Height="59" Fill="{Binding BackgroundBrush}"/>
                                                 </Border>
-                                                <TextBlock Text="{Binding Reward}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#B2FFFFFF" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding Reward}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="33" Foreground="#FFE8E8E8" FontWeight="Bold"/>
                                                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-1 0 0 0">
                                                         <TextBlock Text="U:" Style="{StaticResource qlearningCellText}"/>
