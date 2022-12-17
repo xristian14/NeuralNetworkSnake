@@ -22,6 +22,7 @@ namespace NeuralNetworkSnake
             MapSelection.Add("Карта Обрыв");
             MapSelection.Add("Карта Приключение");
             SelectedMapSelection = MapSelection[0];
+            SelectedAlgorithmLearningCombobox = AlgorithmLearningCombobox[0];
         }
         public static ViewModel getInstance()
         {
@@ -79,6 +80,16 @@ namespace NeuralNetworkSnake
                 {
                     _thirdHiddenLayerCountNeurons = value;
                 }
+                OnPropertyChanged();
+            }
+        }
+        private bool _isGeneticLearning = false;
+        public bool IsGeneticLearning //выбрано генетическое обучение змейки. Если нет, то DeepQLearning
+        {
+            get { return _isGeneticLearning; }
+            set
+            {
+                _isGeneticLearning = value;
                 OnPropertyChanged();
             }
         }
@@ -386,8 +397,18 @@ namespace NeuralNetworkSnake
             {
                 return new DelegateCommand((obj) =>
                 {
+                    if (AlgorithmLearningCombobox.IndexOf(SelectedAlgorithmLearningCombobox) == 0)
+                    {
+                        _isGeneticLearning = true;
+                    }
+                    else
+                    {
+                        _isGeneticLearning = false;
+                    }
+
+                    
                     int[] layers = new int[2 + HiddenLayersCount];
-                    layers[0] = 40;
+                    layers[0] = 39;
                     if(HiddenLayersCount >= 1)
                     {
                         layers[1] = int.Parse(FirstHiddenLayerCountNeurons);
@@ -401,10 +422,25 @@ namespace NeuralNetworkSnake
                         layers[3] = int.Parse(ThirdHiddenLayerCountNeurons);
                     }
                     layers[layers.Length - 1] = 3;
-                    int populationSize = int.Parse(PopulationSize);
 
-                    GeneticLearning geneticLearning = new GeneticLearning(populationSize, int.Parse(MutationPercent), int.Parse(TestsCount), int.Parse(PassedToNewGenerationCount), layers);
-                    _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
+                    if (_isGeneticLearning)
+                    {
+                        int populationSize = int.Parse(PopulationSize);
+                        GeneticLearning geneticLearning = new GeneticLearning(populationSize, int.Parse(MutationPercent), int.Parse(TestsCount), int.Parse(PassedToNewGenerationCount), layers);
+                        _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
+                    }
+                    else
+                    {
+                        int[] layers2 = new int[layers.Length - 1];
+                        for(int i = 0; i < layers2.Length; i++)
+                        {
+                            layers2[i] = layers[i + 1];
+                        }
+                        AForge.Neuro.ActivationNetwork activationNetwork = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), layers[0], layers2);
+                        //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForgeExtensions.Neuro.ReLuActivationFunction(), new AForgeExtensions.Neuro.ReLuActivationFunction(), layers[0], layers2);
+                        AForgeExtensions.Neuro.Learning.DeepQLearning deepQLearning = new AForgeExtensions.Neuro.Learning.DeepQLearning(activationNetwork);
+                        _simulation = new Simulation(deepQLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
+                    }
 
                     LayersText = layers[0].ToString();
                     for (int i = 1; i < layers.Length; i++)
@@ -739,14 +775,21 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForgeExtensions.Neuro.ReLuActivationFunction(), new AForgeExtensions.Neuro.SameActivationFunction(), 2, 2, 2);
+            //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForgeExtensions.Neuro.ReLuActivationFunction(), new AForgeExtensions.Neuro.ReLuActivationFunction(), 10, 10, 10, 5);
+            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForge.Neuro.SigmoidFunction(), new AForge.Neuro.SigmoidFunction(), 10, 10, 10, 5);
             AForge.Neuro.ActivationNetwork activationNetworkClone = AForgeExtensions.Features.CloneActivationNetwork(activationNetwork);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
-            double[] input = new double[2] { 1.5, 0.33 };
-            double[] output1 = activationNetwork.Compute(input);
-            double[] output2 = activationNetworkClone.Compute(input);
+            double[] input = new double[10] { 0, 0.1, 1, 0.77, 0.2, 0.001, 1, 0.5, 0.3732, 0.1233 };
+            double[] desiredOutput = new double[5] { 1, 0, 1, 0.51515, 0.707070 };
+            while (true)
+            {
+                double[] outputBefore = activationNetwork.Compute(input);
+                backPropagationLearning.Run(input, desiredOutput);
+                double[] outputAfter = activationNetwork.Compute(input);
+                int y = 1;
+            }
             //отрисовываем все qvalues
-            for (int x = 0; x < qLearningMap.GetLength(0); x++)
+            for(int x = 0; x < qLearningMap.GetLength(0); x++)
             {
                 for(int y = 0; y < qLearningMap.GetLength(1); y++)
                 {

@@ -14,6 +14,7 @@ namespace NeuralNetworkSnake
     {
         public Simulation(GeneticLearning geneticLearning, int pauseMillisecDelay, int fixedDuration, int boardSize, int applesCount)
         {
+            _isGeneticLearning = true;
             _geneticLearning = geneticLearning;
             PauseMillisecDelay = pauseMillisecDelay;
             FixedDuration = fixedDuration;
@@ -30,7 +31,29 @@ namespace NeuralNetworkSnake
                 CreateGenerationLeaderBoard();
             }));
         }
+        public Simulation(AForgeExtensions.Neuro.Learning.DeepQLearning deepQLearning, int pauseMillisecDelay, int fixedDuration, int boardSize, int applesCount)
+        {
+            _isGeneticLearning = false;
+            _deepQLearning = deepQLearning;
+            PauseMillisecDelay = pauseMillisecDelay;
+            FixedDuration = fixedDuration;
+            BoardSize = boardSize;
+            ApplesCount = applesCount;
+            IsRunning = false;
+            Age = 0;
+            DispatcherInvoke((Action)(() => {
+                ViewModel.getInstance().Age = Age;
+            }));
+            _gameBoardsGeneticLearning = CreateGameBoards(1, BoardSize, ApplesCount);
+            DispatcherInvoke((Action)(() => {
+                CreateGameBoardForRender();
+            }));
+        }
+        private bool _isGeneticLearning;
+        private Random _random = new Random();
         private GeneticLearning _geneticLearning;
+        private AForgeExtensions.Neuro.Learning.DeepQLearning _deepQLearning;
+        public AForgeExtensions.Neuro.Learning.DeepQLearning DeepQLearning { get { return _deepQLearning; } }
         private GameBoard[] _gameBoardsGeneticLearning;
         private readonly object locker = new object();
         private bool _isRunning { get; set; } //выполняется ли симуляция
@@ -171,7 +194,7 @@ namespace NeuralNetworkSnake
                 _geneticLearning.Population[i].TotalRating += _gameBoardsGeneticLearning[i].Score;
             }
         }
-        private bool SimulateOneStep()
+        private bool SimulateOneStepGeneticLearning()
         {
             bool isAllGameOver = true;
             for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
@@ -250,99 +273,243 @@ namespace NeuralNetworkSnake
             }
             return isAllGameOver;
         }
+        private bool SimulateOneStepDeepQLearning()
+        {
+            bool isAllGameOver = true;
+            if (!_gameBoardsGeneticLearning[0].GetIsGameOver())
+            {
+                isAllGameOver = false;
+                Vector<float> inputsVector = _gameBoardsGeneticLearning[0].GetInputs();
+                double[] inputs = Array.ConvertAll(inputsVector.ToArray(), a => (double)a);
+                double[] outputs = _deepQLearning.Network.Compute(inputs);
+                int chosenAction = AForgeExtensions.Features.MaxIndex(outputs);
+                double epsilon = 0.1;
+                if (_random.NextDouble() < epsilon)
+                {
+                    int randAction = _random.Next(0, 2);
+                    if (chosenAction <= randAction)
+                    {
+                        randAction++;
+                    }
+                    chosenAction = randAction;
+                }
+
+                int xOffset = 0;
+                int yOffset = 0;
+                if (_gameBoardsGeneticLearning[0].IsSnakeGoUp())
+                {
+                    if (chosenAction == 0)
+                    {
+                        xOffset = -1;
+                    }
+                    if (chosenAction == 1)
+                    {
+                        yOffset = -1;
+                    }
+                    if (chosenAction == 2)
+                    {
+                        xOffset = 1;
+                    }
+                }
+                if (_gameBoardsGeneticLearning[0].IsSnakeGoRight())
+                {
+                    if (chosenAction == 0)
+                    {
+                        yOffset = -1;
+                    }
+                    if (chosenAction == 1)
+                    {
+                        xOffset = 1;
+                    }
+                    if (chosenAction == 2)
+                    {
+                        yOffset = 1;
+                    }
+                }
+                if (_gameBoardsGeneticLearning[0].IsSnakeGoDown())
+                {
+                    if (chosenAction == 0)
+                    {
+                        xOffset = 1;
+                    }
+                    if (chosenAction == 1)
+                    {
+                        yOffset = 1;
+                    }
+                    if (chosenAction == 2)
+                    {
+                        xOffset = -1;
+                    }
+                }
+                if (_gameBoardsGeneticLearning[0].IsSnakeGoLeft())
+                {
+                    if (chosenAction == 0)
+                    {
+                        yOffset = 1;
+                    }
+                    if (chosenAction == 1)
+                    {
+                        xOffset = -1;
+                    }
+                    if (chosenAction == 2)
+                    {
+                        yOffset = -1;
+                    }
+                }
+
+                double baseReward = 0.0001;
+                double appleReward = 1;
+                double gameOverReward = 0;
+                double reward = baseReward;
+                int newX = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].X + xOffset;
+                int newY = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].Y + yOffset;
+                if(newX < _gameBoardsGeneticLearning[0].BoardCellsInfo.GetLength(0) && newX > 0 && newY < _gameBoardsGeneticLearning[0].BoardCellsInfo.GetLength(1) && newY > 0) //если не врезались в стенку
+                {
+                    if (_gameBoardsGeneticLearning[0].BoardCellsInfo[newX, newY].IsApple)
+                    {
+                        reward = appleReward;
+                    }
+                }
+                _gameBoardsGeneticLearning[0].MoveSnake(xOffset, yOffset);
+                if (_gameBoardsGeneticLearning[0].GetIsGameOver())
+                {
+                    reward = gameOverReward;
+                }
+                Vector<float> inputsVector2 = _gameBoardsGeneticLearning[0].GetInputs();
+                double[] inputs2 = Array.ConvertAll(inputsVector2.ToArray(), a => (double)a);
+                _deepQLearning.UpdateState(inputs, outputs, chosenAction, reward, inputs2);
+            }
+            return isAllGameOver;
+        }
         public void RealTimeSimulate()
         {
-            DispatcherInvoke((Action)(() => {
-                UpdateCurrentTestNumber();
-                CreateGenerationLeaderBoard();
-            }));
+            if (_isGeneticLearning)
+            {
+                DispatcherInvoke((Action)(() => {
+                    UpdateCurrentTestNumber();
+                    CreateGenerationLeaderBoard();
+                }));
+            }
             IsRunning = true;
             while (IsRunning)
             {
-                if (SimulateOneStep())
+                if (_isGeneticLearning)
                 {
-                    _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
-                    SetGeneticLearningRating();
-                    if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                    if (SimulateOneStepGeneticLearning())
                     {
-                        _geneticLearning.SpawnNewGeneration();
-                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
-                        Age++;
+                        _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
+                        SetGeneticLearningRating();
+                        if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                        {
+                            _geneticLearning.SpawnNewGeneration();
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                            Age++;
+                            DispatcherInvoke((Action)(() => {
+                                ViewModel.getInstance().Age = Age;
+                            }));
+                        }
+                        else //иначе создаем новые поля для нейронных сетей
+                        {
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                        }
                         DispatcherInvoke((Action)(() => {
-                            ViewModel.getInstance().Age = Age;
+                            CreateGameBoardForRender();
+                            CreateGenerationLeaderBoard();
+                            UpdateCurrentTestNumber();
                         }));
                     }
-                    else //иначе создаем новые поля для нейронных сетей
+                    else
                     {
-                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                        DispatcherInvoke((Action)(() => {
+                            UpdateGenerationLeaderBoard();
+                        }));
                     }
+
+                    /*for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++) //вывод inputs
+                    {
+                        if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
+                        {
+                            if (ViewModel.getInstance().IsRealtimeSimulation)
+                            {
+                                DispatcherInvoke((Action)(() => {
+                                    ViewModel.getInstance().UpdateInputsInfo(_gameBoardsGeneticLearning[i].GetInputs());
+                                }));
+                                break;
+                            }
+                        }
+                    }*/
                     DispatcherInvoke((Action)(() => {
-                        CreateGameBoardForRender();
-                        CreateGenerationLeaderBoard();
-                        UpdateCurrentTestNumber();
+                        UpdateGameBoardForRender();
                     }));
                 }
                 else
                 {
+                    if (SimulateOneStepDeepQLearning())
+                    {
+                        _gameBoardsGeneticLearning = CreateGameBoards(1, BoardSize, ApplesCount);
+                        Age++;
+                        DispatcherInvoke((Action)(() => {
+                            ViewModel.getInstance().Age = Age;
+                        }));
+                        DispatcherInvoke((Action)(() => {
+                            CreateGameBoardForRender();
+                        }));
+                    }
                     DispatcherInvoke((Action)(() => {
-                        UpdateGenerationLeaderBoard();
+                        UpdateGameBoardForRender();
                     }));
                 }
-
-                /*for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++) //вывод inputs
-                {
-                    if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
-                    {
-                        if (ViewModel.getInstance().IsRealtimeSimulation)
-                        {
-                            DispatcherInvoke((Action)(() => {
-                                ViewModel.getInstance().UpdateInputsInfo(_gameBoardsGeneticLearning[i].GetInputs());
-                            }));
-                            break;
-                        }
-                    }
-                }*/
-                DispatcherInvoke((Action)(() => {
-                    UpdateGameBoardForRender();
-                }));
                 Thread.Sleep(PauseMillisecDelay);
             }
         }
         public void FixedTimeSimulate()
         {
-            DispatcherInvoke((Action)(() => {
-                UpdateCurrentTestNumber();
-            }));
+            if (_isGeneticLearning)
+            {
+                DispatcherInvoke((Action)(() => {
+                    UpdateCurrentTestNumber();
+                }));
+            }
             IsRunning = true;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             long lastRemaining = FixedDuration - stopwatch.ElapsedMilliseconds / 1000;
             while (IsRunning)
             {
-                if (SimulateOneStep())
+                if (_isGeneticLearning)
                 {
-                    _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
-                    SetGeneticLearningRating();
-                    if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                    if (SimulateOneStepGeneticLearning())
                     {
-                        _geneticLearning.SpawnNewGeneration();
-                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                        _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
+                        SetGeneticLearningRating();
+                        if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                        {
+                            _geneticLearning.SpawnNewGeneration();
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                            Age++;
+                            DispatcherInvoke((Action)(() => {
+                                ViewModel.getInstance().Age = Age;
+                            }));
+                        }
+                        else //иначе создаем новые поля для нейронных сетей
+                        {
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                        }
+                        DispatcherInvoke((Action)(() => {
+                            UpdateCurrentTestNumber();
+                        }));
+                    }
+                }
+                else
+                {
+                    if (SimulateOneStepDeepQLearning())
+                    {
+                        _gameBoardsGeneticLearning = CreateGameBoards(1, BoardSize, ApplesCount);
                         Age++;
                         DispatcherInvoke((Action)(() => {
                             ViewModel.getInstance().Age = Age;
                         }));
                     }
-                    else //иначе создаем новые поля для нейронных сетей
-                    {
-                        _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
-                    }
-                    DispatcherInvoke((Action)(() => {
-                        UpdateCurrentTestNumber();
-                    }));
-                }
-                else
-                {
-
                 }
 
                 if (FixedDuration - stopwatch.ElapsedMilliseconds / 1000 != lastRemaining)
@@ -352,7 +519,7 @@ namespace NeuralNetworkSnake
                         ViewModel.getInstance().RemainingTime = lastRemaining;
                     }));
                 }
-                if(lastRemaining <= 0)
+                if (lastRemaining <= 0)
                 {
                     IsRunning = false;
                 }

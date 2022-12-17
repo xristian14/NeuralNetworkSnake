@@ -14,9 +14,10 @@ namespace AForgeExtensions.Neuro.Learning
         public DeepQLearning(AForge.Neuro.ActivationNetwork network)
         {
             _network = network;
-            _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(network);
+            _targetNetwork = AForgeExtensions.Features.CloneActivationNetwork(_network);
+            _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(_network);
             _learningRate = 0.5;
-            _discountFactor = 0.99;
+            _discountFactor = 0.9;
             _targetNetworkUpdateTime = 100;
             _targetNetworkUpdateTimeElapsed = 0;
         }
@@ -26,6 +27,7 @@ namespace AForgeExtensions.Neuro.Learning
         private AForge.Neuro.Learning.BackPropagationLearning _backPropagationLearning;
         private int _targetNetworkUpdateTime;
         private int _targetNetworkUpdateTimeElapsed;
+        private int _targetNetworkUpdateTotalNumber = 0;
         /// <summary>
         /// Количество итераций UpdateState(), через которое основная нейронная сеть копируется в целевую. (по умолчанию 100)
         /// </summary>
@@ -49,13 +51,48 @@ namespace AForgeExtensions.Neuro.Learning
             previousStateOutput.CopyTo(updatedPreviousStateOutput, 0);
             updatedPreviousStateOutput[action] = updatedQvalue;
             _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+            double[] previousAfterUpdateStateOutput = _network.Compute(previousStateInput);
 
-            //если совершили достаточно итераций обновления состояния, обновляем целевую нейронную сеть
             _targetNetworkUpdateTimeElapsed++;
+            //если совершили достаточно итераций обновления состояния, обновляем целевую нейронную сеть
             if(_targetNetworkUpdateTimeElapsed >= _targetNetworkUpdateTime)
             {
                 _targetNetworkUpdateTimeElapsed = 0;
                 _targetNetwork = AForgeExtensions.Features.CloneActivationNetwork(_network);
+                _targetNetworkUpdateTotalNumber++;
+            }
+            if(_targetNetworkUpdateTotalNumber > 400)
+            {
+                int y = 0;
             }
         }
     }
