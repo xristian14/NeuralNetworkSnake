@@ -8,14 +8,14 @@ namespace NeuralNetworkSnake
 {
     class QLearningMapProcessing
     {
-        public QLearningMapProcessing(QLearningMap[,] map, NeuralNetworkSnake.PointInt startPoint, NeuralNetworkSnake.PointInt destinationPoint, AForgeExtensions.MachineLearning.QLearning qLearning)
+        public QLearningMapProcessing(QLearningMap[,] map, System.Drawing.Point startPoint, System.Drawing.Point[] destinationPoints, AForgeExtensions.MachineLearning.QLearning qLearning)
         {
             _map = map;
             _mapRowsCount = map.GetLength(0);
             _mapColumnCount = map.GetLength(1);
             _startPoint = startPoint;
             _currentPoint = startPoint;
-            _destinationPoint = destinationPoint;
+            _destinationPoints = destinationPoints;
             _qLearning = qLearning;
             UpdateTabuActions();
         }
@@ -27,106 +27,171 @@ namespace NeuralNetworkSnake
         public int MapColumnCount { get { return _mapColumnCount; } }
         private QLearningMap[,] _map;
         public QLearningMap[,] Map { get { return _map; } }
-        private NeuralNetworkSnake.PointInt _startPoint;
-        public NeuralNetworkSnake.PointInt StartPoint { get { return _startPoint; } }
-        private NeuralNetworkSnake.PointInt _currentPoint;
-        public NeuralNetworkSnake.PointInt CurrentPoint { get { return _currentPoint; } }
-        private NeuralNetworkSnake.PointInt _destinationPoint;
-        public NeuralNetworkSnake.PointInt DestinationPoint { get { return _destinationPoint; } }
-        private int PointIntToState(NeuralNetworkSnake.PointInt pointInt)
+        private System.Drawing.Point _startPoint;
+        public System.Drawing.Point StartPoint { get { return _startPoint; } }
+        private System.Drawing.Point _currentPoint;
+        public System.Drawing.Point CurrentPoint { get { return _currentPoint; } }
+        private System.Drawing.Point[] _destinationPoints;
+        public System.Drawing.Point[] DestinationPoint { get { return _destinationPoints; } }
+        private int PointToState(System.Drawing.Point point)
         {
-            return _mapColumnCount * pointInt.X + pointInt.Y;
+            return _mapColumnCount * point.X + point.Y;
         }
-        private NeuralNetworkSnake.PointInt StateToPointInt(int state)
+        private System.Drawing.Point StateToPoint(int state)
         {
-            return new NeuralNetworkSnake.PointInt((int)Math.Truncate((double)state / _mapColumnCount), state % _mapColumnCount);
+            return new System.Drawing.Point((int)Math.Truncate((double)state / _mapColumnCount), state % _mapColumnCount);
         }
         /// <summary>
         /// Устанавливает в табу действия, невозможные для текущего положения на карте, на 1 ход
         /// </summary>
         private void UpdateTabuActions()
         {
-            ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).ResetTabuList();
+            AForgeExtensions.MachineLearning.TabuSearchExploration tabu = (AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy;
+            tabu.ResetTabuList();
             int time = 2;
             //up
             if (_currentPoint.X == 0)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
+                tabu.SetTabuAction(0, time);
             }
             else if (_map[_currentPoint.X - 1, _currentPoint.Y].IsWall)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(0, time);
+                tabu.SetTabuAction(0, time);
             }
             //right
             if (_currentPoint.Y == _mapColumnCount - 1)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
+                tabu.SetTabuAction(1, time);
             }
             else if (_map[_currentPoint.X, _currentPoint.Y + 1].IsWall)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(1, time);
+                tabu.SetTabuAction(1, time);
             }
             //left
             if (_currentPoint.Y == 0)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
+                tabu.SetTabuAction(2, time);
             }
             else if (_map[_currentPoint.X, _currentPoint.Y - 1].IsWall)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(2, time);
+                tabu.SetTabuAction(2, time);
             }
             //down
             if (_currentPoint.X == _mapRowsCount - 1)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
+                tabu.SetTabuAction(3, time);
             }
             else if (_map[_currentPoint.X + 1, _currentPoint.Y].IsWall)
             {
-                ((AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy).SetTabuAction(3, time);
+                tabu.SetTabuAction(3, time);
             }
 
         }
-        private int GetNextState(NeuralNetworkSnake.PointInt previousPoint, int action)
+        private int GetNextState(System.Drawing.Point previousPoint, int action)
         {
             int nextState = 0;
             if (action == 0)
             {
-                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X - 1, previousPoint.Y)); //up
+                nextState = PointToState(new System.Drawing.Point(previousPoint.X - 1, previousPoint.Y)); //up
             }
             else if (action == 1)
             {
-                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X, previousPoint.Y + 1)); //right
+                nextState = PointToState(new System.Drawing.Point(previousPoint.X, previousPoint.Y + 1)); //right
             }
             else if (action == 2)
             {
-                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X, previousPoint.Y - 1)); //left
+                nextState = PointToState(new System.Drawing.Point(previousPoint.X, previousPoint.Y - 1)); //left
             }
             else if (action == 3)
             {
-                nextState = PointIntToState(new NeuralNetworkSnake.PointInt(previousPoint.X + 1, previousPoint.Y)); //down
+                nextState = PointToState(new System.Drawing.Point(previousPoint.X + 1, previousPoint.Y)); //down
             }
             return nextState;
         }
-        /// <summary>
-        /// Возвращает точку, на которую перешел.
-        /// </summary>
-        public NeuralNetworkSnake.PointInt Move()
+        private bool IsDestinationPoint(System.Drawing.Point point)
         {
-            if (_map[_currentPoint.X, _currentPoint.Y].IsCliff || (_currentPoint.X == _destinationPoint.X && _currentPoint.Y == _destinationPoint.Y)) //если попали в обрыв или в точку назначения, переходим в начало
+            for(int i = 0; i < _destinationPoints.Length; i++)
             {
-                _currentPoint = _startPoint;
-                UpdateTabuActions();
+                if(_destinationPoints[i].X == point.X && _destinationPoints[i].Y == point.Y)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        private int _nextAction = -1;
+        /// <summary>
+        /// Возвращает точку, на которую перешел. Перебирает все действия для всех состояний
+        /// </summary>
+        public System.Drawing.Point MoveEnumeration()
+        {
+            while (_map[_currentPoint.X, _currentPoint.Y].IsCliff || _map[_currentPoint.X, _currentPoint.Y].IsWall || IsDestinationPoint(_currentPoint))
+            {
+                _currentPoint.Y++;
+                if (_currentPoint.Y >= _mapColumnCount)
+                {
+                    _currentPoint.X++;
+                    _currentPoint.Y = 0;
+                    if (_currentPoint.X >= _mapRowsCount)
+                    {
+                        _currentPoint.X = 0;
+                    }
+                }
+            }
+            UpdateTabuActions();
+            _nextAction++;
+            System.Drawing.Point nextPoint = _currentPoint;
+            if (_nextAction < _qLearning.ActionsCount)
+            {
+                AForgeExtensions.MachineLearning.TabuSearchExploration tabu = (AForgeExtensions.MachineLearning.TabuSearchExploration)_qLearning.ExplorationPolicy;
+                if (tabu.TabuActions[_nextAction] == 0)
+                {
+                    int previousState = PointToState(_currentPoint);
+                    int previousAction = _nextAction;
+                    int nextState = GetNextState(_currentPoint, previousAction);
+                    nextPoint = StateToPoint(nextState);
+                    System.Drawing.Point savePoint = _currentPoint;
+                    _currentPoint = nextPoint;
+                    UpdateTabuActions();
+                    _qLearning.UpdateState(previousState, previousAction, Map[nextPoint.X, nextPoint.Y].Reward, nextState);
+                    _currentPoint = savePoint;
+                }
             }
             else
             {
-                int previousState = PointIntToState(_currentPoint);
-                int previousAction = _qLearning.GetAction(previousState);
-                int nextState = GetNextState(_currentPoint, previousAction);
-                NeuralNetworkSnake.PointInt nextPoint = StateToPointInt(nextState);
-                _currentPoint = nextPoint;
-                UpdateTabuActions();
-                _qLearning.UpdateState(previousState, previousAction, Map[nextPoint.X, nextPoint.Y].Reward, nextState);
+                _nextAction = -1;
+                _currentPoint.Y++;
+                if (_currentPoint.Y >= _mapColumnCount)
+                {
+                    _currentPoint.X++;
+                    _currentPoint.Y = 0;
+                    if (_currentPoint.X >= _mapRowsCount)
+                    {
+                        _currentPoint.X = 0;
+                    }
+                }
             }
+            
+            return nextPoint;
+        }
+        /// <summary>
+        /// Возвращает точку, на которую перешел
+        /// </summary>
+        public System.Drawing.Point Move()
+        {
+            if (_map[_currentPoint.X, _currentPoint.Y].IsCliff || IsDestinationPoint(_currentPoint)) //если попали в обрыв или в точку назначения, переходим в начало
+            {
+                _currentPoint = _startPoint;
+                UpdateTabuActions();
+                return _currentPoint;
+            }
+            int previousState = PointToState(_currentPoint);
+            int previousAction = _qLearning.GetAction(previousState);
+            int nextState = GetNextState(_currentPoint, previousAction);
+            System.Drawing.Point nextPoint = StateToPoint(nextState);
+            _currentPoint = nextPoint;
+            UpdateTabuActions();
+            _qLearning.UpdateState(previousState, previousAction, Map[nextPoint.X, nextPoint.Y].Reward, nextState);
             return _currentPoint;
         }
     }

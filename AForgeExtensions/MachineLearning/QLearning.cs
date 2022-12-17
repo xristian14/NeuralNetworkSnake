@@ -29,9 +29,9 @@ namespace AForgeExtensions.MachineLearning
             }
         }
         /// <summary>
-        /// Инициализирует экземпляр QLearning, заполняя массив qvalues случайными значениями, от min до max
+        /// Инициализирует экземпляр QLearning, заполняя массив qvalues случайными значениями, от min до max. fixedStates - массив с индексами состояний, вознаграждения за действия которых будут равны fixedStatesValue
         /// </summary>
-        public QLearning(int states, int actions, AForgeExtensions.MachineLearning.IExplorationPolicy explorationPolicy, double min, double max)
+        public QLearning(int states, int actions, AForgeExtensions.MachineLearning.IExplorationPolicy explorationPolicy, double min, double max, int[] fixedStates, double fixedStatesValue)
         {
             StatesCount = states;
             _actions = actions;
@@ -42,9 +42,19 @@ namespace AForgeExtensions.MachineLearning
             for (int i = 0; i < states; i++)
             {
                 _qvalues[i] = new double[actions];
-                for (int k = 0; k < actions; k++)
+                if (fixedStates.Contains(i))
                 {
-                    _qvalues[i][k] = AForgeExtensions.Features.GetRandDouble(min, max);
+                    for (int k = 0; k < actions; k++)
+                    {
+                        _qvalues[i][k] = fixedStatesValue;
+                    }
+                }
+                else
+                {
+                    for (int k = 0; k < actions; k++)
+                    {
+                        _qvalues[i][k] = AForgeExtensions.Features.GetRandDouble(min, max);
+                    }
                 }
             }
         }
