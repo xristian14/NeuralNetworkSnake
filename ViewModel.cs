@@ -436,8 +436,7 @@ namespace NeuralNetworkSnake
                         {
                             layers2[i] = layers[i + 1];
                         }
-                        AForge.Neuro.ActivationNetwork activationNetwork = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), layers[0], layers2);
-                        //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForgeExtensions.Neuro.ReLuActivationFunction(), new AForgeExtensions.Neuro.ReLuActivationFunction(), layers[0], layers2);
+                        AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-0.1f, 0.1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), layers[0], layers2);
                         AForgeExtensions.Neuro.Learning.DeepQLearning deepQLearning = new AForgeExtensions.Neuro.Learning.DeepQLearning(activationNetwork);
                         _simulation = new Simulation(deepQLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
                     }
@@ -775,18 +774,40 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForgeExtensions.Neuro.ReLuActivationFunction(), new AForgeExtensions.Neuro.ReLuActivationFunction(), 10, 10, 10, 5);
-            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForge.Neuro.SigmoidFunction(), new AForge.Neuro.SigmoidFunction(), 10, 10, 10, 5);
+            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 10, 10, 10, 5);
+            //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 10, 10, 10, 5);
             AForge.Neuro.ActivationNetwork activationNetworkClone = AForgeExtensions.Features.CloneActivationNetwork(activationNetwork);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
+            //backPropagationLearning.LearningRate = 0.01;
             double[] input = new double[10] { 0, 0.1, 1, 0.77, 0.2, 0.001, 1, 0.5, 0.3732, 0.1233 };
             double[] desiredOutput = new double[5] { 1, 0, 1, 0.51515, 0.707070 };
+            int e = 0;
             while (true)
             {
                 double[] outputBefore = activationNetwork.Compute(input);
                 backPropagationLearning.Run(input, desiredOutput);
                 double[] outputAfter = activationNetwork.Compute(input);
-                int y = 1;
+                e++;
+                if(e == 1)
+                {
+                    int y = 0;
+                }
+                if (e == 1000)
+                {
+                    int y = 0;
+                }
+                if (e == 10000)
+                {
+                    int y = 0;
+                }
+                if (e == 100000)
+                {
+                    int y = 0;
+                }
+                if (e == 1000000000)
+                {
+                    int y = 10000;
+                }
             }
             //отрисовываем все qvalues
             for(int x = 0; x < qLearningMap.GetLength(0); x++)
@@ -905,7 +926,7 @@ namespace NeuralNetworkSnake
                 //create neural network
                 //network = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), a[0], a[1], a[2], a[3]);
                 //network = new AForge.Neuro.ActivationNetwork(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
-                network = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandFromNegativeOneToOne(new AForgeExtensions.Neuro.ReLuActivationFunction(), new AForgeExtensions.Neuro.SameActivationFunction(), a[0], a[1], a[2]);
+                network = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), a[0], a[1], a[2]);
                 network2 = new AForge.Neuro.ActivationNetwork(new AForgeExtensions.Neuro.ReLuActivationFunction(), a[0], a[1], a[2]);
                 //create teacher
                 AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(network);

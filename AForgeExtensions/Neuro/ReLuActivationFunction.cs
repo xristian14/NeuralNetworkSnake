@@ -16,13 +16,13 @@ namespace AForgeExtensions.Neuro
         {
             return new ReLuActivationFunction();
         }
-        public double Derivative(double x)
+        public double Derivative(double value)
         {
-            return x;
+            return value >= 0 ? 1 : 0;
         }
-        public double Derivative2(double y)
+        public double Derivative2(double value)
         {
-            return y;
+            return value >= 0 ? 1 : 0;
         }
         public double Function(double value)
         {

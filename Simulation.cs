@@ -357,7 +357,7 @@ namespace NeuralNetworkSnake
                     }
                 }
 
-                double baseReward = 0.0001;
+                double baseReward = 0.3;
                 double appleReward = 1;
                 double gameOverReward = 0;
                 double reward = baseReward;

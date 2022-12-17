@@ -16,15 +16,10 @@ namespace AForgeExtensions.Neuro
         /// <param name="inputsCount"></param>
         /// <param name="neuronsCount"></param>
         /// <returns></returns>
-        public static AForge.Neuro.ActivationNetwork BuildRandFromNegativeOneToOne(AForge.Neuro.IActivationFunction function, AForge.Neuro.IActivationFunction outputLayerFunction, int inputsCount, params int[] neuronsCount)
+        public static AForge.Neuro.ActivationNetwork BuildRandom(float randomMin, float randomMax, AForge.Neuro.IActivationFunction function, int inputsCount, params int[] neuronsCount)
         {
-            AForge.Neuro.Neuron.RandRange = new AForge.Range(-1f, 1f);
+            AForge.Neuro.Neuron.RandRange = new AForge.Range(randomMin, randomMax);
             AForge.Neuro.ActivationNetwork activationNetwork = new AForge.Neuro.ActivationNetwork(function, inputsCount, neuronsCount);
-            int lastLayerIndex = activationNetwork.Layers.Length - 1;
-            for (int i = 0; i < activationNetwork.Layers[lastLayerIndex].Neurons.Length; i++)
-            {
-                ((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[lastLayerIndex].Neurons[i]).ActivationFunction = outputLayerFunction;
-            }
             return activationNetwork;
         }
     }
