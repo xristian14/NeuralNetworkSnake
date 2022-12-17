@@ -85,7 +85,7 @@
     <Compile Include="AForgeExtensions\MachineLearning\IExplorationPolicy.cs" />
     <Compile Include="AForgeExtensions\MachineLearning\QLearning.cs" />
     <Compile Include="AForgeExtensions\MachineLearning\TabuSearchExploration.cs" />
-    <Compile Include="AForgeExtensions\Neuro\ActivationNetwork.cs" />
+    <Compile Include="AForgeExtensions\Neuro\ActivationNetworkFactory.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\DeepQLearning.cs" />
     <Compile Include="AForgeExtensions\Neuro\ReLuActivationFunction.cs" />
     <Compile Include="AForgeExtensions\Neuro\SameActivationFunction.cs" />

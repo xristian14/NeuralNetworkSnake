@@ -18,12 +18,14 @@ namespace AForgeExtensions.Neuro.Learning
             _learningRate = 0.5;
             _discountFactor = 0.99;
             _targetNetworkUpdateTime = 100;
+            _targetNetworkUpdateTimeElapsed = 0;
         }
         private AForge.Neuro.ActivationNetwork _network; //основная нейронная сеть
         public AForge.Neuro.ActivationNetwork Network { get { return _network; } }
         private AForge.Neuro.ActivationNetwork _targetNetwork; //целевая нейронная сеть, из неё будут браться значения будующих наград
         private AForge.Neuro.Learning.BackPropagationLearning _backPropagationLearning;
         private int _targetNetworkUpdateTime;
+        private int _targetNetworkUpdateTimeElapsed;
         /// <summary>
         /// Количество итераций UpdateState(), через которое основная нейронная сеть копируется в целевую. (по умолчанию 100)
         /// </summary>
@@ -38,10 +40,23 @@ namespace AForgeExtensions.Neuro.Learning
         /// Фактор дисконтирования (по умолчанию 0.99), в соответствии с которым размер будующей награды будет уменьшен.
         /// </summary>
         public double DiscountFactor { get { return _discountFactor; } set { _discountFactor = value; } }
-        public void UpdateState(double[] previousStateInput, int previousAction, double[] nextStateInput)
+        public void UpdateState(double[] previousStateInput, double[] previousStateOutput, int action, double reward, double[] nextStateInput)
         {
-            //определяем стоимости будующих наград
-            double[][] nextStateOutputs = new double[_network.InputsCount][]; //
+            double[] nextStateOutput = _targetNetwork.Compute(nextStateInput);
+            double previousQvalue = previousStateOutput[action];
+            double updatedQvalue = previousQvalue + _learningRate * (reward + _discountFactor * nextStateOutput.Max() - previousQvalue);
+            double[] updatedPreviousStateOutput = new double[previousStateOutput.Length];
+            previousStateOutput.CopyTo(updatedPreviousStateOutput, 0);
+            updatedPreviousStateOutput[action] = updatedQvalue;
+            _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
+
+            //если совершили достаточно итераций обновления состояния, обновляем целевую нейронную сеть
+            _targetNetworkUpdateTimeElapsed++;
+            if(_targetNetworkUpdateTimeElapsed >= _targetNetworkUpdateTime)
+            {
+                _targetNetworkUpdateTimeElapsed = 0;
+                _targetNetwork = AForgeExtensions.Features.CloneActivationNetwork(_network);
+            }
         }
     }
 }
