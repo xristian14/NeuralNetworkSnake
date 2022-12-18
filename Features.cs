@@ -38,17 +38,6 @@ namespace NeuralNetworkSnake
         }
         public static double[] SoftMaxVector(double[] inputVector) //возвращает вектор, сумма значений которого равняется 1
         {
-            /*double[] outputVector = new double[inputVector.Length];
-            double vectorSum = 0;
-            for (int i = 0; i < inputVector.Length; i++)
-            {
-                vectorSum += Math.Pow(Math.E, inputVector[i]);
-            }
-            for (int i = 0; i < inputVector.Length; i++)
-            {
-                outputVector[i] = Math.Pow(Math.E, inputVector[i]) / vectorSum;
-            }
-            return outputVector;*/
             double[] outputVector = new double[inputVector.Length];
             double inputVectorSum = inputVector.Sum();
             for (int i = 0; i < inputVector.Length; i++)

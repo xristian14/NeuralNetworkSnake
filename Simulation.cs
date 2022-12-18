@@ -41,6 +41,7 @@ namespace NeuralNetworkSnake
             ApplesCount = applesCount;
             IsRunning = false;
             Age = 0;
+            _epsilonDeepQLearning = double.Parse(ViewModel.getInstance().EpsilonDeepQLearning);
             DispatcherInvoke((Action)(() => {
                 ViewModel.getInstance().Age = Age;
             }));
@@ -85,6 +86,12 @@ namespace NeuralNetworkSnake
         {
             get { lock (locker) { return _applesCount; } }
             set { lock (locker) { _applesCount = value; } }
+        }
+        private double _epsilonDeepQLearning { get; set; }
+        public double EpsilonDeepQLearning
+        {
+            get { lock (locker) { return _epsilonDeepQLearning; } }
+            set { lock (locker) { _epsilonDeepQLearning = value; } }
         }
         private int Age = 0;
         public void SetMutationPercent(double mutationPercent)
@@ -283,8 +290,7 @@ namespace NeuralNetworkSnake
                 double[] inputs = Array.ConvertAll(inputsVector.ToArray(), a => (double)a);
                 double[] outputs = _deepQLearning.Network.Compute(inputs);
                 int chosenAction = AForgeExtensions.Features.MaxIndex(outputs);
-                double epsilon = 0.1;
-                if (_random.NextDouble() < epsilon)
+                if (_random.NextDouble() < _epsilonDeepQLearning)
                 {
                     int randAction = _random.Next(0, 2);
                     if (chosenAction <= randAction)
@@ -357,9 +363,9 @@ namespace NeuralNetworkSnake
                     }
                 }
 
-                double baseReward = 0.3;
-                double appleReward = 1;
-                double gameOverReward = 0;
+                double baseReward = 0;
+                double appleReward = 2;
+                double gameOverReward = -2;
                 double reward = baseReward;
                 int newX = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].X + xOffset;
                 int newY = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].Y + yOffset;

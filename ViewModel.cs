@@ -44,7 +44,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _firstHiddenLayerCountNeurons = "24";
+        private string _firstHiddenLayerCountNeurons = "12";
         public string FirstHiddenLayerCountNeurons
         {
             get { return _firstHiddenLayerCountNeurons; }
@@ -57,7 +57,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _secondHiddenLayerCountNeurons = "24";
+        private string _secondHiddenLayerCountNeurons = "12";
         public string SecondHiddenLayerCountNeurons
         {
             get { return _secondHiddenLayerCountNeurons; }
@@ -70,7 +70,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _thirdHiddenLayerCountNeurons = "24";
+        private string _thirdHiddenLayerCountNeurons = "12";
         public string ThirdHiddenLayerCountNeurons
         {
             get { return _thirdHiddenLayerCountNeurons; }
@@ -79,6 +79,32 @@ namespace NeuralNetworkSnake
                 if (int.TryParse(value, out int res))
                 {
                     _thirdHiddenLayerCountNeurons = value;
+                }
+                OnPropertyChanged();
+            }
+        }
+        private string _fourthHiddenLayerCountNeurons = "12";
+        public string FourthHiddenLayerCountNeurons
+        {
+            get { return _fourthHiddenLayerCountNeurons; }
+            set
+            {
+                if (int.TryParse(value, out int res))
+                {
+                    _fourthHiddenLayerCountNeurons = value;
+                }
+                OnPropertyChanged();
+            }
+        }
+        private string _fifthHiddenLayerCountNeurons = "12";
+        public string FifthHiddenLayerCountNeurons
+        {
+            get { return _fifthHiddenLayerCountNeurons; }
+            set
+            {
+                if (int.TryParse(value, out int res))
+                {
+                    _fifthHiddenLayerCountNeurons = value;
                 }
                 OnPropertyChanged();
             }
@@ -389,6 +415,26 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
+        private string _epsilonDeepQLearning = "0,1";
+        public string EpsilonDeepQLearning
+        {
+            get { return _epsilonDeepQLearning; }
+            set
+            {
+                if (double.TryParse(value, out double res))
+                {
+                    if (res >= 0 && res <= 100)
+                    {
+                        _epsilonDeepQLearning = value;
+                        if (_simulation != null)
+                        {
+                            _simulation.EpsilonDeepQLearning = res;
+                        }
+                    }
+                }
+                OnPropertyChanged();
+            }
+        }
 
 
         public ICommand CreateNeuralNetwork_Click
@@ -421,6 +467,14 @@ namespace NeuralNetworkSnake
                     {
                         layers[3] = int.Parse(ThirdHiddenLayerCountNeurons);
                     }
+                    if (HiddenLayersCount >= 3)
+                    {
+                        layers[4] = int.Parse(FourthHiddenLayerCountNeurons);
+                    }
+                    if (HiddenLayersCount >= 3)
+                    {
+                        layers[5] = int.Parse(FifthHiddenLayerCountNeurons);
+                    }
                     layers[layers.Length - 1] = 3;
 
                     if (_isGeneticLearning)
@@ -436,7 +490,9 @@ namespace NeuralNetworkSnake
                         {
                             layers2[i] = layers[i + 1];
                         }
-                        AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-0.1f, 0.1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), layers[0], layers2);
+                        AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-0.1f, 0.1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), layers[0], layers2);
+                        //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-0.1f, 0.1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), layers[0], layers2);
+                        //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(0f, 0.01f, new AForge.Neuro.BipolarSigmoidFunction(), layers[0], layers2);
                         AForgeExtensions.Neuro.Learning.DeepQLearning deepQLearning = new AForgeExtensions.Neuro.Learning.DeepQLearning(activationNetwork);
                         _simulation = new Simulation(deepQLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
                     }
@@ -782,7 +838,7 @@ namespace NeuralNetworkSnake
             double[] input = new double[10] { 0, 0.1, 1, 0.77, 0.2, 0.001, 1, 0.5, 0.3732, 0.1233 };
             double[] desiredOutput = new double[5] { 1, 0, 1, 0.51515, 0.707070 };
             int e = 0;
-            while (true)
+            while (false)
             {
                 double[] outputBefore = activationNetwork.Compute(input);
                 backPropagationLearning.Run(input, desiredOutput);

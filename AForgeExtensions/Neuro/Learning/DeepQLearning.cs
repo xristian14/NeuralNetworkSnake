@@ -16,9 +16,10 @@ namespace AForgeExtensions.Neuro.Learning
             _network = network;
             _targetNetwork = AForgeExtensions.Features.CloneActivationNetwork(_network);
             _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(_network);
+            _backPropagationLearning.LearningRate = 0.3;
             _learningRate = 0.5;
-            _discountFactor = 0.75;
-            _targetNetworkUpdateTime = 400;
+            _discountFactor = 0.9;
+            _targetNetworkUpdateTime = 100;
             _targetNetworkUpdateTimeElapsed = 0;
         }
         private AForge.Neuro.ActivationNetwork _network; //основная нейронная сеть
@@ -44,33 +45,45 @@ namespace AForgeExtensions.Neuro.Learning
         public double DiscountFactor { get { return _discountFactor; } set { _discountFactor = value; } }
         public void UpdateState(double[] previousStateInput, double[] previousStateOutput, int action, double reward, double[] nextStateInput)
         {
-            if(previousStateOutput.Max() > 40)
+            if (previousStateOutput.Max() > 40)
             {
                 int y = 0;
             }
             double[] nextStateOutput = _targetNetwork.Compute(nextStateInput);
             double previousQvalue = previousStateOutput[action];
             double updatedQvalue = previousQvalue + _learningRate * (reward + _discountFactor * nextStateOutput.Max() - previousQvalue);
+            if (updatedQvalue > 5)
+            {
+                int y = 0;
+            }
+            if (updatedQvalue > 10)
+            {
+                int y = 0;
+            }
+            if (updatedQvalue > 30)
+            {
+                int y = 0;
+            }
             double[] updatedPreviousStateOutput = new double[previousStateOutput.Length];
             previousStateOutput.CopyTo(updatedPreviousStateOutput, 0);
             updatedPreviousStateOutput[action] = updatedQvalue;
             _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
             double[] previousAfterUpdateStateOutput = _network.Compute(previousStateInput);
 
-            if(reward == 1)
+            if (reward == 1)
             {
                 int y = 0;
             }
 
             _targetNetworkUpdateTimeElapsed++;
             //если совершили достаточно итераций обновления состояния, обновляем целевую нейронную сеть
-            if(_targetNetworkUpdateTimeElapsed >= _targetNetworkUpdateTime)
+            if (_targetNetworkUpdateTimeElapsed >= _targetNetworkUpdateTime)
             {
                 _targetNetworkUpdateTimeElapsed = 0;
                 _targetNetwork = AForgeExtensions.Features.CloneActivationNetwork(_network);
                 _targetNetworkUpdateTotalNumber++;
             }
-            if(_targetNetworkUpdateTotalNumber > 400)
+            if (_targetNetworkUpdateTotalNumber > 400)
             {
                 int y = 0;
             }

@@ -29,7 +29,7 @@
                         <StackPanel Grid.Row="0" Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" Margin="0 3 0 3">
                                 <TextBlock Text="Количество скрытых слоёв" Margin="6 0 0 0"/>
-                                <Slider Value="{Binding HiddenLayersCount}" Minimum="1" Maximum="3" Width="30" Margin="6 0 0 0"/>
+                                <Slider Value="{Binding HiddenLayersCount}" Minimum="1" Maximum="5" Width="30" Margin="6 0 0 0"/>
                                 <TextBlock Text="{Binding HiddenLayersCount}" Margin="3 0 0 0"/>
                                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
                                 <TextBlock Text="Размер скрытых слоёв:" Margin="6 0 0 0"/>
@@ -39,6 +39,10 @@
                                 <TextBox Text="{Binding SecondHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
                                 <TextBlock Text="3-й слой" Margin="6 0 0 0"/>
                                 <TextBox Text="{Binding ThirdHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
+                                <TextBlock Text="4-й слой" Margin="6 0 0 0"/>
+                                <TextBox Text="{Binding FourthHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
+                                <TextBlock Text="5-й слой" Margin="6 0 0 0"/>
+                                <TextBox Text="{Binding FifthHiddenLayerCountNeurons}" Width="25" Margin="6 0 0 0"/>
                                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
                                 <TextBlock Text="Алгоритм обучения" Margin="6 0 0 0"/>
                                 <ComboBox ItemsSource="{Binding AlgorithmLearningCombobox}" SelectedItem="{Binding SelectedAlgorithmLearningCombobox}" SelectedIndex="0" Margin="6 0 0 0"/>
@@ -172,7 +176,11 @@
                                             </TabItem.Header>
                                             <TabItem.Content>
                                                 <StackPanel Orientation="Vertical">
-
+                                                    <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                                        <TextBlock Text="Скорость исследования" Margin="6 0 0 0"/>
+                                                        <TextBox Text="{Binding EpsilonDeepQLearning}" Width="30" Margin="6 0 6 0"/>
+                                                        <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
+                                                    </StackPanel>
                                                 </StackPanel>
                                             </TabItem.Content>
                                         </TabItem>

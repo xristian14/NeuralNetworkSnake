@@ -88,6 +88,10 @@
     <Compile Include="AForgeExtensions\Neuro\ActivationNetworkFactory.cs" />
     <Compile Include="AForgeExtensions\Neuro\LeakyReLuActivationFunction.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\DeepQLearning.cs" />
+    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning.cs" />
+    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\Chromosome.cs" />
+    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\ISelectionMethod.cs" />
+    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\RouletteWheelSelection.cs" />
     <Compile Include="AForgeExtensions\Neuro\ReLuActivationFunction.cs" />
     <Compile Include="AForgeExtensions\Neuro\SameActivationFunction.cs" />
     <Compile Include="AppleCoordinate.cs" />

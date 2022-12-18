@@ -55,5 +55,18 @@ namespace AForgeExtensions
             }
             return activationNetwork;
         }
+        /// <summary>
+        /// возвращает массив, сумма значений которого равняется 1
+        /// </summary>
+        public static double[] SoftMaxArray(double[] input)
+        {
+            double[] output = new double[input.Length];
+            double inputSum = input.Sum();
+            for (int i = 0; i < input.Length; i++)
+            {
+                output[i] = input[i] / inputSum;
+            }
+            return output;
+        }
     }
 }
