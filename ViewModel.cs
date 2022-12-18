@@ -834,6 +834,7 @@ namespace NeuralNetworkSnake
             //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 10, 10, 10, 5);
             AForge.Neuro.ActivationNetwork activationNetworkClone = AForgeExtensions.Features.CloneActivationNetwork(activationNetwork);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
+            AForge.Neuro.Learning.EvolutionaryLearning evolutionaryLearning = new AForge.Neuro.Learning.EvolutionaryLearning(activationNetwork, 50);
             //backPropagationLearning.LearningRate = 0.01;
             double[] input = new double[10] { 0, 0.1, 1, 0.77, 0.2, 0.001, 1, 0.5, 0.3732, 0.1233 };
             double[] desiredOutput = new double[5] { 1, 0, 1, 0.51515, 0.707070 };

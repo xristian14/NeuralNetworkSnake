@@ -56,6 +56,27 @@ namespace AForgeExtensions
             return activationNetwork;
         }
         /// <summary>
+        /// Копирует значения весов и смещений из sourceNetwork в targetNetwork
+        /// </summary>
+        public static void CopyActivationNetworkWeightsBiases(AForge.Neuro.ActivationNetwork sourceNetwork, AForge.Neuro.ActivationNetwork targetNetwork)
+        {
+            for (int i = 0; i < sourceNetwork.Layers.Length; i++)
+            {
+                for (int n = 0; n < sourceNetwork.Layers[i].Neurons.Length; n++)
+                {
+                    sourceNetwork.Layers[i].Neurons[n].Weights.CopyTo(targetNetwork.Layers[i].Neurons[n].Weights, 0);
+                    ((AForge.Neuro.ActivationNeuron)targetNetwork.Layers[i].Neurons[n]).Threshold = ((AForge.Neuro.ActivationNeuron)sourceNetwork.Layers[i].Neurons[n]).Threshold;
+                }
+            }
+        }
+        /// <summary>
+        /// Функция возвращает значение ошибки, для массивов фактического и ожидаемого результата работы нейронной сети
+        /// </summary>
+        public static double ActivationNetworkLoss(double[] actualOutput, double[] desiredOutput)
+        {
+
+        }
+        /// <summary>
         /// возвращает массив, сумма значений которого равняется 1
         /// </summary>
         public static double[] SoftMaxArray(double[] input)

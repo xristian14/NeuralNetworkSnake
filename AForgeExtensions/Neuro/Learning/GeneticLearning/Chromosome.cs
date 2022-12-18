@@ -23,9 +23,9 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         public AForge.Neuro.ActivationNetwork Network { get { return _network; } }
         private double _fitness = 0;
         public double Fitness { get { return _fitness; } set { _fitness = value; } }
-        private double _length = 0;
+        private double _length;
         /// <summary>
-        /// Длина генома (количество значений)
+        /// Длина генома (количество значений).
         /// </summary>
         public double Length { get { return _length; } }
         public object Clone()
