@@ -21,7 +21,8 @@ namespace AForgeExtensions.Neuro.Learning
             _lossFunction = new MSELossFunction();
             _selectionMethod = new GeneticLearning.RouletteWheelMinimizationSelection();
             _mutationRate = 0.1;
-            _mutationProbability = 0.001;
+            _genomeLength = GetGenomeLength(network);
+            _mutationProbability = 1.0 / _genomeLength;
             _crossoverRate = 0.75;
             _randomRateInitialPopulation = 0;
         }
@@ -62,26 +63,31 @@ namespace AForgeExtensions.Neuro.Learning
         /// <summary>
         /// Минимальное значение приспособленности, для всех поколений
         /// </summary>
-        private List<double> MinFitnessProgression { get { return _minFitnessProgression; } }
+        public List<double> MinFitnessProgression { get { return _minFitnessProgression; } }
         private List<double> _averageFitnessProgression = new List<double>();
         /// <summary>
         /// Среднее значение приспособленности, для всех поколений
         /// </summary>
-        private List<double> AverageFitnessProgression { get { return _averageFitnessProgression; } }
+        public List<double> AverageFitnessProgression { get { return _averageFitnessProgression; } }
         private List<double> _maxFitnessProgression = new List<double>();
         /// <summary>
         /// Максимальное значение приспособленности, для всех поколений
         /// </summary>
-        private List<double> MaxFitnessProgression { get { return _maxFitnessProgression; } }
+        public List<double> MaxFitnessProgression { get { return _maxFitnessProgression; } }
         private double _randomRateInitialPopulation;
         /// <summary>
         /// Количество случайно сгенерированных особей в начальной популяции [0,1]. Хотя бы одна особь будет с оригинальной AForge.Neuro.ActivationNetwork
         /// </summary>
-        private double RandomRateInitialPopulation { get { return _randomRateInitialPopulation; } set { _randomRateInitialPopulation = value; } }
+        public double RandomRateInitialPopulation { get { return _randomRateInitialPopulation; } set { _randomRateInitialPopulation = value; } }
         private double[][] _inputs;
         private double[][] _desiredOutputs;
         private int _populationSize;
         public int PopulationSize { get { return _populationSize; } }
+        private int _genomeLength;
+        /// <summary>
+        /// Длина генома нейронной сети
+        /// </summary>
+        public int GenomeLength { get { return _genomeLength; } }
         private ILossFunction _lossFunction;
         /// <summary>
         /// Функция расчета ошибки (по умолчанию MSELossFunction)
@@ -94,11 +100,21 @@ namespace AForgeExtensions.Neuro.Learning
         public GeneticLearning.ISelectionMethod SelectionMethod { get { return _selectionMethod; } set { _selectionMethod = value; } }
         private GeneticLearning.Chromosome _bestChromosome;
         private GeneticLearning.Chromosome[] _population;
+        private int GetGenomeLength(AForge.Neuro.ActivationNetwork network)
+        {
+            int length = 0;
+            for (int i = 0; i < network.Layers.Length; i++)
+            {
+                length += network.Layers[i].Neurons.Length * network.Layers[i].Neurons[0].Weights.Length; //веса
+                length += network.Layers[i].Neurons.Length; //смещение
+            }
+            return length;
+        }
         private void SpawnInitialPopulation()
         {
             _population = new GeneticLearning.Chromosome[_populationSize];
             bool isOriginalNetwork = false;
-            for (int i = 1; i < _populationSize; i++)
+            for (int i = 0; i < _populationSize; i++)
             {
                 if(_random.NextDouble() < _randomRateInitialPopulation)
                 {

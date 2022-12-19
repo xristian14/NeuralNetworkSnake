@@ -22,15 +22,15 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         public Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize)
         {
             Chromosome[] newPopulation = new Chromosome[newPopulationSize];
-            double fintessSum = population.Sum(a => a.Fitness);
+            double fintessSum = population.Sum(a => 1 / a.Fitness);
             for (int i = 0; i < newPopulationSize; i++)
             {
-                double randFitnessSum = _random.NextDouble();
+                double randFitness = _random.NextDouble() * fintessSum;
                 int k = 0;
                 double sum = 0;
-                while (k < population.Length && sum < randFitnessSum)
+                while (k < population.Length && sum < randFitness)
                 {
-                    sum += 1 - population[k].Fitness / fintessSum;
+                    sum += 1 / population[k].Fitness;
                     k++;
                 }
                 int index = k - 1;

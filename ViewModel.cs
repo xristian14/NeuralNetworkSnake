@@ -830,44 +830,27 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 10, 10, 10, 5);
-            //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 10, 10, 10, 5);
-            AForge.Neuro.ActivationNetwork activationNetworkClone = AForgeExtensions.Features.CloneActivationNetwork(activationNetwork);
+            //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 4, 3);
+            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 4, 4, 3);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
-            AForge.Neuro.Learning.EvolutionaryLearning evolutionaryLearning = new AForge.Neuro.Learning.EvolutionaryLearning(activationNetwork, 50);
-            //backPropagationLearning.LearningRate = 0.01;
-            double[] input = new double[10] { 0, 0.1, 1, 0.77, 0.2, 0.001, 1, 0.5, 0.3732, 0.1233 };
-            double[] desiredOutput = new double[5] { 1, 0, 1, 0.51515, 0.707070 };
-            int e = 0;
-            while (false)
-            {
-                double[] outputBefore = activationNetwork.Compute(input);
-                backPropagationLearning.Run(input, desiredOutput);
-                double[] outputAfter = activationNetwork.Compute(input);
-                e++;
-                if(e == 1)
-                {
-                    int y = 0;
-                }
-                if (e == 1000)
-                {
-                    int y = 0;
-                }
-                if (e == 10000)
-                {
-                    int y = 0;
-                }
-                if (e == 100000)
-                {
-                    int y = 0;
-                }
-                if (e == 1000000000)
-                {
-                    int y = 10000;
-                }
-            }
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, 100, -1, 1);
+            //geneticLearningTeacher.RandomRateInitialPopulation = 1;
+            geneticLearningTeacher.MutationProbability = 1.0 / geneticLearningTeacher.GenomeLength;
+            geneticLearningTeacher.MutationRate = 0.5;
+            double[] input = new double[4] { 0, 0.1, 1, 0.77 };
+            double[] desiredOutput = new double[3] { 0.51515, 0, 0.707070 };
+            AForgeExtensions.Neuro.MSELossFunction mSELossFunction = new AForgeExtensions.Neuro.MSELossFunction();
+            double[] otputBefore = activationNetwork.Compute(input);
+            double lossBefore = mSELossFunction.Calculate(otputBefore, desiredOutput);
+            double[][] inputs = new double[1][];
+            inputs[0] = input;
+            double[][] desiredOutputs = new double[1][];
+            desiredOutputs[0] = desiredOutput;
+            double loss = geneticLearningTeacher.Run(inputs, desiredOutputs);
+            double[] otputAfter = activationNetwork.Compute(input);
+            double lossAfter = mSELossFunction.Calculate(otputAfter, desiredOutput);
             //отрисовываем все qvalues
-            for(int x = 0; x < qLearningMap.GetLength(0); x++)
+            for (int x = 0; x < qLearningMap.GetLength(0); x++)
             {
                 for(int y = 0; y < qLearningMap.GetLength(1); y++)
                 {

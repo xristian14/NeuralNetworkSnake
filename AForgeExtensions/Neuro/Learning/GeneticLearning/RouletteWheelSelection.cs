@@ -25,10 +25,10 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
             double fintessSum = population.Sum(a => a.Fitness);
             for (int i = 0; i < newPopulationSize; i++)
             {
-                double randFitnessSum = _random.NextDouble() * fintessSum;
+                double randFitness = _random.NextDouble() * fintessSum;
                 int k = 0;
                 double sum = 0;
-                while (k < population.Length && sum < randFitnessSum)
+                while (k < population.Length && sum < randFitness)
                 {
                     sum += population[k].Fitness;
                     k++;

@@ -15,7 +15,7 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
             for(int i = 0; i < network.Layers.Length; i++)
             {
                 length += network.Layers[i].Neurons.Length * network.Layers[i].Neurons[0].Weights.Length; //веса
-                length++; //смещение
+                length += network.Layers[i].Neurons.Length; //смещение
             }
             _length = length;
         }
