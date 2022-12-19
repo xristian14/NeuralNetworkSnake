@@ -82,7 +82,7 @@ namespace AForgeExtensions.Neuro.Learning
         private double[][] _inputs;
         private double[][] _desiredOutputs;
         private int _populationSize;
-        public int PopulationSize { get { return _populationSize; } }
+        public int PopulationSize { get { return _populationSize; } set { _populationSize = value; } }
         private int _genomeLength;
         /// <summary>
         /// Длина генома нейронной сети
@@ -118,19 +118,19 @@ namespace AForgeExtensions.Neuro.Learning
             {
                 if(_random.NextDouble() < _randomRateInitialPopulation)
                 {
-                    AForge.Neuro.ActivationNetwork randNetwork = Features.CloneActivationNetwork(_network);
-                    Features.FillRandomlyActivationNetwork(randNetwork, _mutateMinValue, _mutateMaxValue);
+                    AForge.Neuro.ActivationNetwork randNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
+                    ActivationNetworkFeatures.FillRandomlyActivationNetwork(randNetwork, _mutateMinValue, _mutateMaxValue);
                     _population[i] = new GeneticLearning.Chromosome(randNetwork);
                 }
                 else
                 {
                     isOriginalNetwork = true;
-                    _population[i] = new GeneticLearning.Chromosome(Features.CloneActivationNetwork(_network));
+                    _population[i] = new GeneticLearning.Chromosome(ActivationNetworkFeatures.CloneActivationNetwork(_network));
                 }
             }
             if (!isOriginalNetwork)
             {
-                _population[0] = new GeneticLearning.Chromosome(Features.CloneActivationNetwork(_network));
+                _population[0] = new GeneticLearning.Chromosome(ActivationNetworkFeatures.CloneActivationNetwork(_network));
             }
             _bestChromosome = _population[0];
         }
@@ -145,13 +145,8 @@ namespace AForgeExtensions.Neuro.Learning
         }
         private void FitnessCalculate(GeneticLearning.Chromosome chromosome)
         {
-            double lossSum = 0;
-            for(int i = 0; i < _inputs.Length; i++)
-            {
-                double[] actualOutput = chromosome.Network.Compute(_inputs[i]);
-                lossSum += _lossFunction.Calculate(actualOutput, _desiredOutputs[i]);
-            }
-            chromosome.Fitness = lossSum / _inputs.Length;
+            double[][] outputs = ActivationNetworkFeatures.ActivationNetworkCompute(chromosome.Network, _inputs);
+            chromosome.Fitness = _lossFunction.Calculate(outputs, _desiredOutputs);
         }
         private void GenerationFitnessCalculate()
         {
@@ -279,7 +274,7 @@ namespace AForgeExtensions.Neuro.Learning
                 GenerationFitnessCalculate();
                 _population = SelectionPopulation(_population);
             }
-            Features.CopyActivationNetworkWeightsBiases(_bestChromosome.Network, _network);
+            ActivationNetworkFeatures.CopyActivationNetworkWeightsBiases(_bestChromosome.Network, _network);
             return _bestChromosome.Fitness;
         }
     }

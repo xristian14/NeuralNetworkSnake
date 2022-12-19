@@ -14,7 +14,7 @@ namespace AForgeExtensions.Neuro.Learning
         public DeepQLearning(AForge.Neuro.ActivationNetwork network)
         {
             _network = network;
-            _targetNetwork = AForgeExtensions.Features.CloneActivationNetwork(_network);
+            _targetNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
             _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(_network);
             _backPropagationLearning.LearningRate = 0.3;
             _learningRate = 0.5;
@@ -52,35 +52,17 @@ namespace AForgeExtensions.Neuro.Learning
             double[] nextStateOutput = _targetNetwork.Compute(nextStateInput);
             double previousQvalue = previousStateOutput[action];
             double updatedQvalue = previousQvalue + _learningRate * (reward + _discountFactor * nextStateOutput.Max() - previousQvalue);
-            if (updatedQvalue > 5)
-            {
-                int y = 0;
-            }
-            if (updatedQvalue > 10)
-            {
-                int y = 0;
-            }
-            if (updatedQvalue > 30)
-            {
-                int y = 0;
-            }
             double[] updatedPreviousStateOutput = new double[previousStateOutput.Length];
             previousStateOutput.CopyTo(updatedPreviousStateOutput, 0);
             updatedPreviousStateOutput[action] = updatedQvalue;
             _backPropagationLearning.Run(previousStateInput, updatedPreviousStateOutput);
-            double[] previousAfterUpdateStateOutput = _network.Compute(previousStateInput);
-
-            if (reward == 1)
-            {
-                int y = 0;
-            }
 
             _targetNetworkUpdateTimeElapsed++;
             //если совершили достаточно итераций обновления состояния, обновляем целевую нейронную сеть
             if (_targetNetworkUpdateTimeElapsed >= _targetNetworkUpdateTime)
             {
                 _targetNetworkUpdateTimeElapsed = 0;
-                _targetNetwork = AForgeExtensions.Features.CloneActivationNetwork(_network);
+                _targetNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
                 _targetNetworkUpdateTotalNumber++;
             }
             if (_targetNetworkUpdateTotalNumber > 400)

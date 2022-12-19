@@ -364,8 +364,8 @@ namespace NeuralNetworkSnake
                 }
 
                 double baseReward = 0;
-                double appleReward = 2;
-                double gameOverReward = -2;
+                double appleReward = 1;
+                double gameOverReward = -1;
                 double reward = baseReward;
                 int newX = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].X + xOffset;
                 int newY = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].Y + yOffset;

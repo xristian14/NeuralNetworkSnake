@@ -12,7 +12,7 @@ namespace AForgeExtensions.Neuro
         {
 
         }
-        private double _negativeSlope = 0.01;
+        private double _negativeSlope = 0.1;
         /// <summary>
         /// Наклон отрицательного значения. (Множитель, на который умножается отрицательное значение)
         /// </summary>

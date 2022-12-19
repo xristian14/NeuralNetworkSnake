@@ -18,14 +18,17 @@ namespace AForgeExtensions.Neuro
         /// <summary>
         /// Возвращает среднеквадратичную ошибку.
         /// </summary>
-        public double Calculate(double[] actualOutput, double[] desiredOutput)
+        public double Calculate(double[][] actualOutputs, double[][] desiredOutputs)
         {
-            double sum = 0;
-            for(int i = 0; i < actualOutput.Length; i++)
+            double totalSum = 0;
+            for(int i = 0; i < actualOutputs.Length; i++)
             {
-                sum += Math.Pow(actualOutput[i] - desiredOutput[i], 2);
+                for(int k = 0; k < actualOutputs[i].Length; k++)
+                {
+                    totalSum += Math.Pow(actualOutputs[i][k] - desiredOutputs[i][k], 2);
+                }
             }
-            return sum / actualOutput.Length;
+            return totalSum / actualOutputs.Length;
         }
     }
 }
