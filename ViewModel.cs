@@ -830,18 +830,18 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 8, 8, 3);
+            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 12, 12, 3);
             //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 4, 4, 3);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
-            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, 3000, -1, 1);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, 1000, -1, 1);
             geneticLearningTeacher.MutationRate = 0.75;
             AForgeExtensions.Neuro.MSELossFunction mSELossFunction = new AForgeExtensions.Neuro.MSELossFunction();
-            double[][] inputs = new double[3][] { new double[4] { 0.1, 1, 0.88, 0.2 }, new double[4] { 1, 0.5, 0.04, 0.6 }, new double[4] { 0.5, 0.3, 0.4, 0.01 } };
-            double[][] desiredOutputs = new double[3][] { new double[3] { 0.51515, -1, -0.707070 }, new double[3] { 0.3, -0.5, -0.05 }, new double[3] { 0.9, 0.5, -0.3 } };
-            double[][] otputsBefore = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
+            List<double[]> inputs = new List<double[]> { new double[4] { 0.1, 1, 0.88, 0.2 }, new double[4] { 1, 0.5, 0.04, 0.6 }, new double[4] { 0.5, 0.3, 0.4, 0.01 } };
+            List<double[]> desiredOutputs = new List<double[]> { new double[3] { 0.51515, -1, -0.707070 }, new double[3] { 0.3, -0.5, -0.05 }, new double[3] { 0.9, 0.5, -0.3 } };
+            List<double[]> otputsBefore = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
             double lossBefore = mSELossFunction.Calculate(otputsBefore, desiredOutputs);
             double loss = geneticLearningTeacher.Run(inputs, desiredOutputs);
-            double[][] otputsAfter = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
+            List<double[]> otputsAfter = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
             double lossAfter = mSELossFunction.Calculate(otputsAfter, desiredOutputs);
             //отрисовываем все qvalues
             for (int x = 0; x < qLearningMap.GetLength(0); x++)

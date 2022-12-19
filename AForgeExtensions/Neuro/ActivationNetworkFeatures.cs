@@ -20,12 +20,12 @@ namespace AForgeExtensions.Neuro
         /// <summary>
         /// Вычисляет работу нейросети для массива массивов входных значений
         /// </summary>
-        public static double[][] ActivationNetworkCompute(AForge.Neuro.ActivationNetwork network, double[][] inputs)
+        public static List<double[]> ActivationNetworkCompute(AForge.Neuro.ActivationNetwork network, List<double[]> inputs)
         {
-            double[][] outputs = new double[inputs.Length][];
-            for(int i = 0; i < inputs.Length; i++)
+            List<double[]> outputs = new List<double[]>();
+            for(int i = 0; i < inputs.Count; i++)
             {
-                outputs[i] = network.Compute(inputs[i]);
+                outputs.Add(network.Compute(inputs[i]));
             }
             return outputs;
         }

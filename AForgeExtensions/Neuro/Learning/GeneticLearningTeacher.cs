@@ -20,7 +20,7 @@ namespace AForgeExtensions.Neuro.Learning
             _mutateMaxValue = mutateMaxValue;
             _lossFunction = new MSELossFunction();
             _selectionMethod = new GeneticLearning.RouletteWheelMinimizationSelection();
-            _mutationRate = 0.1;
+            _mutationRate = 0.75;
             _genomeLength = GetGenomeLength(network);
             _mutationProbability = 1.0 / _genomeLength;
             _crossoverRate = 0.75;
@@ -79,8 +79,8 @@ namespace AForgeExtensions.Neuro.Learning
         /// Количество случайно сгенерированных особей в начальной популяции [0,1]. Хотя бы одна особь будет с оригинальной AForge.Neuro.ActivationNetwork
         /// </summary>
         public double RandomRateInitialPopulation { get { return _randomRateInitialPopulation; } set { _randomRateInitialPopulation = value; } }
-        private double[][] _inputs;
-        private double[][] _desiredOutputs;
+        private List<double[]> _inputs;
+        private List<double[]> _desiredOutputs;
         private int _populationSize;
         public int PopulationSize { get { return _populationSize; } set { _populationSize = value; } }
         private int _genomeLength;
@@ -145,7 +145,7 @@ namespace AForgeExtensions.Neuro.Learning
         }
         private void FitnessCalculate(GeneticLearning.Chromosome chromosome)
         {
-            double[][] outputs = ActivationNetworkFeatures.ActivationNetworkCompute(chromosome.Network, _inputs);
+            List<double[]> outputs = ActivationNetworkFeatures.ActivationNetworkCompute(chromosome.Network, _inputs);
             chromosome.Fitness = _lossFunction.Calculate(outputs, _desiredOutputs);
         }
         private void GenerationFitnessCalculate()
@@ -255,10 +255,8 @@ namespace AForgeExtensions.Neuro.Learning
         /// <summary>
         /// Ищет настройки нейронной сети с минимальным значением ошибки, и копирует веса и смещения лучшей модели в нейронную сеть, переданную в конструктор
         /// </summary>
-        /// <param name="inputs"></param>
-        /// <param name="desiredOutputs"></param>
         /// <returns></returns>
-        public double Run(double[][] inputs, double[][] desiredOutputs)
+        public double Run(List<double[]> inputs, List<double[]> desiredOutputs)
         {
             _inputs = inputs;
             _desiredOutputs = desiredOutputs;

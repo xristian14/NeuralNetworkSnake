@@ -8,6 +8,6 @@ namespace AForgeExtensions.Neuro
 {
     public interface ILossFunction
     {
-        double Calculate(double[][] actualOutputs, double[][] desiredOutputs);
+        double Calculate(List<double[]> actualOutputs, List<double[]> desiredOutputs);
     }
 }

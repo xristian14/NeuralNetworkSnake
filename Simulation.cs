@@ -363,6 +363,7 @@ namespace NeuralNetworkSnake
                     }
                 }
 
+                bool isAppleOrGameOver = false;
                 double baseReward = 0;
                 double appleReward = 1;
                 double gameOverReward = -1;
@@ -374,16 +375,22 @@ namespace NeuralNetworkSnake
                     if (_gameBoardsGeneticLearning[0].BoardCellsInfo[newX, newY].IsApple)
                     {
                         reward = appleReward;
+                        isAppleOrGameOver = true;
                     }
                 }
                 _gameBoardsGeneticLearning[0].MoveSnake(xOffset, yOffset);
                 if (_gameBoardsGeneticLearning[0].GetIsGameOver())
                 {
                     reward = gameOverReward;
+                    isAppleOrGameOver = true;
                 }
                 Vector<float> inputsVector2 = _gameBoardsGeneticLearning[0].GetInputs();
                 double[] inputs2 = Array.ConvertAll(inputsVector2.ToArray(), a => (double)a);
-                _deepQLearning.UpdateState(inputs, outputs, chosenAction, reward, inputs2);
+                _deepQLearning.AddStateActionUpdate(inputs, outputs, chosenAction, reward, !isAppleOrGameOver, inputs2);
+                if(_deepQLearning.PoolStateActionUpdateLength > 30)
+                {
+                    _deepQLearning.UpdateState();
+                }
             }
             return isAllGameOver;
         }
