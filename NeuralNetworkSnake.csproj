@@ -92,6 +92,7 @@
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearningTeacher.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\Chromosome.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\ISelectionMethod.cs" />
+    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\RouletteWheelMinimizationSelection.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\RouletteWheelSelection.cs" />
     <Compile Include="AForgeExtensions\Neuro\MSELossFunction.cs" />
     <Compile Include="AForgeExtensions\Neuro\ReLuActivationFunction.cs" />

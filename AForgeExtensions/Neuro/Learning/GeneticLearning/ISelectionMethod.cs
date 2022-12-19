@@ -8,6 +8,6 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
 {
     public interface ISelectionMethod
     {
-        Chromosome[] ApplySelection(Chromosome[] population);
+        Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize);
     }
 }

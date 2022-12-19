@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace AForgeExtensions.Neuro.Learning.GeneticLearning
 {
     /// <summary>
-    /// Выбор хромосом в новую популяцию осуществляется случайным образом, чем ВЫШЕ значение приспособленности, тем выше шанс быть выбранным. Значение приспособленности прямо пропорционально шансу быть выбранным.
+    /// Выбор хромосом в новую популяцию осуществляется случайным образом, чем НИЖЕ значение приспособленности, тем выше шанс быть выбранным. Значение приспособленности прямо пропорционально шансу быть выбранным.
     /// </summary>
-    public class RouletteWheelSelection : ISelectionMethod
+    public class RouletteWheelMinimizationSelection : ISelectionMethod
     {
-        public RouletteWheelSelection()
+        public RouletteWheelMinimizationSelection()
         {
 
         }
@@ -25,12 +25,12 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
             double fintessSum = population.Sum(a => a.Fitness);
             for (int i = 0; i < newPopulationSize; i++)
             {
-                double randFitnessSum = _random.NextDouble() * fintessSum;
+                double randFitnessSum = _random.NextDouble();
                 int k = 0;
                 double sum = 0;
                 while (k < population.Length && sum < randFitnessSum)
                 {
-                    sum += population[k].Fitness;
+                    sum += 1 - population[k].Fitness / fintessSum;
                     k++;
                 }
                 int index = k - 1;

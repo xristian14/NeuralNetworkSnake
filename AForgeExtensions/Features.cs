@@ -56,6 +56,23 @@ namespace AForgeExtensions
             return activationNetwork;
         }
         /// <summary>
+        /// Заполняет значения весов и смещений случайными значениями от randomMin до randomMax
+        /// </summary>
+        public static void FillRandomlyActivationNetwork(AForge.Neuro.ActivationNetwork inputNetwork, double randomMin, double randomMax)
+        {
+            for (int i = 0; i < inputNetwork.Layers.Length; i++)
+            {
+                for (int n = 0; n < inputNetwork.Layers[i].Neurons.Length; n++)
+                {
+                    for (int w = 0; w < inputNetwork.Layers[i].Neurons[n].Weights.Length; w++)
+                    {
+                        inputNetwork.Layers[i].Neurons[n].Weights[w] = GetRandDouble(randomMin, randomMax);
+                    }
+                    ((AForge.Neuro.ActivationNeuron)inputNetwork.Layers[i].Neurons[n]).Threshold = GetRandDouble(randomMin, randomMax);
+                }
+            }
+        }
+        /// <summary>
         /// Копирует значения весов и смещений из sourceNetwork в targetNetwork
         /// </summary>
         public static void CopyActivationNetworkWeightsBiases(AForge.Neuro.ActivationNetwork sourceNetwork, AForge.Neuro.ActivationNetwork targetNetwork)
@@ -68,13 +85,6 @@ namespace AForgeExtensions
                     ((AForge.Neuro.ActivationNeuron)targetNetwork.Layers[i].Neurons[n]).Threshold = ((AForge.Neuro.ActivationNeuron)sourceNetwork.Layers[i].Neurons[n]).Threshold;
                 }
             }
-        }
-        /// <summary>
-        /// Функция возвращает значение ошибки, для массивов фактического и ожидаемого результата работы нейронной сети
-        /// </summary>
-        public static double ActivationNetworkLoss(double[] actualOutput, double[] desiredOutput)
-        {
-
         }
         /// <summary>
         /// возвращает массив, сумма значений которого равняется 1
