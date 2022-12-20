@@ -374,7 +374,7 @@ namespace NeuralNetworkSnake
                 double reward = baseReward;
                 int newX = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].X + xOffset;
                 int newY = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].Y + yOffset;
-                if(newX < _gameBoardsGeneticLearning[0].BoardCellsInfo.GetLength(0) && newX > 0 && newY < _gameBoardsGeneticLearning[0].BoardCellsInfo.GetLength(1) && newY > 0) //если не врезались в стенку
+                if(newX < _gameBoardsGeneticLearning[0].BoardCellsInfo.GetLength(0) && newX >= 0 && newY < _gameBoardsGeneticLearning[0].BoardCellsInfo.GetLength(1) && newY >= 0) //если не врезались в стенку
                 {
                     if (_gameBoardsGeneticLearning[0].BoardCellsInfo[newX, newY].IsApple)
                     {

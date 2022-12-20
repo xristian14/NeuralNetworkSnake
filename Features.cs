@@ -10,6 +10,26 @@ namespace NeuralNetworkSnake
     public static class Features
     {
         public static Random _random = new Random();
+        /// <summary>
+        /// Возвращает индекс наибольшего элемента в последовательности
+        /// </summary>
+        public static int MaxIndex<T>(this IEnumerable<T> sequence) where T : IComparable<T>
+        {
+            int maxIndex = -1;
+            T maxValue = default(T);
+
+            int index = 0;
+            foreach (T value in sequence)
+            {
+                if (value.CompareTo(maxValue) > 0 || maxIndex == -1)
+                {
+                    maxIndex = index;
+                    maxValue = value;
+                }
+                index++;
+            }
+            return maxIndex;
+        }
         public static int GetRandInt(int min, int max)
         {
             return _random.Next(min, max);

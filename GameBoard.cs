@@ -254,7 +254,7 @@ namespace NeuralNetworkSnake
         /// </summary>
         private int GetSquare(System.Drawing.Point point)
         {
-            if (point.X < BoardCellsInfo.GetLength(0) && point.X > 0 && point.Y < BoardCellsInfo.GetLength(1) && point.Y > 0) //если не врезались в стенку
+            if (point.X < BoardCellsInfo.GetLength(0) && point.X >= 0 && point.Y < BoardCellsInfo.GetLength(1) && point.Y >= 0) //если не врезались в стенку
             {
                 if (BoardCellsInfo[point.X, point.Y].IsSnake) //врезались в хвост
                 {
@@ -274,16 +274,16 @@ namespace NeuralNetworkSnake
             {
                 //определяем направление
                 System.Drawing.Point[] directionsPoints = new System.Drawing.Point[4];
-                directionsPoints[0] = new System.Drawing.Point(currentPoint.X - 1, currentPoint.Y); //вверх
-                directionsPoints[1] = new System.Drawing.Point(currentPoint.X, currentPoint.Y + 1); //вправо
-                directionsPoints[2] = new System.Drawing.Point(currentPoint.X + 1, currentPoint.Y); //вниз
-                directionsPoints[3] = new System.Drawing.Point(currentPoint.X, currentPoint.Y - 1); //влево
+                directionsPoints[0] = new System.Drawing.Point(currentPoint.X, currentPoint.Y - 1); //вверх
+                directionsPoints[1] = new System.Drawing.Point(currentPoint.X + 1, currentPoint.Y); //вправо
+                directionsPoints[2] = new System.Drawing.Point(currentPoint.X, currentPoint.Y + 1); //вниз
+                directionsPoints[3] = new System.Drawing.Point(currentPoint.X - 1, currentPoint.Y); //влево
                 bool isFree = false;
                 int index = 0;
                 while(index < 4 && !isFree)
                 {
                     isFree = false;
-                    if (directionsPoints[index].X < BoardCellsInfo.GetLength(0) && directionsPoints[index].X > 0 && directionsPoints[index].Y < BoardCellsInfo.GetLength(1) && directionsPoints[index].Y > 0) //не врезались в стенку
+                    if (directionsPoints[index].X < BoardCellsInfo.GetLength(0) && directionsPoints[index].X >= 0 && directionsPoints[index].Y < BoardCellsInfo.GetLength(1) && directionsPoints[index].Y >= 0) //не врезались в стенку
                     {
                         if (!BoardCellsInfo[directionsPoints[index].X, directionsPoints[index].Y].IsSnake) //не врезались в хвост
                         {
@@ -315,6 +315,34 @@ namespace NeuralNetworkSnake
         }
         public Vector<float> GetInputs()
         {
+            for(int i = 0; i < BoardCellsInfo.GetLength(0); i++)
+            {
+                for (int k = 0; k < BoardCellsInfo.GetLength(1); k++)
+                {
+                    BoardCellsInfo[i, k].IsSnake = false;
+                }
+            }
+            List<System.Drawing.Point> snakePoints = new List<System.Drawing.Point>();
+            snakePoints.Add(new System.Drawing.Point(1, 1));
+            snakePoints.Add(new System.Drawing.Point(2, 1));
+            snakePoints.Add(new System.Drawing.Point(3, 1));
+            snakePoints.Add(new System.Drawing.Point(4, 1));
+            snakePoints.Add(new System.Drawing.Point(1, 2));
+            snakePoints.Add(new System.Drawing.Point(4, 2));
+            snakePoints.Add(new System.Drawing.Point(1, 3));
+            snakePoints.Add(new System.Drawing.Point(4, 3));
+            snakePoints.Add(new System.Drawing.Point(1, 4));
+            snakePoints.Add(new System.Drawing.Point(4, 4));
+            snakePoints.Add(new System.Drawing.Point(2, 4));
+            snakePoints.Add(new System.Drawing.Point(3, 4));
+            for(int o = 0; o < snakePoints.Count; o++)
+            {
+                BoardCellsInfo[snakePoints[o].X, snakePoints[o].Y].IsSnake = true;
+                SnakeCoordinates.Add(new SnakeCoordinate(snakePoints[o].X, snakePoints[o].Y));
+            }
+            //-------
+
+
             double[] angles = new double[13] { 224, 202, 180, 157.5, 135, 112.5, 90, 67.5, 45, 22.5, 0, 338, 316 }; //углы наклона лучей, оносительно оси X
             Vector<float> inputs = Vector<float>.Build.Dense(angles.Length * 3 + 3, 0);
             double headCenterX = SnakeCoordinates[SnakeCoordinates.Count - 1].X + 0.5;
@@ -756,6 +784,55 @@ namespace NeuralNetworkSnake
                 }
                 inputs[angles.Length * 2 + i] = isTailWasFind ? (float)(1 / (minDistanceToTail - 0.5 + 1)) : 0;
             }
+
+            //определяю количество свободных клеток в клетках поворота змейки
+            System.Drawing.Point[] actionPoints = new System.Drawing.Point[3] { new System.Drawing.Point(SnakeCoordinates[SnakeCoordinates.Count - 1].X, SnakeCoordinates[SnakeCoordinates.Count - 1].Y), new System.Drawing.Point(SnakeCoordinates[SnakeCoordinates.Count - 1].X, SnakeCoordinates[SnakeCoordinates.Count - 1].Y), new System.Drawing.Point(SnakeCoordinates[SnakeCoordinates.Count - 1].X, SnakeCoordinates[SnakeCoordinates.Count - 1].Y) };
+            if (IsSnakeGoUp())
+            {
+                actionPoints[0].X += -1;
+                actionPoints[0].Y += 0;
+                actionPoints[1].X += 0;
+                actionPoints[1].Y += -1;
+                actionPoints[2].X += 1;
+                actionPoints[2].Y += 0;
+            }
+            else if (IsSnakeGoRight())
+            {
+                actionPoints[0].X += 0;
+                actionPoints[0].Y += -1;
+                actionPoints[1].X += 1;
+                actionPoints[1].Y += 0;
+                actionPoints[2].X += 0;
+                actionPoints[2].Y += 1;
+            }
+            else if (IsSnakeGoDown())
+            {
+                actionPoints[0].X += 1;
+                actionPoints[0].Y += 0;
+                actionPoints[1].X += 0;
+                actionPoints[1].Y += 1;
+                actionPoints[2].X += -1;
+                actionPoints[2].Y += 0;
+            }
+            else if (IsSnakeGoLeft())
+            {
+                actionPoints[0].X += 0;
+                actionPoints[0].Y += 1;
+                actionPoints[1].X += -1;
+                actionPoints[1].Y += 0;
+                actionPoints[2].X += 0;
+                actionPoints[2].Y += -1;
+            }
+            int[] square = new int[3];
+            square[0] = GetSquare(actionPoints[0]);
+            square[1] = GetSquare(actionPoints[1]);
+            square[2] = GetSquare(actionPoints[2]);
+            int indexMax = Features.MaxIndex(square);
+            inputs[angles.Length * 3 + 0] = 0;
+            inputs[angles.Length * 3 + 1] = 0;
+            inputs[angles.Length * 3 + 2] = 0;
+            inputs[angles.Length * 3 + indexMax] = 1;
+
             return inputs;
         }
         public double InvertCoordinate(double coordinate)
