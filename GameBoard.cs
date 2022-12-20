@@ -249,9 +249,69 @@ namespace NeuralNetworkSnake
         {
             return _isGameOver;
         }
-        private int GetVolume(System.Drawing.Point point) //получить свободный объем в выбранной точке
+        /// <summary>
+        /// Возвращает количество свободных клеток в замкнутой области, к которой принадлежит точка
+        /// </summary>
+        private int GetSquare(System.Drawing.Point point)
         {
-            return 0;
+            if (point.X < BoardCellsInfo.GetLength(0) && point.X > 0 && point.Y < BoardCellsInfo.GetLength(1) && point.Y > 0) //если не врезались в стенку
+            {
+                if (BoardCellsInfo[point.X, point.Y].IsSnake) //врезались в хвост
+                {
+                    return 0;
+                }
+            }
+            else //врезались в стенку
+            {
+                return 0;
+            }
+            List<System.Drawing.Point> historyPoints = new List<System.Drawing.Point>();
+            historyPoints.Add(point);
+            List<System.Drawing.Point> visitedPoints = new List<System.Drawing.Point>();
+            visitedPoints.Add(point);
+            System.Drawing.Point currentPoint = new System.Drawing.Point(point.X, point.Y);
+            while (historyPoints.Count > 0)
+            {
+                //определяем направление
+                System.Drawing.Point[] directionsPoints = new System.Drawing.Point[4];
+                directionsPoints[0] = new System.Drawing.Point(currentPoint.X - 1, currentPoint.Y); //вверх
+                directionsPoints[1] = new System.Drawing.Point(currentPoint.X, currentPoint.Y + 1); //вправо
+                directionsPoints[2] = new System.Drawing.Point(currentPoint.X + 1, currentPoint.Y); //вниз
+                directionsPoints[3] = new System.Drawing.Point(currentPoint.X, currentPoint.Y - 1); //влево
+                bool isFree = false;
+                int index = 0;
+                while(index < 4 && !isFree)
+                {
+                    isFree = false;
+                    if (directionsPoints[index].X < BoardCellsInfo.GetLength(0) && directionsPoints[index].X > 0 && directionsPoints[index].Y < BoardCellsInfo.GetLength(1) && directionsPoints[index].Y > 0) //не врезались в стенку
+                    {
+                        if (!BoardCellsInfo[directionsPoints[index].X, directionsPoints[index].Y].IsSnake) //не врезались в хвост
+                        {
+                            if (!visitedPoints.Any(a => a.Equals(directionsPoints[index]))) //точка отсутствует в списке посещаемых
+                            {
+                                isFree = true;
+                            }
+                        }
+                    }
+                    index++;
+                }
+                index--;
+                if (isFree)
+                {
+                    currentPoint = directionsPoints[index];
+                    historyPoints.Add(new System.Drawing.Point(currentPoint.X, currentPoint.Y));
+                    visitedPoints.Add(new System.Drawing.Point(currentPoint.X, currentPoint.Y));
+                }
+                else
+                {
+                    historyPoints.RemoveAt(historyPoints.Count - 1);
+                    if(historyPoints.Count > 0)
+                    {
+                        currentPoint = historyPoints.Last();
+                    }
+                }
+            }
+            return visitedPoints.Count;
         }
         public Vector<float> GetInputs()
         {
