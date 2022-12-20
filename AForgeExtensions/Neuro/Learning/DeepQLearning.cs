@@ -19,7 +19,7 @@ namespace AForgeExtensions.Neuro.Learning
             _backPropagationLearning.LearningRate = 0.5;
             _learningRate = 0.5;
             _discountFactor = 0.9;
-            _targetNetworkUpdateTime = 5;
+            _targetNetworkUpdateTime = 0;
             _targetNetworkUpdateTimeElapsed = 0;
 
             _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, 200, -1, 1);
@@ -32,7 +32,6 @@ namespace AForgeExtensions.Neuro.Learning
         public GeneticLearningTeacher GeneticLearningTeacher { get { return _geneticLearningTeacher; } }
         private int _targetNetworkUpdateTime;
         private int _targetNetworkUpdateTimeElapsed;
-        private int _targetNetworkUpdateTotalNumber = 0;
         /// <summary>
         /// Количество итераций UpdateState(), через которое основная нейронная сеть копируется в целевую. (по умолчанию 100)
         /// </summary>
@@ -51,7 +50,7 @@ namespace AForgeExtensions.Neuro.Learning
         private List<double[]> _inputs = new List<double[]>();
         private List<double[]> _desiredOutputs = new List<double[]>();
         /// <summary>
-        /// Добавляет в пул значений для обновления значения входа и желаемого выход. При вызове UpdateState() будут обновляться веса и смещения для минимизации ошибки всего пула значений
+        /// Добавляет в пул значений для обновления весов и смещений, значения входа и желаемого выхода. При вызове UpdateState() будут обновляться веса и смещения для минимизации ошибки всего пула значений
         /// </summary>
         /// <param name="previousStateInput">Вход предыдущего состояния</param>
         /// <param name="previousStateOutput">Выход предыдущего состояния</param>
@@ -80,10 +79,10 @@ namespace AForgeExtensions.Neuro.Learning
         /// </summary>
         public void UpdateState()
         {
-            //List<double[]> outputsBefore = ActivationNetworkFeatures.ActivationNetworkCompute(_network, _inputs);
+            List<double[]> outputsBefore = ActivationNetworkFeatures.ActivationNetworkCompute(_network, _inputs);
             _geneticLearningTeacher.Run(_inputs, _desiredOutputs);
             //_backPropagationLearning.RunEpoch(_inputs.ToArray(), _desiredOutputs.ToArray());
-            //List<double[]> outputsAfter = ActivationNetworkFeatures.ActivationNetworkCompute(_network, _inputs);
+            List<double[]> outputsAfter = ActivationNetworkFeatures.ActivationNetworkCompute(_network, _inputs);
             int u = 0;
             _inputs.Clear();
             _desiredOutputs.Clear();
@@ -93,7 +92,6 @@ namespace AForgeExtensions.Neuro.Learning
             {
                 _targetNetworkUpdateTimeElapsed = 0;
                 _targetNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
-                _targetNetworkUpdateTotalNumber++;
             }
         }
     }

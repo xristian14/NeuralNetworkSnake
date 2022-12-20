@@ -265,12 +265,24 @@ namespace AForgeExtensions.Neuro.Learning
             _maxFitnessProgression.Clear();
             SpawnInitialPopulation();
             GenerationFitnessCalculate();
+            /*System.Diagnostics.Stopwatch stopwatch1 = new System.Diagnostics.Stopwatch();
+            System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
+            System.Diagnostics.Stopwatch stopwatch3 = new System.Diagnostics.Stopwatch();
+            System.Diagnostics.Stopwatch stopwatch4 = new System.Diagnostics.Stopwatch();*/
             for (int i = 0; i < _generationsCount; i++)
             {
+                //stopwatch1.Start();
                 _population = CrossOverPopulation(_population);
+                //stopwatch1.Stop();
+                //stopwatch2.Start();
                 MutatePopulation(_population);
+                //stopwatch2.Stop();
+                //stopwatch3.Start();
                 GenerationFitnessCalculate();
+                //stopwatch3.Stop();
+                //stopwatch4.Start();
                 _population = SelectionPopulation(_population);
+                //stopwatch4.Stop();
             }
             ActivationNetworkFeatures.CopyActivationNetworkWeightsBiases(_bestChromosome.Network, _network);
             return _bestChromosome.Fitness;

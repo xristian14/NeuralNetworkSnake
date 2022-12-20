@@ -249,10 +249,14 @@ namespace NeuralNetworkSnake
         {
             return _isGameOver;
         }
+        private int GetVolume(System.Drawing.Point point) //получить свободный объем в выбранной точке
+        {
+            return 0;
+        }
         public Vector<float> GetInputs()
         {
             double[] angles = new double[13] { 224, 202, 180, 157.5, 135, 112.5, 90, 67.5, 45, 22.5, 0, 338, 316 }; //углы наклона лучей, оносительно оси X
-            Vector<float> inputs = Vector<float>.Build.Dense(angles.Length * 3, 0);
+            Vector<float> inputs = Vector<float>.Build.Dense(angles.Length * 3 + 3, 0);
             double headCenterX = SnakeCoordinates[SnakeCoordinates.Count - 1].X + 0.5;
             double headCenterY = SnakeCoordinates[SnakeCoordinates.Count - 1].Y + 0.5;
             //определяем угол изменения вектора взгляда, исходя из направления змейки

@@ -454,7 +454,7 @@ namespace NeuralNetworkSnake
 
                     
                     int[] layers = new int[2 + HiddenLayersCount];
-                    layers[0] = 39;
+                    layers[0] = 42;
                     if(HiddenLayersCount >= 1)
                     {
                         layers[1] = int.Parse(FirstHiddenLayerCountNeurons);

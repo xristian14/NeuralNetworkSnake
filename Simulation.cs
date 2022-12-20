@@ -280,6 +280,9 @@ namespace NeuralNetworkSnake
             }
             return isAllGameOver;
         }
+        private int _reward1StateActions = 0; //base
+        private int _reward2StateActions = 0; //apple
+        private int _reward3StateActions = 0; //gameOver
         private bool SimulateOneStepDeepQLearning()
         {
             bool isAllGameOver = true;
@@ -363,7 +366,8 @@ namespace NeuralNetworkSnake
                     }
                 }
 
-                bool isAppleOrGameOver = false;
+                bool isApple = false;
+                bool isGameOver = false;
                 double baseReward = 0;
                 double appleReward = 1;
                 double gameOverReward = -1;
@@ -375,21 +379,64 @@ namespace NeuralNetworkSnake
                     if (_gameBoardsGeneticLearning[0].BoardCellsInfo[newX, newY].IsApple)
                     {
                         reward = appleReward;
-                        isAppleOrGameOver = true;
+                        isApple = true;
                     }
                 }
                 _gameBoardsGeneticLearning[0].MoveSnake(xOffset, yOffset);
                 if (_gameBoardsGeneticLearning[0].GetIsGameOver())
                 {
-                    reward = gameOverReward;
-                    isAppleOrGameOver = true;
+                    if(isApple == false) //если игра закончилась из-за того что змейка заполнила все поле, не нужно указывать за это отрицательную награду
+                    {
+                        reward = gameOverReward;
+                        isGameOver = true;
+                    }
                 }
                 Vector<float> inputsVector2 = _gameBoardsGeneticLearning[0].GetInputs();
                 double[] inputs2 = Array.ConvertAll(inputsVector2.ToArray(), a => (double)a);
-                _deepQLearning.AddStateActionUpdate(inputs, outputs, chosenAction, reward, !isAppleOrGameOver, inputs2);
-                if(_deepQLearning.PoolStateActionUpdateLength > 30)
+                int poolLength = 200;
+                double minPart = 0.2;
+                int reward1Reservation = (int)Math.Round(poolLength * minPart) - _reward1StateActions; //base
+                reward1Reservation = reward1Reservation < 0 ? 0 : reward1Reservation;
+                int reward2Reservation = (int)Math.Round(poolLength * minPart) - _reward2StateActions; //apple
+                reward2Reservation = reward2Reservation < 0 ? 0 : reward2Reservation;
+                int reward3Reservation = (int)Math.Round(poolLength * minPart) - _reward3StateActions; //gameOver
+                reward3Reservation = reward3Reservation < 0 ? 0 : reward3Reservation;
+                int freeCount = (poolLength - _deepQLearning.PoolStateActionUpdateLength) - (reward1Reservation + reward2Reservation + reward3Reservation);
+                bool isAddStateAction = false;
+                if (isApple)
                 {
-                    _deepQLearning.UpdateState();
+                    if(freeCount > 0 || reward2Reservation > 0)
+                    {
+                        isAddStateAction = true;
+                        _reward2StateActions++;
+                    }
+                }
+                else if (isGameOver)
+                {
+                    if (freeCount > 0 || reward3Reservation > 0)
+                    {
+                        isAddStateAction = true;
+                        _reward3StateActions++;
+                    }
+                }
+                else
+                {
+                    if (freeCount > 0 || reward1Reservation > 0)
+                    {
+                        isAddStateAction = true;
+                        _reward1StateActions++;
+                    }
+                }
+                if (isAddStateAction)
+                {
+                    _deepQLearning.AddStateActionUpdate(inputs, outputs, chosenAction, reward, !(isApple || isGameOver), inputs2);
+                    if (_deepQLearning.PoolStateActionUpdateLength == poolLength)
+                    {
+                        _deepQLearning.UpdateState();
+                        _reward1StateActions = 0; //base
+                        _reward2StateActions = 0; //apple
+                        _reward3StateActions = 0; //gameOver
+                    }
                 }
             }
             return isAllGameOver;
