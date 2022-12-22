@@ -9,7 +9,7 @@ namespace NeuralNetworkSnake
 {
     class GeneticLearning
     {
-        public GeneticLearning(int populationSize, int mutationPercent, int testsCount, int passedToNewGenerationCount, int[] layers)
+        public GeneticLearning(int populationSize, double mutationPercent, int testsCount, int passedToNewGenerationCount, int[] layers)
         {
             Layers = layers;
             MutationPercent = mutationPercent;

@@ -315,7 +315,7 @@ namespace NeuralNetworkSnake
         }
         public Vector<float> GetInputs()
         {
-            for(int i = 0; i < BoardCellsInfo.GetLength(0); i++)
+            /*for(int i = 0; i < BoardCellsInfo.GetLength(0); i++)
             {
                 for (int k = 0; k < BoardCellsInfo.GetLength(1); k++)
                 {
@@ -339,8 +339,7 @@ namespace NeuralNetworkSnake
             {
                 BoardCellsInfo[snakePoints[o].X, snakePoints[o].Y].IsSnake = true;
                 SnakeCoordinates.Add(new SnakeCoordinate(snakePoints[o].X, snakePoints[o].Y));
-            }
-            //-------
+            }*/
 
 
             double[] angles = new double[13] { 224, 202, 180, 157.5, 135, 112.5, 90, 67.5, 45, 22.5, 0, 338, 316 }; //углы наклона лучей, оносительно оси X

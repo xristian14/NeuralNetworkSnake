@@ -18,11 +18,11 @@ namespace AForgeExtensions.Neuro.Learning
             _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(_network);
             _backPropagationLearning.LearningRate = 0.5;
             _learningRate = 0.5;
-            _discountFactor = 0.9;
+            _discountFactor = 0.98;
             _targetNetworkUpdateTime = 0;
             _targetNetworkUpdateTimeElapsed = 0;
 
-            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, 200, -1, 1);
+            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, 400, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1);
         }
         private AForge.Neuro.ActivationNetwork _network; //основная нейронная сеть
         public AForge.Neuro.ActivationNetwork Network { get { return _network; } }

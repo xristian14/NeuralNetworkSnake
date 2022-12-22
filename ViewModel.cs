@@ -480,7 +480,7 @@ namespace NeuralNetworkSnake
                     if (_isGeneticLearning)
                     {
                         int populationSize = int.Parse(PopulationSize);
-                        GeneticLearning geneticLearning = new GeneticLearning(populationSize, int.Parse(MutationPercent), int.Parse(TestsCount), int.Parse(PassedToNewGenerationCount), layers);
+                        GeneticLearning geneticLearning = new GeneticLearning(populationSize, double.Parse(MutationPercent), int.Parse(TestsCount), int.Parse(PassedToNewGenerationCount), layers);
                         _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
                     }
                     else
@@ -833,7 +833,7 @@ namespace NeuralNetworkSnake
             AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 12, 12, 3);
             //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 4, 4, 3);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
-            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, 1000, -1, 1);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, 1000, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1);
             geneticLearningTeacher.MutationRate = 0.75;
             AForgeExtensions.Neuro.MSELossFunction mSELossFunction = new AForgeExtensions.Neuro.MSELossFunction();
             List<double[]> inputs = new List<double[]> { new double[4] { 0.1, 1, 0.88, 0.2 }, new double[4] { 1, 0.5, 0.04, 0.6 }, new double[4] { 0.5, 0.3, 0.4, 0.01 } };
@@ -843,6 +843,24 @@ namespace NeuralNetworkSnake
             double loss = geneticLearningTeacher.Run(inputs, desiredOutputs);
             List<double[]> otputsAfter = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
             double lossAfter = mSELossFunction.Calculate(otputsAfter, desiredOutputs);
+
+            int inputLength = 720;
+            AForge.Neuro.ActivationNetwork activationNetworkLarge = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), inputLength, 192, 192, 192, 3);
+            
+            double[] inputLarge = new double[inputLength];
+            for (int i = 0; i < inputLarge.Length; i++)
+            {
+                inputLarge[i] = Features.GetRandDouble(0, 1);
+            }
+            System.Diagnostics.Stopwatch stopwatch = new Stopwatch();
+            double[] outputLarge = new double[0];
+            stopwatch.Start();
+            for (int i = 0; i < 175200; i++)
+            {
+                outputLarge = activationNetworkLarge.Compute(inputLarge);
+            }
+            stopwatch.Stop();
+
             //отрисовываем все qvalues
             for (int x = 0; x < qLearningMap.GetLength(0); x++)
             {

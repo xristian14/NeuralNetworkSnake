@@ -9,17 +9,16 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
     /// <summary>
     /// Выбор хромосом в новую популяцию осуществляется случайным образом, чем НИЖЕ значение приспособленности, тем выше шанс быть выбранным. Значение приспособленности прямо пропорционально шансу быть выбранным.
     /// </summary>
-    public class RouletteWheelMinimizationSelection : ISelectionMethod
+    public class RouletteWheelMinimizationSelection : SelectionMethodBase
     {
         public RouletteWheelMinimizationSelection()
         {
-
+            _isFitnessMaximization = false;
         }
-        private static Random _random = new Random();
         /// <summary>
         /// Возвращает массив хромосом, которые были выбраны в результате селекции. Результирующий массив содержит ссылки на хромосомы исходного массива.
         /// </summary>
-        public Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize)
+        public new Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize)
         {
             Chromosome[] newPopulation = new Chromosome[newPopulationSize];
             double fintessSum = population.Sum(a => 1 / a.Fitness);
