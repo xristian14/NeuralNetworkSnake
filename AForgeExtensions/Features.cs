@@ -46,6 +46,9 @@ namespace AForgeExtensions
             }
             return output;
         }
+        /// <summary>
+        /// Переводит объект типа AForge.Neuro.ActivationNetwork в объект типа AForgeExtensions.Neuro.ActivationNetworkSerializeFormat, который можно сериализовать и десериализовать
+        /// </summary>
         public static Neuro.ActivationNetworkSerializeFormat ConvertActNetToSerializeFormat(AForge.Neuro.ActivationNetwork activationNetwork)
         {
             Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = new Neuro.ActivationNetworkSerializeFormat();
@@ -72,31 +75,27 @@ namespace AForgeExtensions
             }
             return activationNetworkSerializeFormat;
         }
+        /// <summary>
+        /// Переводит объект типа AForgeExtensions.Neuro.ActivationNetworkSerializeFormat в объект типа AForge.Neuro.ActivationNetwork
+        /// </summary>
         public static AForge.Neuro.ActivationNetwork ConvertSerializeFormatToActNet(Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat)
         {
-            Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = new Neuro.ActivationNetworkSerializeFormat();
-            activationNetworkSerializeFormat.InputNeuronsCount = activationNetwork.InputsCount;
-            activationNetworkSerializeFormat.OtherLayersNeuronsCount = new int[activationNetwork.Layers.Length];
-            activationNetworkSerializeFormat.OtherLayersActivationFunction = new string[activationNetwork.Layers.Length];
-            activationNetworkSerializeFormat.Weights = new double[activationNetwork.Layers.Length][][];
-            activationNetworkSerializeFormat.Biases = new double[activationNetwork.Layers.Length][];
-            for (int i = 0; i < activationNetwork.Layers.Length; i++)
+            AForge.Neuro.ActivationNetwork activationNetwork = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), activationNetworkSerializeFormat.InputNeuronsCount, activationNetworkSerializeFormat.OtherLayersNeuronsCount);
+            AForge.Neuro.IActivationFunction[] activationFunctions = new AForge.Neuro.IActivationFunction[activationNetworkSerializeFormat.OtherLayersActivationFunction.Length];
+            for(int i = 0; i < activationNetworkSerializeFormat.Weights.Length; i++)
             {
-                activationNetworkSerializeFormat.OtherLayersNeuronsCount[i] = activationNetwork.Layers[i].Neurons.Length;
-                activationNetworkSerializeFormat.OtherLayersActivationFunction[i] = ((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[i].Neurons[0]).ActivationFunction.GetType().ToString();
-                activationNetworkSerializeFormat.Weights[i] = new double[activationNetwork.Layers[i].Neurons.Length][];
-                activationNetworkSerializeFormat.Biases[i] = new double[activationNetwork.Layers[i].Neurons.Length];
+                AForge.Neuro.IActivationFunction activationFunction = (AForge.Neuro.IActivationFunction)Activator.CreateInstance(null, activationNetworkSerializeFormat.OtherLayersActivationFunction[i]).Unwrap();
                 for (int n = 0; n < activationNetwork.Layers[i].Neurons.Length; n++)
                 {
-                    activationNetworkSerializeFormat.Weights[i][n] = new double[activationNetwork.Layers[i].Neurons[n].Weights.Length];
                     for (int w = 0; w < activationNetwork.Layers[i].Neurons[n].Weights.Length; w++)
                     {
-                        activationNetworkSerializeFormat.Weights[i][n][w] = activationNetwork.Layers[i].Neurons[n].Weights[w];
+                        activationNetwork.Layers[i].Neurons[n].Weights[w] = activationNetworkSerializeFormat.Weights[i][n][w];
                     }
-                    activationNetworkSerializeFormat.Biases[i][n] = ((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[i].Neurons[n]).Threshold;
+                    ((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[i].Neurons[n]).Threshold = activationNetworkSerializeFormat.Biases[i][n];
+                    ((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[i].Neurons[n]).ActivationFunction = activationFunction;
                 }
             }
-            return activationNetworkSerializeFormat;
+            return activationNetwork;
         }
     }
 }
