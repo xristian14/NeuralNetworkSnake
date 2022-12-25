@@ -12,10 +12,13 @@ namespace NeuralNetworkSnake
 {
     class Simulation : ViewModelBase
     {
-        public Simulation(GeneticLearning geneticLearning, int pauseMillisecDelay, int fixedDuration, int boardSize, int applesCount)
+        public Simulation(AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher geneticLearningNoTeacher, int testsCount, int pauseMillisecDelay, int fixedDuration, int boardSize, int applesCount)
         {
             _isGeneticLearning = true;
-            _geneticLearning = geneticLearning;
+            _geneticLearningNoTeacher = geneticLearningNoTeacher;
+            _geneticLearningNoTeacher.SpawnInitialPopulation();
+            _testsCount = testsCount;
+            _currentTestNumber = 1;
             PauseMillisecDelay = pauseMillisecDelay;
             FixedDuration = fixedDuration;
             BoardSize = boardSize;
@@ -25,7 +28,8 @@ namespace NeuralNetworkSnake
             DispatcherInvoke((Action)(() => {
                 ViewModel.getInstance().Age = Age;
             }));
-            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearningNoTeacher.PopulationSize, BoardSize, ApplesCount);
+            CreateSnakesInfo();
             DispatcherInvoke((Action)(() => {
                 CreateGameBoardForRender();
                 CreateGenerationLeaderBoard();
@@ -52,7 +56,11 @@ namespace NeuralNetworkSnake
         }
         private bool _isGeneticLearning;
         private Random _random = new Random();
-        private GeneticLearning _geneticLearning;
+        private AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher _geneticLearningNoTeacher;
+        private int _testsCount;
+        private int _currentTestNumber;
+        private SnakeInfo[] _snakesInfo;
+        private int snakeInfoCurrentId = 0;
         private AForgeExtensions.Neuro.Learning.DeepQLearning _deepQLearning;
         public AForgeExtensions.Neuro.Learning.DeepQLearning DeepQLearning { get { return _deepQLearning; } }
         private GameBoard[] _gameBoardsGeneticLearning;
@@ -96,11 +104,24 @@ namespace NeuralNetworkSnake
         private int Age = 0;
         public void SetMutationPercent(double mutationPercent)
         {
-            _geneticLearning.SetMutationPercent(mutationPercent);
+            _geneticLearningNoTeacher.MutationProbability = mutationPercent;
         }
-        public void SetPopulationSize(int size)
+        private void CreateSnakesInfo()
         {
-            _geneticLearning.SetNewPopulationSize(size);
+            _snakesInfo = new SnakeInfo[_gameBoardsGeneticLearning.Length];
+            for(int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
+            {
+                snakeInfoCurrentId++;
+                _snakesInfo[i] = new SnakeInfo { Id = snakeInfoCurrentId, EatenApples = 0, Score = 0, TotalRating = 0 };
+            }
+        }
+        private void UpdateSnakesInfo()
+        {
+            for (int i = 0; i < _snakesInfo.Length; i++)
+            {
+                _snakesInfo[i].Score = _gameBoardsGeneticLearning[i].Score;
+                _snakesInfo[i].EatenApples = _gameBoardsGeneticLearning[i].EatenApples;
+            }
         }
         private GameBoard[] CreateGameBoards(int count, int boardSize, int applesCount)
         {
@@ -115,9 +136,9 @@ namespace NeuralNetworkSnake
         {
             ViewModel viewModel = ViewModel.getInstance();
             viewModel.GenerationLeaderboard.Clear();
-            for(int i = 0; i < _geneticLearning.Population.Length; i++)
+            for(int i = 0; i < _snakesInfo.Length; i++)
             {
-                viewModel.GenerationLeaderboard.Add(new GenerationLeaderboardItem { Id = _geneticLearning.Population[i].Id, TotalScore = _geneticLearning.Population[i].TotalRating, Score = _gameBoardsGeneticLearning[i].Score, EatenApples = _gameBoardsGeneticLearning[i].EatenApples });
+                viewModel.GenerationLeaderboard.Add(new GenerationLeaderboardItem { Id = _snakesInfo[i].Id, TotalScore = _snakesInfo[i].TotalRating, Score = _snakesInfo[i].Score, EatenApples = _snakesInfo[i].EatenApples });
             }
         }
         private void UpdateGenerationLeaderBoard()
@@ -125,8 +146,8 @@ namespace NeuralNetworkSnake
             ViewModel viewModel = ViewModel.getInstance();
             for(int i = 0; i < viewModel.GenerationLeaderboard.Count; i++)
             {
-                int index = Array.FindIndex(_geneticLearning.Population, a => a.Id == viewModel.GenerationLeaderboard[i].Id);
-                viewModel.GenerationLeaderboard[i].TotalScore = _geneticLearning.Population[index].TotalRating;
+                int index = Array.FindIndex(_snakesInfo, a => a.Id == viewModel.GenerationLeaderboard[i].Id);
+                viewModel.GenerationLeaderboard[i].TotalScore = _snakesInfo[index].TotalRating;
                 viewModel.GenerationLeaderboard[i].Score = _gameBoardsGeneticLearning[index].Score;
                 viewModel.GenerationLeaderboard[i].EatenApples = _gameBoardsGeneticLearning[index].EatenApples;
             }
@@ -135,7 +156,7 @@ namespace NeuralNetworkSnake
         private void UpdateCurrentTestNumber() //обновляет номер текущего теста для представления
         {
             ViewModel viewModel = ViewModel.getInstance();
-            viewModel.CurrentTestNumber = _geneticLearning.CurrentTestNumber.ToString() + "/" + _geneticLearning.TestsCount.ToString();
+            viewModel.CurrentTestNumber = _currentTestNumber.ToString() + "/" + _testsCount.ToString();
         }
         private void CreateGameBoardForRender()
         {
@@ -198,7 +219,7 @@ namespace NeuralNetworkSnake
         {
             for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++)
             {
-                _geneticLearning.Population[i].TotalRating += _gameBoardsGeneticLearning[i].Score;
+                _snakesInfo[i].TotalRating += _gameBoardsGeneticLearning[i].Score;
             }
         }
         private bool SimulateOneStepGeneticLearning()
@@ -209,12 +230,12 @@ namespace NeuralNetworkSnake
                 if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
                 {
                     isAllGameOver = false;
-                    Vector<float> inputs = _gameBoardsGeneticLearning[i].GetInputs();
-                    Vector<float> outputs = _geneticLearning.Population[i].NeuralNetworkUnit.ForwardPropagation(inputs);
+                    double[] inputs = _gameBoardsGeneticLearning[i].GetInputs();
+                    double[] outputs = _geneticLearningNoTeacher.Population[i].Network.Compute(inputs);
                     int xOffset = 0;
                     int yOffset = 0;
 
-                    int indexMaximum = outputs.MaximumIndex();
+                    int indexMaximum = Features.MaxIndex(outputs);
                     if (_gameBoardsGeneticLearning[i].IsSnakeGoUp())
                     {
                         if(indexMaximum == 0)
@@ -289,8 +310,7 @@ namespace NeuralNetworkSnake
             if (!_gameBoardsGeneticLearning[0].GetIsGameOver())
             {
                 isAllGameOver = false;
-                Vector<float> inputsVector = _gameBoardsGeneticLearning[0].GetInputs();
-                double[] inputs = Array.ConvertAll(inputsVector.ToArray(), a => (double)a);
+                double[] inputs = _gameBoardsGeneticLearning[0].GetInputs();
                 double[] outputs = _deepQLearning.Network.Compute(inputs);
                 int chosenAction = AForgeExtensions.Features.MaxIndex(outputs);
                 if (_random.NextDouble() < _epsilonDeepQLearning)
@@ -391,8 +411,7 @@ namespace NeuralNetworkSnake
                         isGameOver = true;
                     }
                 }
-                Vector<float> inputsVector2 = _gameBoardsGeneticLearning[0].GetInputs();
-                double[] inputs2 = Array.ConvertAll(inputsVector2.ToArray(), a => (double)a);
+                double[] inputs2 = _gameBoardsGeneticLearning[0].GetInputs();
                 int poolLength = 200;
                 double minPart = 0.2;
                 int reward1Reservation = (int)Math.Round(poolLength * minPart) - _reward1StateActions; //base
@@ -457,12 +476,19 @@ namespace NeuralNetworkSnake
                 {
                     if (SimulateOneStepGeneticLearning())
                     {
-                        _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
+                        _currentTestNumber++; //указываем что перешли на следующий раунд тестов нейросетей
                         SetGeneticLearningRating();
-                        if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                        if (_currentTestNumber > _testsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
                         {
-                            _geneticLearning.SpawnNewGeneration();
-                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                            _currentTestNumber = 1;
+                            double[] populationFitness = new double[_geneticLearningNoTeacher.PopulationSize];
+                            for(int i = 0; i < _geneticLearningNoTeacher.PopulationSize; i++)
+                            {
+                                populationFitness[i] = _snakesInfo[i].TotalRating / _testsCount;
+                            }
+                            _geneticLearningNoTeacher.Run(populationFitness);
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearningNoTeacher.PopulationSize, BoardSize, ApplesCount);
+                            CreateSnakesInfo();
                             Age++;
                             DispatcherInvoke((Action)(() => {
                                 ViewModel.getInstance().Age = Age;
@@ -470,7 +496,7 @@ namespace NeuralNetworkSnake
                         }
                         else //иначе создаем новые поля для нейронных сетей
                         {
-                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearningNoTeacher.PopulationSize, BoardSize, ApplesCount);
                         }
                         DispatcherInvoke((Action)(() => {
                             CreateGameBoardForRender();
@@ -484,7 +510,7 @@ namespace NeuralNetworkSnake
                             UpdateGenerationLeaderBoard();
                         }));
                     }
-
+                    UpdateSnakesInfo();
                     /*for (int i = 0; i < _gameBoardsGeneticLearning.Length; i++) //вывод inputs
                     {
                         if (!_gameBoardsGeneticLearning[i].GetIsGameOver())
@@ -540,12 +566,19 @@ namespace NeuralNetworkSnake
                 {
                     if (SimulateOneStepGeneticLearning())
                     {
-                        _geneticLearning.CurrentTestNumberIncrement(); //указываем что перешли на следующий раунд тестов нейросетей
+                        _currentTestNumber++; //указываем что перешли на следующий раунд тестов нейросетей
                         SetGeneticLearningRating();
-                        if (_geneticLearning.CurrentTestNumber > _geneticLearning.TestsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
+                        if (_currentTestNumber > _testsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
                         {
-                            _geneticLearning.SpawnNewGeneration();
-                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                            _currentTestNumber = 1;
+                            double[] populationFitness = new double[_geneticLearningNoTeacher.PopulationSize];
+                            for (int i = 0; i < _geneticLearningNoTeacher.PopulationSize; i++)
+                            {
+                                populationFitness[i] = _snakesInfo[i].TotalRating / _testsCount;
+                            }
+                            _geneticLearningNoTeacher.Run(populationFitness);
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearningNoTeacher.PopulationSize, BoardSize, ApplesCount);
+                            CreateSnakesInfo();
                             Age++;
                             DispatcherInvoke((Action)(() => {
                                 ViewModel.getInstance().Age = Age;
@@ -553,12 +586,13 @@ namespace NeuralNetworkSnake
                         }
                         else //иначе создаем новые поля для нейронных сетей
                         {
-                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearning.GetPopulationSize(), BoardSize, ApplesCount);
+                            _gameBoardsGeneticLearning = CreateGameBoards(_geneticLearningNoTeacher.PopulationSize, BoardSize, ApplesCount);
                         }
                         DispatcherInvoke((Action)(() => {
                             UpdateCurrentTestNumber();
                         }));
                     }
+                    UpdateSnakesInfo();
                 }
                 else
                 {

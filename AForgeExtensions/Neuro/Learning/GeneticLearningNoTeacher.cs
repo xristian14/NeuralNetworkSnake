@@ -25,21 +25,21 @@ namespace AForgeExtensions.Neuro.Learning
             _crossoverRate = 0.75;
             _randomRateInitialPopulation = 0;
         }
-        private void SetFitness(double[] popultionFitness)
+        private void SetFitness(double[] populationFitness)
         {
             for (int i = 0; i < _population.Length; i++)
             {
-                _population[i].Fitness = popultionFitness[i];
+                _population[i].Fitness = populationFitness[i];
             }
         }
         /// <summary>
-        /// Генерирует следующее поколение, на основе значений приспосоленности текущего
+        /// Генерирует следующее поколение, на основе значений приспосоленности текущего поколения
         /// </summary>
         /// <param name="popultionFitness">Значения приспособленности текущего поколения</param>
         /// <returns>Значение приспособленности лучшей особи за все поколения</returns>
-        public double Run(double[] popultionFitness)
+        public double Run(double[] populationFitness)
         {
-            SetFitness(popultionFitness);
+            SetFitness(populationFitness);
             UpdateBestChromosome();
             _population = SelectionPopulation(_population);
             _population = CrossOverPopulation(_population);

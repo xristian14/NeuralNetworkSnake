@@ -18,7 +18,7 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         /// <summary>
         /// Возвращает массив хромосом, которые были выбраны в результате селекции. Результирующий массив содержит ссылки на хромосомы исходного массива.
         /// </summary>
-        public new Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize)
+        public override Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize)
         {
             Chromosome[] newPopulation = new Chromosome[newPopulationSize];
             double fintessSum = population.Sum(a => a.Fitness);

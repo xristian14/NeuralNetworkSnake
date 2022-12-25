@@ -313,7 +313,7 @@ namespace NeuralNetworkSnake
             }
             return visitedPoints.Count;
         }
-        public Vector<float> GetInputs()
+        public double[] GetInputs()
         {
             /*for(int i = 0; i < BoardCellsInfo.GetLength(0); i++)
             {
@@ -343,7 +343,7 @@ namespace NeuralNetworkSnake
 
 
             double[] angles = new double[13] { 224, 202, 180, 157.5, 135, 112.5, 90, 67.5, 45, 22.5, 0, 338, 316 }; //углы наклона лучей, оносительно оси X
-            Vector<float> inputs = Vector<float>.Build.Dense(angles.Length * 3 + 3, 0);
+            double[] inputs = new double[angles.Length * 3 + 3];
             double headCenterX = SnakeCoordinates[SnakeCoordinates.Count - 1].X + 0.5;
             double headCenterY = SnakeCoordinates[SnakeCoordinates.Count - 1].Y + 0.5;
             //определяем угол изменения вектора взгляда, исходя из направления змейки
@@ -823,9 +823,9 @@ namespace NeuralNetworkSnake
                 actionPoints[2].Y += -1;
             }
             int[] square = new int[3];
-            square[0] = GetSquare(actionPoints[0]);
+            /*square[0] = GetSquare(actionPoints[0]);
             square[1] = GetSquare(actionPoints[1]);
-            square[2] = GetSquare(actionPoints[2]);
+            square[2] = GetSquare(actionPoints[2]);*/
             int indexMax = Features.MaxIndex(square);
             inputs[angles.Length * 3 + 0] = 0;
             inputs[angles.Length * 3 + 1] = 0;

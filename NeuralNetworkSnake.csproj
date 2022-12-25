@@ -95,9 +95,6 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Numpy.Bare, Version=3.7.1.4, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Numpy.Bare.3.8.1.25\lib\netstandard2.0\Numpy.Bare.dll</HintPath>
-    </Reference>
     <Reference Include="Protobuf.Text, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Protobuf.Text.0.5.0\lib\netstandard2.0\Protobuf.Text.dll</HintPath>
     </Reference>
@@ -144,9 +141,6 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="Tensorflow.Binding, Version=0.70.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\TensorFlow.NET.0.70.2\lib\netstandard2.0\Tensorflow.Binding.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -166,9 +160,9 @@
     <Compile Include="AForgeExtensions\Neuro\LeakyReLuActivationFunction.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\DeepQLearning.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearningBase.cs" />
+    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearningNoTeacher.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearningTeacher.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\Chromosome.cs" />
-    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\GeneticLearningNoTeacher.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\ISelectionMethod.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\RouletteWheelMinimizationSelection.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\RouletteWheelSelection.cs" />
@@ -185,7 +179,6 @@
     <Compile Include="GameBoard.cs" />
     <Compile Include="GameBoardForRender.cs" />
     <Compile Include="GenerationLeaderboardItem.cs" />
-    <Compile Include="GeneticLearning.cs" />
     <Compile Include="LeaderboardItem.cs" />
     <Compile Include="LightweightMatrixCSharp\Matrix.cs" />
     <Compile Include="Matrix.cs" />
@@ -198,6 +191,7 @@
     <Compile Include="SnakeCoordinate.cs" />
     <Compile Include="SnakeForRender.cs" />
     <Compile Include="SnakeHistory.cs" />
+    <Compile Include="SnakeInfo.cs" />
     <Compile Include="SnakesForRender.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelBase.cs" />

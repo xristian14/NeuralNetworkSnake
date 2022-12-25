@@ -344,10 +344,6 @@ namespace NeuralNetworkSnake
                     if(res > 0)
                     {
                         _populationSize = value;
-                        if (_simulation != null)
-                        {
-                            _simulation.SetPopulationSize(res);
-                        }
                     }
                 }
                 OnPropertyChanged();
@@ -479,9 +475,15 @@ namespace NeuralNetworkSnake
 
                     if (_isGeneticLearning)
                     {
+                        int[] layers2 = new int[layers.Length - 1];
+                        for (int i = 0; i < layers2.Length; i++)
+                        {
+                            layers2[i] = layers[i + 1];
+                        }
+                        AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), layers[0], layers2);
                         int populationSize = int.Parse(PopulationSize);
-                        GeneticLearning geneticLearning = new GeneticLearning(populationSize, double.Parse(MutationPercent), int.Parse(TestsCount), int.Parse(PassedToNewGenerationCount), layers);
-                        _simulation = new Simulation(geneticLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
+                        AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher geneticLearningNoTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher(activationNetwork, populationSize, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(), -1, 1);
+                        _simulation = new Simulation(geneticLearningNoTeacher, int.Parse(TestsCount), RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
                     }
                     else
                     {
