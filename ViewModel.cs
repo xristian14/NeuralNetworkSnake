@@ -11,6 +11,7 @@ using System.Windows;
 using System.ComponentModel;
 using System.Collections.Specialized;
 using System.Threading;
+using System.IO;
 
 namespace NeuralNetworkSnake
 {
@@ -832,7 +833,10 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 12, 12, 3);
+            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 3, 2);
+            AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(activationNetwork);
+            AForge.Neuro.IActivationFunction func = (AForge.Neuro.IActivationFunction)Activator.CreateInstance(((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[0].Neurons[0]).ActivationFunction.GetType());
+            AForge.Neuro.IActivationFunction func2 = (AForge.Neuro.IActivationFunction)Activator.CreateInstance(null, ((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[0].Neurons[0]).ActivationFunction.GetType().ToString()).Unwrap();
             //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 4, 4, 3);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
             AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, 1000, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1);
@@ -857,12 +861,19 @@ namespace NeuralNetworkSnake
             System.Diagnostics.Stopwatch stopwatch = new Stopwatch();
             double[] outputLarge = new double[0];
             stopwatch.Start();
-            for (int i = 0; i < 175200; i++)
+            for (int i = 0; i < 1; i++)
             {
                 outputLarge = activationNetworkLarge.Compute(inputLarge);
             }
             stopwatch.Stop();
 
+
+            //string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkLarge);
+            string sOutput = Newtonsoft.Json.JsonConvert.SerializeObject(activationNetworkLarge);
+            File.WriteAllText("file1.json", sOutput);
+            string sInput = File.ReadAllText("file1.json");
+            AForge.Neuro.ActivationNetwork activationNetworkLarge2 = Newtonsoft.Json.JsonConvert.DeserializeObject<AForge.Neuro.ActivationNetwork>(sInput);
+            double[] outputLarge2 = activationNetworkLarge2.Compute(inputLarge);
             //отрисовываем все qvalues
             for (int x = 0; x < qLearningMap.GetLength(0); x++)
             {
