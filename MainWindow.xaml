@@ -46,6 +46,7 @@
                                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
                                 <TextBlock Text="Алгоритм обучения" Margin="6 0 0 0"/>
                                 <ComboBox ItemsSource="{Binding AlgorithmLearningCombobox}" SelectedItem="{Binding SelectedAlgorithmLearningCombobox}" SelectedIndex="0" Margin="6 0 0 0"/>
+                                <CheckBox IsChecked="{Binding IsLoadSavedNetwork}" Content="Загрузить сохраненную нейронную сеть"/>
                                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
                                 <Button Content="Создать нейросеть" Command="{Binding CreateNeuralNetwork_Click}" Margin="6 0 0 0" Padding="4 1"/>
                                 <Button Content="Тестовая функция" Command="{Binding ButtonTest_Click}" Margin="6 0 0 0" Padding="4 1"/>
@@ -197,7 +198,7 @@
                                     <RadioButton GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Длительность, сек" Margin="6 0 0 0"/>
-                                        <Slider Minimum="5" Maximum="3600" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
+                                        <Slider Minimum="5" Maximum="7200" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
                                         <TextBlock Text="{Binding FixedDuration}" Margin="4 0 6 0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 6 0 0">

@@ -16,13 +16,13 @@ namespace AForgeExtensions.Neuro.Learning
             _network = network;
             _targetNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
             _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(_network);
-            _backPropagationLearning.LearningRate = 0.5;
             _learningRate = 0.5;
-            _discountFactor = 0.98;
-            _targetNetworkUpdateTime = 0;
+            _discountFactor = 0.99;
+            _targetNetworkUpdateTime = 5;
             _targetNetworkUpdateTimeElapsed = 0;
+            _targetNetworkUpdateCount = 0;
 
-            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, 400, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1);
+            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1);
         }
         private AForge.Neuro.ActivationNetwork _network; //основная нейронная сеть
         public AForge.Neuro.ActivationNetwork Network { get { return _network; } }
@@ -32,6 +32,7 @@ namespace AForgeExtensions.Neuro.Learning
         public GeneticLearningTeacher GeneticLearningTeacher { get { return _geneticLearningTeacher; } }
         private int _targetNetworkUpdateTime;
         private int _targetNetworkUpdateTimeElapsed;
+        private int _targetNetworkUpdateCount;
         /// <summary>
         /// Количество итераций UpdateState(), через которое основная нейронная сеть копируется в целевую. (по умолчанию 100)
         /// </summary>
@@ -90,6 +91,7 @@ namespace AForgeExtensions.Neuro.Learning
             //если совершили достаточно итераций обновления состояния, обновляем целевую нейронную сеть
             if (_targetNetworkUpdateTimeElapsed >= _targetNetworkUpdateTime)
             {
+                _targetNetworkUpdateCount++;
                 _targetNetworkUpdateTimeElapsed = 0;
                 _targetNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
             }

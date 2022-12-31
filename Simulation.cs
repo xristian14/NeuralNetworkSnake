@@ -390,7 +390,7 @@ namespace NeuralNetworkSnake
                 bool isGameOver = false;
                 double baseReward = 0;
                 double appleReward = 1;
-                double gameOverReward = -1;
+                double gameOverReward = -10;
                 double reward = baseReward;
                 int newX = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].X + xOffset;
                 int newY = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].Y + yOffset;
@@ -413,7 +413,7 @@ namespace NeuralNetworkSnake
                 }
                 double[] inputs2 = _gameBoardsGeneticLearning[0].GetInputs();
                 int poolLength = 200;
-                double minPart = 0.2;
+                double minPart = 0.12;
                 int reward1Reservation = (int)Math.Round(poolLength * minPart) - _reward1StateActions; //base
                 reward1Reservation = reward1Reservation < 0 ? 0 : reward1Reservation;
                 int reward2Reservation = (int)Math.Round(poolLength * minPart) - _reward2StateActions; //apple
@@ -422,7 +422,11 @@ namespace NeuralNetworkSnake
                 reward3Reservation = reward3Reservation < 0 ? 0 : reward3Reservation;
                 int freeCount = (poolLength - _deepQLearning.PoolStateActionUpdateLength) - (reward1Reservation + reward2Reservation + reward3Reservation);
                 bool isAddStateAction = false;
-                if (isApple)
+                if(_random.NextDouble() < 0.1)
+                {
+                    isAddStateAction = true;
+                }
+                /*if (isApple)
                 {
                     if(freeCount > 0 || reward2Reservation > 0)
                     {
@@ -445,16 +449,19 @@ namespace NeuralNetworkSnake
                         isAddStateAction = true;
                         _reward1StateActions++;
                     }
-                }
+                }*/
                 if (isAddStateAction)
                 {
-                    _deepQLearning.AddStateActionUpdate(inputs, outputs, chosenAction, reward, !(isApple || isGameOver), inputs2);
+                    _deepQLearning.AddStateActionUpdate(inputs, outputs, chosenAction, reward, !isGameOver/*!(isApple || isGameOver)*/, inputs2);
                     if (_deepQLearning.PoolStateActionUpdateLength == poolLength)
                     {
                         _deepQLearning.UpdateState();
                         _reward1StateActions = 0; //base
                         _reward2StateActions = 0; //apple
                         _reward3StateActions = 0; //gameOver
+                        AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(_deepQLearning.Network);
+                        string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkSerializeFormat);
+                        System.IO.File.WriteAllText("deepQLearningNetwork.json", s);
                     }
                 }
             }
@@ -481,6 +488,14 @@ namespace NeuralNetworkSnake
                         if (_currentTestNumber > _testsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
                         {
                             _currentTestNumber = 1;
+
+                            if (Age % 5 == 0)
+                            {
+                                AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(_geneticLearningNoTeacher.BestChromosome.Network);
+                                string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkSerializeFormat);
+                                System.IO.File.WriteAllText("bestChromosome.json", s);
+                            }
+
                             double[] populationFitness = new double[_geneticLearningNoTeacher.PopulationSize];
                             for(int i = 0; i < _geneticLearningNoTeacher.PopulationSize; i++)
                             {
@@ -571,6 +586,14 @@ namespace NeuralNetworkSnake
                         if (_currentTestNumber > _testsCount) //если выполнили все тесты для данных нейросетей, генерируем новое поколение
                         {
                             _currentTestNumber = 1;
+
+                            if (Age % 5 == 0)
+                            {
+                                AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(_geneticLearningNoTeacher.BestChromosome.Network);
+                                string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkSerializeFormat);
+                                System.IO.File.WriteAllText("bestChromosome.json", s);
+                            }
+
                             double[] populationFitness = new double[_geneticLearningNoTeacher.PopulationSize];
                             for (int i = 0; i < _geneticLearningNoTeacher.PopulationSize; i++)
                             {

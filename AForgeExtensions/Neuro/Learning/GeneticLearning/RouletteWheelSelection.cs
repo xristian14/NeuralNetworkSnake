@@ -32,7 +32,7 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
                     sum += population[k].Fitness;
                     k++;
                 }
-                int index = k - 1;
+                int index = k > 0 ? k - 1 : k;
                 newPopulation[i] = population[index];
             }
             return newPopulation;

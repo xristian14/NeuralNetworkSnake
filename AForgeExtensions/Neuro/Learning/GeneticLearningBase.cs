@@ -77,7 +77,7 @@ namespace AForgeExtensions.Neuro.Learning
         /// <summary>
         /// Лучшая особь за все поколения
         /// </summary>
-        protected GeneticLearning.Chromosome BestChromosome { get { return _bestChromosome; } }
+        public GeneticLearning.Chromosome BestChromosome { get { return _bestChromosome; } }
         protected GeneticLearning.Chromosome[] _population;
         public GeneticLearning.Chromosome[] Population { get { return _population; } }
         protected int GetGenomeLength(AForge.Neuro.ActivationNetwork network)

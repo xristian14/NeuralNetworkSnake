@@ -231,7 +231,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private int _fixedDuration = 30;
+        private int _fixedDuration = 7200;
         public int FixedDuration
         {
             get { return _fixedDuration; }
@@ -432,6 +432,16 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
+        private bool _isLoadSavedNetwork = false;
+        public bool IsLoadSavedNetwork
+        {
+            get { return _isLoadSavedNetwork; }
+            set
+            {
+                _isLoadSavedNetwork = value;
+                OnPropertyChanged();
+            }
+        }
 
 
         public ICommand CreateNeuralNetwork_Click
@@ -481,7 +491,20 @@ namespace NeuralNetworkSnake
                         {
                             layers2[i] = layers[i + 1];
                         }
+
                         AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), layers[0], layers2);
+                        if (IsLoadSavedNetwork)
+                        {
+                            string s = System.IO.File.ReadAllText("bestChromosome.json");
+                            activationNetwork = AForgeExtensions.Features.ConvertSerializeFormatToActNet(System.Text.Json.JsonSerializer.Deserialize<AForgeExtensions.Neuro.ActivationNetworkSerializeFormat>(s));
+                            layers = new int[activationNetwork.Layers.Length + 1];
+                            layers[0] = activationNetwork.Layers[0].InputsCount;
+                            for (int k = 0; k < activationNetwork.Layers.Length; k++)
+                            {
+                                layers[k + 1] = activationNetwork.Layers[k].Neurons.Length;
+                            }
+                        }
+                        
                         int populationSize = int.Parse(PopulationSize);
                         AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher geneticLearningNoTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher(activationNetwork, populationSize, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(), -1, 1);
                         _simulation = new Simulation(geneticLearningNoTeacher, int.Parse(TestsCount), RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
@@ -494,9 +517,20 @@ namespace NeuralNetworkSnake
                             layers2[i] = layers[i + 1];
                         }
                         AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-0.1f, 0.1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), layers[0], layers2);
-                        //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(-0.1f, 0.1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), layers[0], layers2);
-                        //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFactory.BuildRandom(0f, 0.01f, new AForge.Neuro.BipolarSigmoidFunction(), layers[0], layers2);
+                        if (IsLoadSavedNetwork)
+                        {
+                            string s = System.IO.File.ReadAllText("deepQLearningNetwork.json");
+                            activationNetwork = AForgeExtensions.Features.ConvertSerializeFormatToActNet(System.Text.Json.JsonSerializer.Deserialize<AForgeExtensions.Neuro.ActivationNetworkSerializeFormat>(s));
+                            layers = new int[activationNetwork.Layers.Length + 1];
+                            layers[0] = activationNetwork.Layers[0].InputsCount;
+                            for (int k = 0; k < activationNetwork.Layers.Length; k++)
+                            {
+                                layers[k + 1] = activationNetwork.Layers[k].Neurons.Length;
+                            }
+                        }
                         AForgeExtensions.Neuro.Learning.DeepQLearning deepQLearning = new AForgeExtensions.Neuro.Learning.DeepQLearning(activationNetwork);
+                        deepQLearning.GeneticLearningTeacher.MutateMinValue = -2;
+                        deepQLearning.GeneticLearningTeacher.MutateMaxValue = 2;
                         _simulation = new Simulation(deepQLearning, RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
                     }
 
@@ -833,10 +867,7 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 3, 2);
-            AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(activationNetwork);
-            AForge.Neuro.IActivationFunction func = (AForge.Neuro.IActivationFunction)Activator.CreateInstance(((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[0].Neurons[0]).ActivationFunction.GetType());
-            AForge.Neuro.IActivationFunction func2 = (AForge.Neuro.IActivationFunction)Activator.CreateInstance(null, ((AForge.Neuro.ActivationNeuron)activationNetwork.Layers[0].Neurons[0]).ActivationFunction.GetType().ToString()).Unwrap();
+            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 12, 12, 3);
             //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 4, 4, 3);
             AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
             AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, 1000, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1);
@@ -850,8 +881,8 @@ namespace NeuralNetworkSnake
             List<double[]> otputsAfter = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
             double lossAfter = mSELossFunction.Calculate(otputsAfter, desiredOutputs);
 
-            int inputLength = 720;
-            AForge.Neuro.ActivationNetwork activationNetworkLarge = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), inputLength, 192, 192, 192, 3);
+            int inputLength = 616;
+            AForge.Neuro.ActivationNetwork activationNetworkLarge = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), inputLength, 256, 256, 256, 3);
             
             double[] inputLarge = new double[inputLength];
             for (int i = 0; i < inputLarge.Length; i++)
@@ -861,7 +892,7 @@ namespace NeuralNetworkSnake
             System.Diagnostics.Stopwatch stopwatch = new Stopwatch();
             double[] outputLarge = new double[0];
             stopwatch.Start();
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 17520; i++)
             {
                 outputLarge = activationNetworkLarge.Compute(inputLarge);
             }

@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 namespace AForgeExtensions.Neuro
 {
+    [Serializable]
     public class ActivationNetworkSerializeFormat
     {
-        public double[][][] Weights;
-        public double[][] Biases;
-        public int InputNeuronsCount;
-        public int[] OtherLayersNeuronsCount;
-        public string[] OtherLayersActivationFunction; //название типа, функции активации
+        public ActivationNetworkSerializeFormat()
+        {
+
+        }
+        public double[][][] Weights { get; set; }
+        public double[][] Biases { get; set; }
+        public int InputNeuronsCount { get; set; }
+        public int[] OtherLayersNeuronsCount { get; set; }
+        public string[] OtherLayersActivationFunction { get; set; } //название типа, функции активации
     }
 }
