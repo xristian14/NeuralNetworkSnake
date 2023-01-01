@@ -18,7 +18,7 @@ namespace AForgeExtensions.Neuro.Learning
             _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(_network);
             _learningRate = 0.5;
             _discountFactor = 0.99;
-            _targetNetworkUpdateTime = 5;
+            _targetNetworkUpdateTime = 3;
             _targetNetworkUpdateTimeElapsed = 0;
             _targetNetworkUpdateCount = 0;
 

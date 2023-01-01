@@ -474,11 +474,11 @@ namespace NeuralNetworkSnake
                     {
                         layers[3] = int.Parse(ThirdHiddenLayerCountNeurons);
                     }
-                    if (HiddenLayersCount >= 3)
+                    if (HiddenLayersCount >= 4)
                     {
                         layers[4] = int.Parse(FourthHiddenLayerCountNeurons);
                     }
-                    if (HiddenLayersCount >= 3)
+                    if (HiddenLayersCount >= 5)
                     {
                         layers[5] = int.Parse(FifthHiddenLayerCountNeurons);
                     }
@@ -882,7 +882,7 @@ namespace NeuralNetworkSnake
             double lossAfter = mSELossFunction.Calculate(otputsAfter, desiredOutputs);
 
             int inputLength = 616;
-            AForge.Neuro.ActivationNetwork activationNetworkLarge = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), inputLength, 256, 256, 256, 3);
+            AForge.Neuro.ActivationNetwork activationNetworkLarge = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), inputLength, 128, 128, 128, 3);
             
             double[] inputLarge = new double[inputLength];
             for (int i = 0; i < inputLarge.Length; i++)
