@@ -20,9 +20,9 @@ namespace AForgeExtensions.Neuro.Learning
             _mutateMaxValue = mutateMaxValue;
             _lossFunction = lossFunction;//new MSELossFunction();
             _selectionMethod = selectionMethod;//new GeneticLearning.RouletteWheelMinimizationSelection();
-            _mutationRate = 0.75;
+            _mutationRate = 1;
             _genomeLength = GetGenomeLength(network);
-            _crossoverRate = 0.75;
+            _crossoverRate = 1;
             _randomRateInitialPopulation = 0;
             _stepsSettings = stepsSettings;
         }
@@ -52,18 +52,21 @@ namespace AForgeExtensions.Neuro.Learning
             _averageFitnessProgression.Clear();
             _maxFitnessProgression.Clear();
             SpawnInitialPopulation(_network);
+            MutatePopulation(_population);
             GenerationFitnessCalculate();
             ConvertFitness();
             /*System.Diagnostics.Stopwatch stopwatch1 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch3 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch4 = new System.Diagnostics.Stopwatch();*/
-            for (_stepNumber = 0; _stepNumber < _stepsSettings.Count; _stepNumber++)
+            ResetStepsSettingsNumber();
+            while (_stepNumber < _stepsSettings.Count)
             {
                 SpawnInitialPopulation(_stepNumber > 0 ? _bestChromosome.Network : _network);
+                MutatePopulation(_population);
                 GenerationFitnessCalculate();
                 ConvertFitness();
-                for (_stepGenerationNumber = 0; _stepGenerationNumber < _stepsSettings[_stepNumber].GenerationsDuration; _stepGenerationNumber++)
+                while(_stepGenerationNumber < _stepsSettings[_stepNumber].GenerationsDuration)
                 {
                     //stopwatch1.Start();
                     _population = CrossOverPopulation(_population);
@@ -79,8 +82,12 @@ namespace AForgeExtensions.Neuro.Learning
                     //stopwatch4.Start();
                     _population = SelectionPopulation(_population);
                     //stopwatch4.Stop();
+                    _stepGenerationNumber++;
                 }
+                _stepGenerationNumber = 0;
+                _stepNumber++;
             }
+            _stepNumber = 0;
             ActivationNetworkFeatures.CopyActivationNetworkWeightsBiases(_bestChromosome.Network, _network);
             return _bestChromosome.Fitness;
         }

@@ -112,10 +112,27 @@ namespace AForgeExtensions.Neuro.Learning
         /// </summary>
         protected void ConvertFitness()
         {
-            double max = _population.Max(a => a.Fitness);
+            double min = _population.Min(a => a.Fitness);
+            for (int i = 0; i < _population.Length; i++)
+            {
+                _population[i].ConvertedFitness = _population[i].Fitness - min; //вычитаем min, чтобы нижняя граница значений приспособленности была 0
+            }
+            double max = _population.Max(a => a.ConvertedFitness);
+            if (!_selectionMethod.IsFitnessMaximization) //если селекция занимается минимизацией занчения приспособленности, тогда инвертируем значения, чтобы подогнать значения к максимуму, а не к минимуму, и затем снова инвертируем
+            {
+                for (int i = 0; i < _population.Length; i++)
+                {
+                    _population[i].ConvertedFitness = -_population[i].ConvertedFitness + max;
+                }
+            }
             for(int i = 0; i < _population.Length; i++)
             {
-                _population[i].ConvertedFitness = _population[i].Fitness * Math.Pow(_population[i].Fitness / max, _stepsSettings[_stepNumber].FitnessMaxHighlightRate);
+                _population[i].ConvertedFitness = _population[i].ConvertedFitness * Math.Pow(_population[i].ConvertedFitness / max, _stepsSettings[_stepNumber].FitnessStretchRate);
+                if (!_selectionMethod.IsFitnessMaximization) //если селекция занимается минимизацией занчения приспособленности, возвращаем инвертированные значения
+                {
+                    _population[i].ConvertedFitness = -_population[i].ConvertedFitness + max;
+                }
+                _population[i].ConvertedFitness += min; //прибавляем min который вычитали вначале
             }
         }
         /// <summary>
@@ -127,7 +144,8 @@ namespace AForgeExtensions.Neuro.Learning
             bool isOriginalNetwork = false;
             for (int i = 0; i < _populationSize; i++)
             {
-                if (_random.NextDouble() < _randomRateInitialPopulation)
+                double randVal = _random.NextDouble();
+                if (randVal < _randomRateInitialPopulation)
                 {
                     AForge.Neuro.ActivationNetwork randNetwork = ActivationNetworkFeatures.CloneActivationNetwork(network);
                     ActivationNetworkFeatures.FillRandomlyActivationNetwork(randNetwork, _mutateMinValue, _mutateMaxValue);

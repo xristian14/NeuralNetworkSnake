@@ -20,9 +20,9 @@ namespace AForgeExtensions.Neuro.Learning
             _mutateMaxValue = mutateMaxValue;
             _lossFunction = lossFunction;
             _selectionMethod = selectionMethod;
-            _mutationRate = 0.75;
+            _mutationRate = 1;
             _genomeLength = GetGenomeLength(network);
-            _crossoverRate = 0.75;
+            _crossoverRate = 1;
             _randomRateInitialPopulation = 0;
             _stepsSettings = stepsSettings;
             ResetStepsSettingsNumber();
@@ -41,6 +41,7 @@ namespace AForgeExtensions.Neuro.Learning
         /// <returns>true если все шаги обучения завершены, и false в противном случае</returns>
         public bool Run(double[] populationFitness)
         {
+            MutatePopulation(_population);
             SetFitness(populationFitness);
             ConvertFitness();
             UpdateBestChromosome();
