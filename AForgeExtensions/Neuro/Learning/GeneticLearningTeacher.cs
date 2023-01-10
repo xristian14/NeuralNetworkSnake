@@ -9,28 +9,23 @@ namespace AForgeExtensions.Neuro.Learning
     public class GeneticLearningTeacher : GeneticLearningBase
     {
         /// <summary>
-        /// Инициализирует экземпляр GeneticLearningTeacher.
+        /// 
         /// </summary>
-        public GeneticLearningTeacher(AForge.Neuro.ActivationNetwork network, int populationSize, int generationsCount, ILossFunction lossFunction, GeneticLearning.SelectionMethodBase selectionMethod, double mutateMinValue, double mutateMaxValue)
+        /// <param name="stepsSettings">Настройки шагов обучения. Каждый шаг обладает шансом мутации, длительностью в поколениях, и степенью выделения максимальных значений приспособленности. По завершению одного шага, и при переходе на следующий, будет создана новая популяция из лучшей хромосомы за весь период обучения.</param>
+        public GeneticLearningTeacher(AForge.Neuro.ActivationNetwork network, int populationSize, ILossFunction lossFunction, GeneticLearning.SelectionMethodBase selectionMethod, double mutateMinValue, double mutateMaxValue, List<GeneticLearning.StepsSettings> stepsSettings)
         {
             _network = network;
             _populationSize = populationSize;
-            _generationsCount = generationsCount;
             _mutateMinValue = mutateMinValue;
             _mutateMaxValue = mutateMaxValue;
             _lossFunction = lossFunction;//new MSELossFunction();
             _selectionMethod = selectionMethod;//new GeneticLearning.RouletteWheelMinimizationSelection();
             _mutationRate = 0.75;
             _genomeLength = GetGenomeLength(network);
-            _mutationProbability = 1.0 / _genomeLength;
             _crossoverRate = 0.75;
             _randomRateInitialPopulation = 0;
+            _stepsSettings = stepsSettings;
         }
-        private int _generationsCount;
-        /// <summary>
-        /// Количество поколений
-        /// </summary>
-        public int GenerationsCount { get { return _generationsCount; } set { _generationsCount = value; } }
         private List<double[]> _inputs;
         private List<double[]> _desiredOutputs;
         private void FitnessCalculate(GeneticLearning.Chromosome chromosome)
@@ -56,27 +51,35 @@ namespace AForgeExtensions.Neuro.Learning
             _minFitnessProgression.Clear();
             _averageFitnessProgression.Clear();
             _maxFitnessProgression.Clear();
-            SpawnInitialPopulation();
+            SpawnInitialPopulation(_network);
             GenerationFitnessCalculate();
+            ConvertFitness();
             /*System.Diagnostics.Stopwatch stopwatch1 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch3 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch4 = new System.Diagnostics.Stopwatch();*/
-            for (int i = 0; i < _generationsCount; i++)
+            for (_stepNumber = 0; _stepNumber < _stepsSettings.Count; _stepNumber++)
             {
-                //stopwatch1.Start();
-                _population = CrossOverPopulation(_population);
-                //stopwatch1.Stop();
-                //stopwatch2.Start();
-                MutatePopulation(_population);
-                //stopwatch2.Stop();
-                //stopwatch3.Start();
+                SpawnInitialPopulation(_stepNumber > 0 ? _bestChromosome.Network : _network);
                 GenerationFitnessCalculate();
-                UpdateBestChromosome();
-                //stopwatch3.Stop();
-                //stopwatch4.Start();
-                _population = SelectionPopulation(_population);
-                //stopwatch4.Stop();
+                ConvertFitness();
+                for (_stepGenerationNumber = 0; _stepGenerationNumber < _stepsSettings[_stepNumber].GenerationsDuration; _stepGenerationNumber++)
+                {
+                    //stopwatch1.Start();
+                    _population = CrossOverPopulation(_population);
+                    //stopwatch1.Stop();
+                    //stopwatch2.Start();
+                    MutatePopulation(_population);
+                    //stopwatch2.Stop();
+                    //stopwatch3.Start();
+                    GenerationFitnessCalculate();
+                    ConvertFitness();
+                    UpdateBestChromosome();
+                    //stopwatch3.Stop();
+                    //stopwatch4.Start();
+                    _population = SelectionPopulation(_population);
+                    //stopwatch4.Stop();
+                }
             }
             ActivationNetworkFeatures.CopyActivationNetworkWeightsBiases(_bestChromosome.Network, _network);
             return _bestChromosome.Fitness;

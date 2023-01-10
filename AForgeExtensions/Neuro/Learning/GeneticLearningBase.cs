@@ -26,16 +26,18 @@ namespace AForgeExtensions.Neuro.Learning
         /// Количество особей, участвующих в мутации [0,1]
         /// </summary>
         public double MutationRate { get { return _mutationRate; } set { _mutationRate = value; } }
-        protected double _mutationProbability;
-        /// <summary>
-        /// Вероятность мутации одного гена [0,1]
-        /// </summary>
-        public double MutationProbability { get { return _mutationProbability; } set { _mutationProbability = value; } }
         protected double _crossoverRate;
         /// <summary>
         /// Количество особей, участвующих в скрещивании [0,1]
         /// </summary>
         public double CrossoverRate { get { return _crossoverRate; } set { _crossoverRate = value; } }
+        protected List<GeneticLearning.StepsSettings> _stepsSettings;
+        /// <summary>
+        /// Настройки шагов обучения. Каждый шаг обладает шансом мутации, длительностью в поколениях, и степенью выделения максимальных значений приспособленности. По завершению одного шага, и при переходе на следующий, будет создана новая популяция из лучшей хромосомы за весь период обучения.
+        /// </summary>
+        public List<GeneticLearning.StepsSettings> StepsSettings { get { return _stepsSettings; } }
+        protected int _stepNumber;
+        protected int _stepGenerationNumber;
         protected List<double> _minFitnessProgression = new List<double>();
         /// <summary>
         /// Минимальное значение приспособленности, для всех поколений
@@ -91,9 +93,35 @@ namespace AForgeExtensions.Neuro.Learning
             return length;
         }
         /// <summary>
+        /// Сбрасывает номер текущего шага обучения и номер поколения, после чего процесс обучения начнется с начального элемента в StepsSettings.
+        /// </summary>
+        public void ResetStepsSettingsNumber()
+        {
+            _stepNumber = 0;
+            _stepGenerationNumber = 0;
+        }
+        /// <summary>
+        /// Возвращает true если все шаги тестирования пройдены, и false в противном случае.
+        /// </summary>
+        public bool IsFinish()
+        {
+            return (_stepNumber == _stepsSettings.Count - 1) && (_stepGenerationNumber > _stepsSettings[_stepNumber].GenerationsDuration);
+        }
+        /// <summary>
+        /// Вычисляет ConvertedFitness для хромосом, и в зависимости от значения FitnessMaxHighlightRate выделяем максимумы приспособленности.
+        /// </summary>
+        protected void ConvertFitness()
+        {
+            double max = _population.Max(a => a.Fitness);
+            for(int i = 0; i < _population.Length; i++)
+            {
+                _population[i].ConvertedFitness = _population[i].Fitness * Math.Pow(_population[i].Fitness / max, _stepsSettings[_stepNumber].FitnessMaxHighlightRate);
+            }
+        }
+        /// <summary>
         /// Порождает начальную популяцию. В начальной популяции будут сгенерированы особи со случайными значениями весов и смещений с шансом _randomRateInitialPopulation, их веса и смещения будут в диапазоне от _mutateMinValue до _mutateMaxValue
         /// </summary>
-        public void SpawnInitialPopulation()
+        public void SpawnInitialPopulation(AForge.Neuro.ActivationNetwork network)
         {
             _population = new GeneticLearning.Chromosome[_populationSize];
             bool isOriginalNetwork = false;
@@ -101,19 +129,19 @@ namespace AForgeExtensions.Neuro.Learning
             {
                 if (_random.NextDouble() < _randomRateInitialPopulation)
                 {
-                    AForge.Neuro.ActivationNetwork randNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
+                    AForge.Neuro.ActivationNetwork randNetwork = ActivationNetworkFeatures.CloneActivationNetwork(network);
                     ActivationNetworkFeatures.FillRandomlyActivationNetwork(randNetwork, _mutateMinValue, _mutateMaxValue);
                     _population[i] = new GeneticLearning.Chromosome(randNetwork);
                 }
                 else
                 {
                     isOriginalNetwork = true;
-                    _population[i] = new GeneticLearning.Chromosome(ActivationNetworkFeatures.CloneActivationNetwork(_network));
+                    _population[i] = new GeneticLearning.Chromosome(ActivationNetworkFeatures.CloneActivationNetwork(network));
                 }
             }
             if (!isOriginalNetwork)
             {
-                _population[0] = new GeneticLearning.Chromosome(ActivationNetworkFeatures.CloneActivationNetwork(_network));
+                _population[0] = new GeneticLearning.Chromosome(ActivationNetworkFeatures.CloneActivationNetwork(network));
             }
             _bestChromosome = _population[0];
         }
@@ -218,12 +246,12 @@ namespace AForgeExtensions.Neuro.Learning
                 {
                     for (int w = 0; w < chromosome.Network.Layers[i].Neurons[n].Weights.Length; w++)
                     {
-                        if (_random.NextDouble() < _mutationProbability)
+                        if (_random.NextDouble() < _stepsSettings[_stepNumber].MutationProbability)
                         {
                             chromosome.Network.Layers[i].Neurons[n].Weights[w] = Features.GetRandDouble(_mutateMinValue, _mutateMaxValue);
                         }
                     }
-                    if (_random.NextDouble() < _mutationProbability)
+                    if (_random.NextDouble() < _stepsSettings[_stepNumber].MutationProbability)
                     {
                         ((AForge.Neuro.ActivationNeuron)chromosome.Network.Layers[i].Neurons[n]).Threshold = Features.GetRandDouble(_mutateMinValue, _mutateMaxValue);
                     }

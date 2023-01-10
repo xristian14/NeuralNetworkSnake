@@ -9,21 +9,23 @@ namespace AForgeExtensions.Neuro.Learning
     public class GeneticLearningNoTeacher : GeneticLearningBase
     {
         /// <summary>
-        /// Инициализирует экземпляр GeneticLearningNoTeacher
+        /// 
         /// </summary>
-        public GeneticLearningNoTeacher(AForge.Neuro.ActivationNetwork network, int populationSize, ILossFunction lossFunction, GeneticLearning.SelectionMethodBase selectionMethod, double mutateMinValue, double mutateMaxValue)
+        /// <param name="stepsSettings">Настройки шагов обучения. Каждый шаг обладает шансом мутации, длительностью в поколениях, и степенью выделения максимальных значений приспособленности. По завершению одного шага, и при переходе на следующий, будет создана новая популяция из лучшей хромосомы за весь период обучения. Если обучение завершено, при следующем вызове Run() будет создано новое поколение на основе настроек последнего элемента в списке stepsSettings. Для обучения по шагам с начала, вызовите метод ResetStepsSettingsNumber().</param>
+        public GeneticLearningNoTeacher(AForge.Neuro.ActivationNetwork network, int populationSize, ILossFunction lossFunction, GeneticLearning.SelectionMethodBase selectionMethod, double mutateMinValue, double mutateMaxValue, List<GeneticLearning.StepsSettings> stepsSettings)
         {
             _network = network;
             _populationSize = populationSize;
             _mutateMinValue = mutateMinValue;
             _mutateMaxValue = mutateMaxValue;
-            _lossFunction = lossFunction;//new MSELossFunction();
-            _selectionMethod = selectionMethod;//new GeneticLearning.RouletteWheelMinimizationSelection();
+            _lossFunction = lossFunction;
+            _selectionMethod = selectionMethod;
             _mutationRate = 0.75;
             _genomeLength = GetGenomeLength(network);
-            _mutationProbability = 1.0 / _genomeLength;
             _crossoverRate = 0.75;
             _randomRateInitialPopulation = 0;
+            _stepsSettings = stepsSettings;
+            ResetStepsSettingsNumber();
         }
         private void SetFitness(double[] populationFitness)
         {
@@ -36,15 +38,26 @@ namespace AForgeExtensions.Neuro.Learning
         /// Генерирует следующее поколение, на основе значений приспосоленности текущего поколения
         /// </summary>
         /// <param name="popultionFitness">Значения приспособленности текущего поколения</param>
-        /// <returns>Значение приспособленности лучшей особи за все поколения</returns>
-        public double Run(double[] populationFitness)
+        /// <returns>true если все шаги обучения завершены, и false в противном случае</returns>
+        public bool Run(double[] populationFitness)
         {
             SetFitness(populationFitness);
+            ConvertFitness();
             UpdateBestChromosome();
-            _population = SelectionPopulation(_population);
-            _population = CrossOverPopulation(_population);
-            MutatePopulation(_population);
-            return _bestChromosome.Fitness;
+            _stepGenerationNumber++;
+            if(_stepGenerationNumber >= _stepsSettings[_stepNumber].GenerationsDuration && _stepNumber < _stepsSettings.Count - 1)
+            {
+                _stepGenerationNumber = 0;
+                _stepNumber++;
+                SpawnInitialPopulation(_bestChromosome.Network);
+            }
+            else
+            {
+                _population = SelectionPopulation(_population);
+                _population = CrossOverPopulation(_population);
+                MutatePopulation(_population);
+            }
+            return IsFinish();
         }
     }
 }

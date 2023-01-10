@@ -198,7 +198,7 @@
                                     <RadioButton GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Длительность, сек" Margin="6 0 0 0"/>
-                                        <Slider Minimum="5" Maximum="7200" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
+                                        <Slider Minimum="5" Maximum="43200" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
                                         <TextBlock Text="{Binding FixedDuration}" Margin="4 0 6 0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 6 0 0">

@@ -17,12 +17,12 @@ namespace AForgeExtensions.Neuro.Learning
             _targetNetwork = ActivationNetworkFeatures.CloneActivationNetwork(_network);
             _backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(_network);
             _learningRate = 0.5;
-            _discountFactor = 0.99;
+            _discountFactor = 0.98;
             _targetNetworkUpdateTime = 3;
             _targetNetworkUpdateTimeElapsed = 0;
             _targetNetworkUpdateCount = 0;
 
-            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1);
+            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1, new List<GeneticLearning.StepsSettings>() { new GeneticLearning.StepsSettings(50, 0.005, 0), new GeneticLearning.StepsSettings(50, 0.0025, 0) });
         }
         private AForge.Neuro.ActivationNetwork _network; //основная нейронная сеть
         public AForge.Neuro.ActivationNetwork Network { get { return _network; } }
@@ -31,8 +31,8 @@ namespace AForgeExtensions.Neuro.Learning
         private GeneticLearningTeacher _geneticLearningTeacher;
         public GeneticLearningTeacher GeneticLearningTeacher { get { return _geneticLearningTeacher; } }
         private int _targetNetworkUpdateTime;
+        private int _targetNetworkUpdateCount; //сколько раз обновлялась целевая нейронная сеть
         private int _targetNetworkUpdateTimeElapsed;
-        private int _targetNetworkUpdateCount;
         /// <summary>
         /// Количество итераций UpdateState(), через которое основная нейронная сеть копируется в целевую. (по умолчанию 100)
         /// </summary>

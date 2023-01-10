@@ -16,7 +16,7 @@ namespace NeuralNetworkSnake
         {
             _isGeneticLearning = true;
             _geneticLearningNoTeacher = geneticLearningNoTeacher;
-            _geneticLearningNoTeacher.SpawnInitialPopulation();
+            _geneticLearningNoTeacher.SpawnInitialPopulation(_geneticLearningNoTeacher.Network);
             _testsCount = testsCount;
             _currentTestNumber = 1;
             PauseMillisecDelay = pauseMillisecDelay;
@@ -104,7 +104,7 @@ namespace NeuralNetworkSnake
         private int Age = 0;
         public void SetMutationPercent(double mutationPercent)
         {
-            _geneticLearningNoTeacher.MutationProbability = mutationPercent;
+            //_geneticLearningNoTeacher.MutationProbability = mutationPercent;
         }
         private void CreateSnakesInfo()
         {
@@ -390,7 +390,7 @@ namespace NeuralNetworkSnake
                 bool isGameOver = false;
                 double baseReward = 0;
                 double appleReward = 1;
-                double gameOverReward = -10;
+                double gameOverReward = -14;
                 double reward = baseReward;
                 int newX = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].X + xOffset;
                 int newY = _gameBoardsGeneticLearning[0].SnakeCoordinates[_gameBoardsGeneticLearning[0].SnakeCoordinates.Count - 1].Y + yOffset;

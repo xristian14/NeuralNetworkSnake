@@ -180,6 +180,7 @@
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\RouletteWheelMinimizationSelection.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\RouletteWheelSelection.cs" />
     <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\SelectionMethodBase.cs" />
+    <Compile Include="AForgeExtensions\Neuro\Learning\GeneticLearning\StepsSettings.cs" />
     <Compile Include="AForgeExtensions\Neuro\MSELossFunction.cs" />
     <Compile Include="AForgeExtensions\Neuro\ReLuActivationFunction.cs" />
     <Compile Include="AForgeExtensions\Neuro\SameActivationFunction.cs" />

@@ -826,12 +826,9 @@ namespace NeuralNetworkSnake
             /*square[0] = GetSquare(actionPoints[0]);
             square[1] = GetSquare(actionPoints[1]);
             square[2] = GetSquare(actionPoints[2]);*/
-            int indexMax = Features.MaxIndex(square);
-            inputs[angles.Length * 3 + 0] = 0;
-            inputs[angles.Length * 3 + 1] = 0;
-            inputs[angles.Length * 3 + 2] = 0;
-            inputs[angles.Length * 3 + indexMax] = 1;
-
+            inputs[angles.Length * 3 + 0] = (double)square[0] / CellsCount;
+            inputs[angles.Length * 3 + 1] = (double)square[1] / CellsCount;
+            inputs[angles.Length * 3 + 2] = (double)square[2] / CellsCount;
             return inputs;
         }
         public double InvertCoordinate(double coordinate)
