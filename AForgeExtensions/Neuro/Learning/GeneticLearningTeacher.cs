@@ -51,10 +51,6 @@ namespace AForgeExtensions.Neuro.Learning
             _minFitnessProgression.Clear();
             _averageFitnessProgression.Clear();
             _maxFitnessProgression.Clear();
-            SpawnInitialPopulation(_network);
-            MutatePopulation(_population);
-            GenerationFitnessCalculate();
-            ConvertFitness();
             /*System.Diagnostics.Stopwatch stopwatch1 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch stopwatch3 = new System.Diagnostics.Stopwatch();
@@ -65,7 +61,7 @@ namespace AForgeExtensions.Neuro.Learning
                 SpawnInitialPopulation(_stepNumber > 0 ? _bestChromosome.Network : _network);
                 MutatePopulation(_population);
                 GenerationFitnessCalculate();
-                ConvertFitness();
+                ScalePopulationFitness(_population);
                 while(_stepGenerationNumber < _stepsSettings[_stepNumber].GenerationsDuration)
                 {
                     //stopwatch1.Start();
@@ -76,7 +72,7 @@ namespace AForgeExtensions.Neuro.Learning
                     //stopwatch2.Stop();
                     //stopwatch3.Start();
                     GenerationFitnessCalculate();
-                    ConvertFitness();
+                    ScalePopulationFitness(_population);
                     UpdateBestChromosome();
                     //stopwatch3.Stop();
                     //stopwatch4.Start();

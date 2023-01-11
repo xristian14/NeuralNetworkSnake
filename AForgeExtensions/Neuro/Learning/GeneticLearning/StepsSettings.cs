@@ -11,14 +11,14 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="generationsDuration">длительность в поколениях</param>
-        /// <param name="mutationProbability">Вероятность мутации одного гена [0,1]</param>
-        /// <param name="fitnessStretchRate">Показатель растягивания значений приспособленности. Показатель позволяет собирать значения около минимума (для максимизации значения приспособленности) или максимума (для минимизации значения приспособленности), с целью выделить лучшие результаты и дать им больше шанса быть отобранными в процессе селекции [0,∞]. 0 - приспособленность не изменяется. Пример(для максимизации приспособленности): значения приспособленности и результаты преобразования для разных FitnessStretchRate: [20, 50, 90, 99, 100]: 0-> [20, 50, 90, 99, 100]; 0.5-> [20, 38.4, 85.5, 98.5, 100]; 1-> [20, 31.3, 81.3, 98, 100]; 2-> [20, 24.2, 73.6, 97, 100]; 5-> [20, 20.2, 55.9, 94.2, 100]; 10-> [20, 20, 38.4, 89.6, 100]; 20-> [20, 20, 24.8, 81.4, 100].</param>
-        public StepsSettings(int generationsDuration, double mutationProbability, double fitnessStretchRate = 0)
+        /// <param name="generationsDuration">Длительность в поколениях.</param>
+        /// <param name="mutationProbability">Вероятность мутации одного гена [0,1].</param>
+        /// <param name="fitnessScaleRate">Показатель масштабирования значений приспособленности [0,∞]. 0 - отсутствие маштабирования, 1 - масштабирование в 2 раза, 2 - масштабирование в 3 раза. Для максимизации приспособленности, точка масштабирования - максимальная приспособленность, для минимизации точка масштабирования - минимальная приспособленость. Примеры: (FitnessScaleRate=1, Минимизация) [0.5, 0.6, 1]->[0.5, 0.7, 1.5]; (FitnessScaleRate=2, Максимизация) [1, 2, 3]->[-3, 0, 3]; (FitnessScaleRate=0.5, Максимизация) [0.5, 0.6, 0.7]->[0.4, 0.55, 0.7].</param>
+        public StepsSettings(int generationsDuration, double mutationProbability, double fitnessScaleRate = 0)
         {
             _generationsDuration = generationsDuration;
             _mutationProbability = mutationProbability;
-            _fitnessStretchRate = fitnessStretchRate;
+            _fitnessScaleRate = fitnessScaleRate;
         }
         private int _generationsDuration;
         /// <summary>
@@ -30,10 +30,10 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         /// Вероятность мутации одного гена [0,1]
         /// </summary>
         public double MutationProbability { get { return _mutationProbability; } set { _mutationProbability = value; } }
-        private double _fitnessStretchRate;
+        private double _fitnessScaleRate;
         /// <summary>
-        /// Показатель растягивания значений приспособленности. Показатель позволяет собирать значения около минимума (для максимизации значения приспособленности) или максимума (для минимизации значения приспособленности), с целью выделить лучшие результаты и дать им больше шанса быть отобранными в процессе селекции [0,∞]. 0 - приспособленность не изменяется. Пример(для максимизации приспособленности): значения приспособленности и результаты преобразования для разных FitnessStretchRate: [20, 50, 90, 99, 100]: 0-> [20, 50, 90, 99, 100]; 0.5-> [20, 38.4, 85.5, 98.5, 100]; 1-> [20, 31.3, 81.3, 98, 100]; 2-> [20, 24.2, 73.6, 97, 100]; 5-> [20, 20.2, 55.9, 94.2, 100]; 10-> [20, 20, 38.4, 89.6, 100]; 20-> [20, 20, 24.8, 81.4, 100].
+        /// Показатель масштабирования значений приспособленности [0,∞]. 0 - отсутствие маштабирования, 1 - масштабирование в 2 раза, 2 - масштабирование в 3 раза. Для максимизации приспособленности, точка масштабирования - максимальная приспособленность, для минимизации точка масштабирования - минимальная приспособленость. Примеры: (FitnessScaleRate=1, Минимизация) [0.5, 0.6, 1]->[0.5, 0.7, 1.5]; (FitnessScaleRate=2, Максимизация) [1, 2, 3]->[-3, 0, 3]; (FitnessScaleRate=0.5, Максимизация) [0.5, 0.6, 0.7]->[0.4, 0.55, 0.7].
         /// </summary>
-        public double FitnessStretchRate { get { return _fitnessStretchRate; } set { _fitnessStretchRate = value; } }
+        public double FitnessScaleRate { get { return _fitnessScaleRate; } set { _fitnessScaleRate = value; } }
     }
 }

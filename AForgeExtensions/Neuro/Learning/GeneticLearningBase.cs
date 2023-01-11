@@ -108,31 +108,14 @@ namespace AForgeExtensions.Neuro.Learning
             return (_stepNumber == _stepsSettings.Count - 1) && (_stepGenerationNumber > _stepsSettings[_stepNumber].GenerationsDuration);
         }
         /// <summary>
-        /// Вычисляет ConvertedFitness для хромосом, и в зависимости от значения FitnessMaxHighlightRate выделяем максимумы приспособленности.
+        /// Вычисляет масштабированную приспособленность для популяции.
         /// </summary>
-        protected void ConvertFitness()
+        protected void ScalePopulationFitness(GeneticLearning.Chromosome[] population)
         {
-            double min = _population.Min(a => a.Fitness);
-            for (int i = 0; i < _population.Length; i++)
+            double scalePoint = _selectionMethod.IsFitnessMaximization ? population.Max(a => a.Fitness) : population.Min(a => a.Fitness);
+            for(int i = 0; i < population.Length; i++)
             {
-                _population[i].ConvertedFitness = _population[i].Fitness - min; //вычитаем min, чтобы нижняя граница значений приспособленности была 0
-            }
-            double max = _population.Max(a => a.ConvertedFitness);
-            if (!_selectionMethod.IsFitnessMaximization) //если селекция занимается минимизацией занчения приспособленности, тогда инвертируем значения, чтобы подогнать значения к максимуму, а не к минимуму, и затем снова инвертируем
-            {
-                for (int i = 0; i < _population.Length; i++)
-                {
-                    _population[i].ConvertedFitness = -_population[i].ConvertedFitness + max;
-                }
-            }
-            for(int i = 0; i < _population.Length; i++)
-            {
-                _population[i].ConvertedFitness = _population[i].ConvertedFitness * Math.Pow(_population[i].ConvertedFitness / max, _stepsSettings[_stepNumber].FitnessStretchRate);
-                if (!_selectionMethod.IsFitnessMaximization) //если селекция занимается минимизацией занчения приспособленности, возвращаем инвертированные значения
-                {
-                    _population[i].ConvertedFitness = -_population[i].ConvertedFitness + max;
-                }
-                _population[i].ConvertedFitness += min; //прибавляем min который вычитали вначале
+                population[i].ScaledFitness = population[i].Fitness + (population[i].Fitness - scalePoint) * _stepsSettings[_stepNumber].FitnessScaleRate;
             }
         }
         /// <summary>
@@ -294,6 +277,9 @@ namespace AForgeExtensions.Neuro.Learning
             {
                 newPopulation[i] = (GeneticLearning.Chromosome)selectionPopulation[i].Clone();
             }
+            double[] populationFitness = population.Select(a => a.Fitness).ToArray();
+            double[] populationConvertedFitness = population.Select(a => a.ScaledFitness).ToArray();
+            double[] selectionPopulationConvertedFitness = selectionPopulation.Select(a => a.ScaledFitness).ToArray();
             return newPopulation;
         }
     }

@@ -43,7 +43,7 @@ namespace AForgeExtensions.Neuro.Learning
         {
             MutatePopulation(_population);
             SetFitness(populationFitness);
-            ConvertFitness();
+            ScalePopulationFitness(_population);
             UpdateBestChromosome();
             _stepGenerationNumber++;
             if(_stepGenerationNumber >= _stepsSettings[_stepNumber].GenerationsDuration && _stepNumber < _stepsSettings.Count - 1)

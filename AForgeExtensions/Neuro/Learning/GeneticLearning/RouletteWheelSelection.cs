@@ -21,7 +21,7 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         public override Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize)
         {
             Chromosome[] newPopulation = new Chromosome[newPopulationSize];
-            double fintessSum = population.Sum(a => a.ConvertedFitness);
+            double fintessSum = population.Sum(a => a.ScaledFitness);
             for (int i = 0; i < newPopulationSize; i++)
             {
                 double randFitness = _random.NextDouble() * fintessSum;
@@ -29,7 +29,7 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
                 double sum = 0;
                 while (k < population.Length && sum < randFitness)
                 {
-                    sum += population[k].ConvertedFitness;
+                    sum += population[k].ScaledFitness;
                     k++;
                 }
                 int index = k > 0 ? k - 1 : k;
