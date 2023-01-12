@@ -93,12 +93,16 @@ namespace AForgeExtensions.Neuro.Learning
             return length;
         }
         /// <summary>
-        /// Сбрасывает номер текущего шага обучения и номер поколения, после чего процесс обучения начнется с начального элемента в StepsSettings.
+        /// Сбрасывает значения полей, сформированных в результате обучения. В результате обучение начнется с начальных настроек.
         /// </summary>
-        public void ResetStepsSettingsNumber()
+        public void ResetLearning()
         {
             _stepNumber = 0;
             _stepGenerationNumber = 0;
+            _minFitnessProgression.Clear();
+            _averageFitnessProgression.Clear();
+            _maxFitnessProgression.Clear();
+            _selectionMethod.ResetSelection();
         }
         /// <summary>
         /// Возвращает true если все шаги тестирования пройдены, и false в противном случае.

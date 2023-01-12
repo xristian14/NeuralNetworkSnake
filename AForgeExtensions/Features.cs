@@ -34,19 +34,6 @@ namespace AForgeExtensions
             return _random.NextDouble() * (max - min) + min;
         }
         /// <summary>
-        /// возвращает массив, сумма значений которого равняется 1
-        /// </summary>
-        public static double[] SoftMaxArray(double[] input)
-        {
-            double[] output = new double[input.Length];
-            double inputSum = input.Sum();
-            for (int i = 0; i < input.Length; i++)
-            {
-                output[i] = input[i] / inputSum;
-            }
-            return output;
-        }
-        /// <summary>
         /// Переводит объект типа AForge.Neuro.ActivationNetwork в объект типа AForgeExtensions.Neuro.ActivationNetworkSerializeFormat, который можно сериализовать и десериализовать
         /// </summary>
         public static Neuro.ActivationNetworkSerializeFormat ConvertActNetToSerializeFormat(AForge.Neuro.ActivationNetwork activationNetwork)
@@ -96,6 +83,19 @@ namespace AForgeExtensions
                 }
             }
             return activationNetwork;
+        }
+        /// <summary>
+        /// Возвращает массив, сумма занчений которого равняется outputSum
+        /// </summary>
+        public static double[] SoftMax(double[] input, double outputSum)
+        {
+            double[] output = new double[input.Length];
+            double inputSum = input.Sum();
+            for (int i = 0; i < input.Length; i++)
+            {
+                output[i] = input[i] / inputSum * outputSum;
+            }
+            return output;
         }
     }
 }

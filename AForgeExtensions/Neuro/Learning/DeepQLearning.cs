@@ -22,7 +22,7 @@ namespace AForgeExtensions.Neuro.Learning
             _targetNetworkUpdateTimeElapsed = 0;
             _targetNetworkUpdateCount = 0;
 
-            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelMinimizationSelection(), -1, 1, new List<GeneticLearning.StepsSettings>() { new GeneticLearning.StepsSettings(50, 0.005, 0), new GeneticLearning.StepsSettings(50, 0.0025, 0) });
+            _geneticLearningTeacher = new GeneticLearningTeacher(network, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, false, 0), -1, 1, new List<GeneticLearning.StepsSettings>() { new GeneticLearning.StepsSettings(50, 0.005, 0), new GeneticLearning.StepsSettings(50, 0.0025, 0) });
         }
         private AForge.Neuro.ActivationNetwork _network; //основная нейронная сеть
         public AForge.Neuro.ActivationNetwork Network { get { return _network; } }

@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace AForgeExtensions.Neuro.Learning.GeneticLearning
 {
-    /// <summary>
-    /// Выбор хромосом в новую популяцию осуществляется случайным образом, чем ВЫШЕ значение приспособленности, тем выше шанс быть выбранным. Значение приспособленности прямо пропорционально шансу быть выбранным.
-    /// </summary>
     public class RouletteWheelSelection : SelectionMethodBase
     {
-        public RouletteWheelSelection()
+        public RouletteWheelSelection(bool isFitnessMaximization, bool isFlexibleTarget, double fixedTarget = 0)
         {
-            _isFitnessMaximization = true;
+            _isFitnessMaximization = isFitnessMaximization;
+            _isFlexibleTarget = isFlexibleTarget;
+            _target = fixedTarget;
         }
         /// <summary>
         /// Возвращает массив хромосом, которые были выбраны в результате селекции. Результирующий массив содержит ссылки на хромосомы исходного массива.
@@ -21,15 +20,29 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         public override Chromosome[] ApplySelection(Chromosome[] population, int newPopulationSize)
         {
             Chromosome[] newPopulation = new Chromosome[newPopulationSize];
-            double fintessSum = population.Sum(a => a.ScaledFitness);
+            double softMaxSum = 100;
+            double[] targetCloseness = new double[population.Length]; //близость приспособленности к цели селекции
+            for(int i = 0; i < population.Length; i++)
+            {
+                targetCloseness[i] = Math.Abs(_target - population[i].ScaledFitness);
+            }
+            targetCloseness = AForgeExtensions.Features.SoftMax(targetCloseness, softMaxSum);
+            if (!_isFitnessMaximization)
+            {
+                for (int i = 0; i < targetCloseness.Length; i++)
+                {
+                    targetCloseness[i] = 1 / targetCloseness[i];
+                }
+            }
+            double targetClosenessSum = targetCloseness.Sum();
             for (int i = 0; i < newPopulationSize; i++)
             {
-                double randFitness = _random.NextDouble() * fintessSum;
+                double random = _random.NextDouble() * targetClosenessSum;
                 int k = 0;
                 double sum = 0;
-                while (k < population.Length && sum < randFitness)
+                while (k < targetCloseness.Length && sum < random)
                 {
-                    sum += population[k].ScaledFitness;
+                    sum += targetCloseness[k];
                     k++;
                 }
                 int index = k > 0 ? k - 1 : k;

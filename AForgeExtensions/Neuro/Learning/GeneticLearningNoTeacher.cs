@@ -11,7 +11,7 @@ namespace AForgeExtensions.Neuro.Learning
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="stepsSettings">Настройки шагов обучения. Каждый шаг обладает шансом мутации, длительностью в поколениях, и степенью выделения максимальных значений приспособленности. По завершению одного шага, и при переходе на следующий, будет создана новая популяция из лучшей хромосомы за весь период обучения. Если обучение завершено, при следующем вызове Run() будет создано новое поколение на основе настроек последнего элемента в списке stepsSettings. Для обучения по шагам с начала, вызовите метод ResetStepsSettingsNumber().</param>
+        /// <param name="stepsSettings">Настройки шагов обучения. Каждый шаг обладает шансом мутации, длительностью в поколениях, и степенью выделения максимальных значений приспособленности. По завершению одного шага, и при переходе на следующий, будет создана новая популяция из лучшей хромосомы за весь период обучения. Если обучение завершено, при следующем вызове Run() будет создано новое поколение на основе настроек последнего элемента в списке stepsSettings. Для обучения с начальных настроек, вызовите метод ResetLearning().</param>
         public GeneticLearningNoTeacher(AForge.Neuro.ActivationNetwork network, int populationSize, ILossFunction lossFunction, GeneticLearning.SelectionMethodBase selectionMethod, double mutateMinValue, double mutateMaxValue, List<GeneticLearning.StepsSettings> stepsSettings)
         {
             _network = network;
@@ -25,7 +25,7 @@ namespace AForgeExtensions.Neuro.Learning
             _crossoverRate = 1;
             _randomRateInitialPopulation = 0;
             _stepsSettings = stepsSettings;
-            ResetStepsSettingsNumber();
+            ResetLearning();
         }
         private void SetFitness(double[] populationFitness)
         {
@@ -44,6 +44,7 @@ namespace AForgeExtensions.Neuro.Learning
             MutatePopulation(_population);
             SetFitness(populationFitness);
             ScalePopulationFitness(_population);
+            _selectionMethod.AddTargetSource(_selectionMethod.IsFitnessMaximization ? _population.Max(a => a.ScaledFitness) : _population.Min(a => a.ScaledFitness));
             UpdateBestChromosome();
             _stepGenerationNumber++;
             if(_stepGenerationNumber >= _stepsSettings[_stepNumber].GenerationsDuration && _stepNumber < _stepsSettings.Count - 1)
