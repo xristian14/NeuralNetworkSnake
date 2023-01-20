@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NeuralNetworkSnake"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
@@ -15,7 +16,7 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <TabControl  VerticalAlignment="Top">
+        <TabControl VerticalAlignment="Stretch">
             <TabItem>
                 <TabItem.Header>
                     <TextBlock Text="Змейка"/>
@@ -49,7 +50,6 @@
                                 <CheckBox IsChecked="{Binding IsLoadSavedNetwork}" Content="Загрузить сохраненную нейронную сеть"/>
                                 <Rectangle Width="1" VerticalAlignment="Stretch" Stroke="#FF646464" Margin="6 0 0 0"/>
                                 <Button Content="Создать нейросеть" Command="{Binding CreateNeuralNetwork_Click}" Margin="6 0 0 0" Padding="4 1"/>
-                                <Button Content="Тестовая функция" Command="{Binding ButtonTest_Click}" Margin="6 0 0 0" Padding="4 1"/>
                             </StackPanel>
                         </StackPanel>
                         <Grid Grid.Row="1">
@@ -189,13 +189,13 @@
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 4 0 0">
                                         <TextBlock Text="Симуляция"/>
                                     </StackPanel>
-                                    <RadioButton IsChecked="{Binding IsRealtimeSimulation}" GroupName="simulationType" Content="В режиме реального времени" Margin="6 0 6 0"/>
+                                    <RadioButton GroupName="simulationType" Content="В режиме реального времени" Margin="6 0 6 0"/>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Задержка между ходами, мс" Margin="6 0 0 0"/>
                                         <Slider Minimum="10" Maximum="500" Width="70" Value="{Binding RealtimeDelay}" Margin="4 0 0 0"/>
                                         <TextBlock Text="{Binding RealtimeDelay}" Margin="4 0 6 0"/>
                                     </StackPanel>
-                                    <RadioButton GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>
+                                    <RadioButton IsChecked="{Binding IsFixedtimeSimulation}" GroupName="simulationType" Content="Фиксированное время" Margin="6 6 6 0"/>
                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                         <TextBlock Text="Длительность, сек" Margin="6 0 0 0"/>
                                         <Slider Minimum="5" Maximum="43200" Width="124" Value="{Binding FixedDuration}" Margin="4 0 0 0"/>
@@ -484,6 +484,56 @@
                             </Grid>
                         </Grid>
                     </StackPanel>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="Графики"/>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Grid Margin="15" HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="0.1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Тестовая функция" Grid.Row="0" Grid.Column="0" Command="{Binding ButtonTest_Click}" Margin="6 0 0 0" Padding="4 1"/>
+                        <lvc:CartesianChart Name="Chart" Grid.Row="1" Grid.Column="0">
+                            <lvc:CartesianChart.Series>
+                                <lvc:LineSeries Values="{Binding ChartValues1, StringFormat={}{0:0.000}}" LineSmoothness="0" StrokeThickness="1" DataLabels="True" FontSize="10" Foreground="#00000000" Stroke="Black" Fill="Transparent" PointGeometrySize="0"/>
+                            </lvc:CartesianChart.Series>
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis IsEnabled="False" ShowLabels="False"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Foreground="White" FontSize="14">
+                                    <lvc:Axis.Separator>
+                                        <lvc:Separator StrokeThickness="1" Stroke="#8E2F9FA4" StrokeDashArray="20" Step="1" />
+                                    </lvc:Axis.Separator>
+                                </lvc:Axis>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                        <lvc:CartesianChart Grid.Row="2" Grid.Column="0">
+                            <lvc:CartesianChart.Series>
+                                <lvc:LineSeries Values="{Binding ChartValues2, StringFormat={}{0:0.000}}" LineSmoothness="0" StrokeThickness="1" DataLabels="True" FontSize="10" Foreground="#00000000" Stroke="Black" Fill="Transparent" PointGeometrySize="0"/>
+                            </lvc:CartesianChart.Series>
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis IsEnabled="False" ShowLabels="False"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Foreground="White" FontSize="14">
+                                    <lvc:Axis.Separator>
+                                        <lvc:Separator StrokeThickness="1" Stroke="#8E2F9FA4" StrokeDashArray="20" Step="1" />
+                                    </lvc:Axis.Separator>
+                                </lvc:Axis>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Grid>
                 </TabItem.Content>
             </TabItem>
         </TabControl>

@@ -20,8 +20,8 @@ namespace AForgeExtensions.Neuro.Learning
             _mutateMaxValue = mutateMaxValue;
             _lossFunction = lossFunction;
             _selectionMethod = selectionMethod;
-            _mutationRate = 1;
             _genomeLength = GetGenomeLength(network);
+            _mutationRate = 1;
             _crossoverRate = 1;
             _randomRateInitialPopulation = 0;
             _stepsSettings = stepsSettings;
@@ -55,6 +55,10 @@ namespace AForgeExtensions.Neuro.Learning
             }
             else
             {
+                if(_stepGenerationNumber == 95)
+                {
+                    int y = 0;
+                }
                 _population = SelectionPopulation(_population);
                 _population = CrossOverPopulation(_population);
                 MutatePopulation(_population);

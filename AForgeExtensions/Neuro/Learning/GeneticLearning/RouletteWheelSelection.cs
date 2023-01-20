@@ -27,12 +27,9 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
                 targetCloseness[i] = Math.Abs(_target - population[i].ScaledFitness);
             }
             targetCloseness = AForgeExtensions.Features.SoftMax(targetCloseness, softMaxSum);
-            if (!_isFitnessMaximization)
+            for (int i = 0; i < targetCloseness.Length; i++)
             {
-                for (int i = 0; i < targetCloseness.Length; i++)
-                {
-                    targetCloseness[i] = 1 / targetCloseness[i];
-                }
+                targetCloseness[i] = 1 / targetCloseness[i];
             }
             double targetClosenessSum = targetCloseness.Sum();
             for (int i = 0; i < newPopulationSize; i++)

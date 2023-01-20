@@ -18,10 +18,10 @@ namespace AForgeExtensions.Neuro.Learning
             _populationSize = populationSize;
             _mutateMinValue = mutateMinValue;
             _mutateMaxValue = mutateMaxValue;
-            _lossFunction = lossFunction;//new MSELossFunction();
-            _selectionMethod = selectionMethod;//new GeneticLearning.RouletteWheelMinimizationSelection();
-            _mutationRate = 1;
+            _lossFunction = lossFunction;
+            _selectionMethod = selectionMethod;
             _genomeLength = GetGenomeLength(network);
+            _mutationRate = 1;
             _crossoverRate = 1;
             _randomRateInitialPopulation = 0;
             _stepsSettings = stepsSettings;

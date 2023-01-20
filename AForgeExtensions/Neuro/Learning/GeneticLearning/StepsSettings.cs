@@ -14,7 +14,7 @@ namespace AForgeExtensions.Neuro.Learning.GeneticLearning
         /// <param name="generationsDuration">Длительность в поколениях.</param>
         /// <param name="mutationProbability">Вероятность мутации одного гена [0,1].</param>
         /// <param name="fitnessScaleRate">Показатель масштабирования значений приспособленности [0,∞]. 0 - отсутствие маштабирования, 1 - масштабирование в 2 раза, 2 - масштабирование в 3 раза. Для максимизации приспособленности, точка масштабирования - максимальная приспособленность, для минимизации точка масштабирования - минимальная приспособленость. Примеры: (FitnessScaleRate=1, Минимизация) [0.5, 0.6, 1]->[0.5, 0.7, 1.5]; (FitnessScaleRate=2, Максимизация) [1, 2, 3]->[-3, 0, 3]; (FitnessScaleRate=0.5, Максимизация) [0.5, 0.6, 0.7]->[0.4, 0.55, 0.7].</param>
-        public StepsSettings(int generationsDuration, double mutationProbability, double fitnessScaleRate = 0)
+        public StepsSettings(int generationsDuration, double mutationProbability, double fitnessScaleRate)
         {
             _generationsDuration = generationsDuration;
             _mutationProbability = mutationProbability;

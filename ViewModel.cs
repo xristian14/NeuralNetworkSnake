@@ -12,6 +12,9 @@ using System.ComponentModel;
 using System.Collections.Specialized;
 using System.Threading;
 using System.IO;
+using LiveCharts;
+using LiveCharts.Wpf;
+using CNTK;
 
 namespace NeuralNetworkSnake
 {
@@ -207,17 +210,17 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private bool _isRealtimeSimulation = true;
-        public bool IsRealtimeSimulation
+        private bool _isFixedtimeSimulation = true;
+        public bool IsFixedtimeSimulation
         {
-            get { return _isRealtimeSimulation; }
+            get { return _isFixedtimeSimulation; }
             set
             {
-                _isRealtimeSimulation = value;
+                _isFixedtimeSimulation = value;
                 OnPropertyChanged();
             }
         }
-        private int _realtimeDelay = 100;
+        private int _realtimeDelay = 50;
         public int RealtimeDelay
         {
             get { return _realtimeDelay; }
@@ -334,7 +337,7 @@ namespace NeuralNetworkSnake
         }
 
         /*генетический алгоритм*/
-        private string _populationSize = "100";
+        private string _populationSize = "50";
         public string PopulationSize
         {
             get { return _populationSize; }
@@ -350,7 +353,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _mutationPercent = "1";
+        private string _mutationPercent = "0,01";
         public string MutationPercent
         {
             get { return _mutationPercent; }
@@ -370,7 +373,7 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
-        private string _testsCount = "10";
+        private string _testsCount = "3";
         public string TestsCount //количество тестов для одной нейросети, нужно чтобы провести несколько тестов для одной змейки, и на основе общего результата за все тесты выбирать пары для скрещивания. Один удачный тест может лишить потомства более совершенную нейронную сеть, у которой тест сложился неудачно
         {
             get { return _testsCount; }
@@ -506,10 +509,9 @@ namespace NeuralNetworkSnake
                         }
                         
                         int populationSize = int.Parse(PopulationSize);
-                        AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher geneticLearningNoTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher(activationNetwork, populationSize, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(true, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(50, double.Parse(MutationPercent), 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(50, double.Parse(MutationPercent) / 2, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(50, double.Parse(MutationPercent) / 4, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(50, double.Parse(MutationPercent) / 8, 0) });
-                        geneticLearningNoTeacher.CrossoverRate = 1;
-                        geneticLearningNoTeacher.MutationRate = 1;
+                        AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher geneticLearningNoTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher(activationNetwork, populationSize, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(true, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(50, double.Parse(MutationPercent) / 2, 4) });
                         _simulation = new Simulation(geneticLearningNoTeacher, int.Parse(TestsCount), RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
+                        
                     }
                     else
                     {
@@ -551,7 +553,7 @@ namespace NeuralNetworkSnake
             {
                 return new DelegateCommand((obj) =>
                 {
-                    if (IsRealtimeSimulation)
+                    if (!_isFixedtimeSimulation)
                     {
                         Task.Run(() => _simulation.RealTimeSimulate()); //запускаем в отдельном потоке чтобы форма обновлялась
                     }
@@ -869,37 +871,71 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-2f, 2f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 64, 64, 3);
-            AForge.Neuro.ActivationNetwork activationNetwork2 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork);
-            AForge.Neuro.ActivationNetwork activationNetwork3 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork);
+            AForge.Neuro.ActivationNetwork activationNetwork0 = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-2f, 2f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 64, 64, 3);
+            AForge.Neuro.ActivationNetwork activationNetwork1 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
+            AForge.Neuro.ActivationNetwork activationNetwork2 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
+            AForge.Neuro.ActivationNetwork activationNetwork3 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
+            AForge.Neuro.ActivationNetwork activationNetwork4 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
+            AForge.Neuro.ActivationNetwork activationNetwork5 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
+            AForge.Neuro.ActivationNetwork activationNetwork6 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
+            AForge.Neuro.ActivationNetwork activationNetwork7 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
+            AForge.Neuro.ActivationNetwork activationNetwork8 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
             //AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), 4, 4, 3);
-            AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
+            AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork0);
 
-            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.0025, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.00125, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000625, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000313, 0) });
+            List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings> stepsSettings0 = new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.0025, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.00125, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000625, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000313, 0.5) };
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher0_0 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork0, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings0);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher0_1 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork1, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings0);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher0_2 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork2, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings0);
+            geneticLearningTeacher0_0.SelectionMethod.FlexibleTargetSourceLength = 3;
+            geneticLearningTeacher0_1.SelectionMethod.FlexibleTargetSourceLength = 3;
+            geneticLearningTeacher0_2.SelectionMethod.FlexibleTargetSourceLength = 3;
 
-            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher2 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork2, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.0025, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.00125, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000625, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000313, 0.5) });
+            List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings> stepsSettings1 = new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.0025, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.00125, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000625, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000313, 0.5) };
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher1_0 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork3, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings1);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher1_1 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork4, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings1);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher1_2 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork5, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings1);
+            geneticLearningTeacher1_0.SelectionMethod.FlexibleTargetSourceLength = 4;
+            geneticLearningTeacher1_1.SelectionMethod.FlexibleTargetSourceLength = 4;
+            geneticLearningTeacher1_2.SelectionMethod.FlexibleTargetSourceLength = 4;
 
-            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher3 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork3, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.0025, 1), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.00125, 1), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000625, 1), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000313, 1) });
+            List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings> stepsSettings2 = new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.0025, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.00125, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000625, 0.5), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(150, 0.000313, 0.5) };
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher2_0 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork6, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings2);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher2_1 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork7, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings2);
+            AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher2_2 = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork8, 100, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, stepsSettings2);
+            geneticLearningTeacher2_0.SelectionMethod.FlexibleTargetSourceLength = 5;
+            geneticLearningTeacher2_1.SelectionMethod.FlexibleTargetSourceLength = 5;
+            geneticLearningTeacher2_2.SelectionMethod.FlexibleTargetSourceLength = 5;
 
             AForgeExtensions.Neuro.MSELossFunction mSELossFunction = new AForgeExtensions.Neuro.MSELossFunction();
             List<double[]> inputs = new List<double[]> { new double[4] { 0.1, 1, 0.88, 0.2 }, new double[4] { 1, 0.5, 0.04, 0.6 }, new double[4] { 0.5, 0.3, 0.4, 0.01 } };
             List<double[]> desiredOutputs = new List<double[]> { new double[3] { 0.51515, -1, -0.707070 }, new double[3] { 0.3, -0.5, -0.05 }, new double[3] { 0.9, 0.5, -0.3 } };
-            List<double[]> otputsBefore = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
-            List<double[]> otputsBefore2 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork2, inputs);
-            List<double[]> otputsBefore3 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork3, inputs);
+            List<double[]> otputsBefore = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork0, inputs);
+            List<double[]> otputsBefore2 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork3, inputs);
+            List<double[]> otputsBefore3 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork6, inputs);
             double lossBefore = mSELossFunction.Calculate(otputsBefore, desiredOutputs);
-            double loss = geneticLearningTeacher.Run(inputs, desiredOutputs);
-            geneticLearningTeacher2.Run(inputs, desiredOutputs);
-            geneticLearningTeacher3.Run(inputs, desiredOutputs);
-            List<double[]> otputsAfter = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
-            List<double[]> otputsAfter2 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork2, inputs);
-            List<double[]> otputsAfter3 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork3, inputs);
+
+            geneticLearningTeacher0_0.Run(inputs, desiredOutputs);
+            geneticLearningTeacher0_1.Run(inputs, desiredOutputs);
+            geneticLearningTeacher0_2.Run(inputs, desiredOutputs);
+
+            geneticLearningTeacher1_0.Run(inputs, desiredOutputs);
+            geneticLearningTeacher1_1.Run(inputs, desiredOutputs);
+            geneticLearningTeacher1_2.Run(inputs, desiredOutputs);
+
+            geneticLearningTeacher2_0.Run(inputs, desiredOutputs);
+            geneticLearningTeacher2_1.Run(inputs, desiredOutputs);
+            geneticLearningTeacher2_2.Run(inputs, desiredOutputs);
+
+            List<double[]> otputsAfter = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork0, inputs);
+            List<double[]> otputsAfter2 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork3, inputs);
+            List<double[]> otputsAfter3 = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork6, inputs);
             double lossAfter = mSELossFunction.Calculate(otputsAfter, desiredOutputs);
 
-            string[] minProgressionStr = geneticLearningTeacher2.MinFitnessProgression.Select(a => a.ToString()).ToArray();
+            string[] minProgressionStr = geneticLearningTeacher1_0.MinFitnessProgression.Select(a => a.ToString()).ToArray();
             File.WriteAllLines("savedMinProgression.txt", minProgressionStr);
 
-            string[] targetHistoryStr = geneticLearningTeacher2.SelectionMethod.TargetHistory.Select(a => a.ToString()).ToArray();
+            string[] targetHistoryStr = geneticLearningTeacher1_0.SelectionMethod.TargetHistory.Select(a => a.ToString()).ToArray();
             File.WriteAllLines("savedTargetHistory.txt", targetHistoryStr);
 
             int inputLength = 616;
@@ -1026,99 +1062,25 @@ namespace NeuralNetworkSnake
 
 
 
-        private bool _isFirstTest = true;
-        private NeuralNetworkUnit _neuralNetworkUnitTest;
-        Matrix<float> _matrix3;
-        Vector<float> _vector1;
-        AForge.Neuro.ActivationNetwork network;
-        AForge.Neuro.ActivationNetwork network2;
-        AForge.Neuro.ActivationNetwork network3;
-        double[] array1;
-        public void testFunc()
+        
+        private ChartValues<double> _chartValues1;
+        public ChartValues<double> ChartValues1
         {
-            int[] a = new int[3] { 10, 10, 3 };
-            if (_isFirstTest)
+            get { return _chartValues1; }
+            set
             {
-                _isFirstTest = false;
-                //create neural network
-                //network = new AForge.Neuro.ActivationNetwork(new AForge.Neuro.SigmoidFunction(), a[0], a[1], a[2], a[3]);
-                //network = new AForge.Neuro.ActivationNetwork(new AForgeNeuroExtensions.ReLuActivationFunction(), a[0], a[1], a[2]);
-                network = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForgeExtensions.Neuro.ReLuActivationFunction(), a[0], a[1], a[2]);
-                network2 = new AForge.Neuro.ActivationNetwork(new AForgeExtensions.Neuro.ReLuActivationFunction(), a[0], a[1], a[2]);
-                //create teacher
-                AForge.Neuro.Learning.BackPropagationLearning backPropagationLearning = new AForge.Neuro.Learning.BackPropagationLearning(network);
-                // loop
-                /*while (!needToStop)
-                {
-                    // run epoch of learning procedure
-                    double error = backPropagationLearning.RunEpoch(input, output);
-                    // check error value to see if we need to stop
-                    // ...
-                }*/
-
-
-
-
-
-
-                _neuralNetworkUnitTest = NeuralNetworkUnit.CreateNeuralNetworkUnitRandomly(a);
-
-                for(int i = 0; i < network.Layers.Length; i++)
-                {
-                    for(int k = 0; k < a[i + 1]; k++)
-                    {
-                        int neuonCount = network.Layers[i].Neurons[k].Weights.Length;
-                        for(int u = 0; u < neuonCount; u++)
-                        {
-                            network.Layers[i].Neurons[k].Weights[u] = _neuralNetworkUnitTest.Weights[i][k, u];
-                            network2.Layers[i].Neurons[k].Weights[u] = _neuralNetworkUnitTest.Weights[i][k, u];
-                        }
-                        ((AForge.Neuro.ActivationNeuron)network.Layers[i].Neurons[k]).Threshold = _neuralNetworkUnitTest.Biases[i][k];
-                        ((AForge.Neuro.ActivationNeuron)network2.Layers[i].Neurons[k]).Threshold = _neuralNetworkUnitTest.Biases[i][k];
-                    }
-                }
-
-                array1 = new double[a[1]];
-                float[] array2 = new float[a[1]];
-                for(int i = 0; i < a[1]; i++)
-                {
-                    array1[i] = Features.GetRandDouble(0, 1);
-                    array2[i] = (float)array1[i];
-                }
-                _vector1 = Vector<float>.Build.Dense(array2);
+                _chartValues1 = value;
+                OnPropertyChanged();
             }
-
-            int iteration = 100;
-            
-            Stopwatch stopwatch1 = new Stopwatch();
-            stopwatch1.Start();
-            for (int i = 0; i < iteration; i++)
+        }
+        private ChartValues<double> _chartValues2;
+        public ChartValues<double> ChartValues2
+        {
+            get { return _chartValues2; }
+            set
             {
-                _ = _neuralNetworkUnitTest.ForwardPropagation(_vector1);
-            }
-            stopwatch1.Stop();
-
-            Stopwatch stopwatch4 = new Stopwatch();
-            stopwatch4.Start();
-            for (int i = 0; i < iteration; i++)
-            {
-                _ = network.Compute(array1);
-            }
-            stopwatch4.Stop();
-
-            //LayersText = "stopwatch1=" + stopwatch1.ElapsedMilliseconds + "мс  stopwatch4 = " + stopwatch4.ElapsedMilliseconds + "мс";
-            LayersText = "_neuralNetworkUnitTest.ForwardPropagation(_vector1)= " + Environment.NewLine + _neuralNetworkUnitTest.ForwardPropagation(_vector1);
-            double[] rr = network.Compute(array1);
-            LayersText += "network.Compute(array1)= ";
-            for(int i = 0; i < rr.Length; i++)
-            {
-                LayersText += Environment.NewLine + "," + rr[i];
-            }
-            rr = network2.Compute(array1);
-            LayersText += Environment.NewLine + "network2.Compute(array1)= ";
-            for(int i = 0; i < rr.Length; i++)
-            {
-                LayersText += Environment.NewLine + "," + rr[i];
+                _chartValues2 = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1128,9 +1090,131 @@ namespace NeuralNetworkSnake
             {
                 return new DelegateCommand((obj) =>
                 {
-                    testFunc();
+                    /*AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-2f, 2f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 64, 64, 3);
+
+                    AForgeExtensions.Neuro.Learning.GeneticLearningTeacher geneticLearningTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningTeacher(activationNetwork, 5, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(false, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(100, 0.0025, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(100, 0.00125, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(100, 0.000625, 0), new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(100, 0.000313, 0) });
+
+                    List<double[]> inputs = new List<double[]> { new double[4] { 0.1, 1, 0.88, 0.2 }, new double[4] { 1, 0.5, 0.04, 0.6 }, new double[4] { 0.5, 0.3, 0.4, 0.01 } };
+                    List<double[]> desiredOutputs = new List<double[]> { new double[3] { 0.51515, -1, -0.707070 }, new double[3] { 0.3, -0.5, -0.05 }, new double[3] { 0.9, 0.5, -0.3 } };
+                    List<double[]> otputsBefore = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
+                    geneticLearningTeacher.Run(inputs, desiredOutputs);
+                    List<double[]> otputsAfter = AForgeExtensions.Neuro.ActivationNetworkFeatures.ActivationNetworkCompute(activationNetwork, inputs);
+                    ChartValues1 = new ChartValues<double>(_simulation.GeneticLearningNoTeacher.MaxFitnessProgression);
+                    ChartValues2 = new ChartValues<double>(_simulation.GeneticLearningNoTeacher.SelectionMethod.TargetHistory);*/
+
+                    /*ChartValues1 = new ChartValues<double>(_simulation.GeneticLearningNoTeacher.MaxFitnessProgression);
+                    ChartValues2 = new ChartValues<double>(_simulation.GeneticLearningNoTeacher.SelectionMethod.TargetHistory);*/
+
+                    int iterations = 1000;
+                    // initialize input and output values
+                    double[][] input = new double[4][] {
+                        new double[] {0, 0}, new double[] {0, 1},
+                        new double[] {1, 0}, new double[] {1, 1}
+                    };
+                    double[][] output = new double[4][] {
+                        new double[] {0}, new double[] {1},
+                        new double[] {1}, new double[] {0}
+                    };
+                    // create neural network
+                    AForge.Neuro.ActivationNetwork activationNetwork = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-1f, 1f, new AForge.Neuro.SigmoidFunction(), 2, 2, 1);
+                    AForge.Neuro.Learning.BackPropagationLearning teacher = new AForge.Neuro.Learning.BackPropagationLearning(activationNetwork);
+                    double[] aforgeLosses = new double[iterations];
+                    for(int i = 0; i < iterations; i++)
+                    {
+                        aforgeLosses[i] = teacher.RunEpoch(input, output);
+                    }
+                    double[] o0 = activationNetwork.Compute(input[0]);
+                    double[] o1 = activationNetwork.Compute(input[1]);
+                    double[] o2 = activationNetwork.Compute(input[2]);
+                    double[] o3 = activationNetwork.Compute(input[3]);
+
+
+                    int inputDim = 2;
+                    int hiddenDim = 2;
+                    int numOutputClasses = 1;
+                    DeviceDescriptor device = DeviceDescriptor.CPUDevice;
+                    Variable inputVariable1 = Variable.InputVariable(new int[] { inputDim }, DataType.Float);
+                    Variable outputVariable1 = Variable.InputVariable(new int[] { hiddenDim }, DataType.Float);
+                    Variable inputVariable2 = Variable.InputVariable(new int[] { hiddenDim }, DataType.Float);
+                    Variable outputVariable2 = Variable.InputVariable(new int[] { numOutputClasses }, DataType.Float);
+
+                    var weightParam1 = new Parameter(new int[] { hiddenDim, inputDim }, DataType.Float, 1, device, "w");
+                    var biasParam1 = new Parameter(new int[] { hiddenDim }, DataType.Float, 0, device, "b");
+                    var classifierOutput0 = CNTKLib.Sigmoid(CNTKLib.Times(weightParam1, inputVariable1) + biasParam1);
+
+                    var weightParam2 = new Parameter(new int[] { numOutputClasses, hiddenDim }, DataType.Float, 1, device, "ww");
+                    var biasParam2 = new Parameter(new int[] { numOutputClasses }, DataType.Float, 0, device, "bb");
+                    var classifierOutput1 = CNTKLib.Sigmoid(CNTKLib.Times(weightParam2, classifierOutput0) + biasParam2);
+
+                    var loss = CNTKLib.CrossEntropyWithSoftmax(classifierOutput1, outputVariable2);
+                    var evalError = CNTKLib.ClassificationError(classifierOutput1, outputVariable2);
+
+                    // prepare for training
+                    CNTK.TrainingParameterScheduleDouble learningRatePerSample = new CNTK.TrainingParameterScheduleDouble(0.01, 1);
+                    IList<Learner> parameterLearners = new List<Learner>() { Learner.SGDLearner(classifierOutput1.Parameters(), learningRatePerSample) };
+                    var trainer = Trainer.CreateTrainer(classifierOutput1, loss, evalError, parameterLearners);
+
+                    float[] inputValuesArr = new float[input.Length * input[0].Length];
+                    for (int i = 0; i < input.Length; i++)
+                    {
+                        for(int k = 0; k < input[i].Length; k++)
+                        {
+                            inputValuesArr[i * input[i].Length + k] = (float)input[i][k];
+                        }
+                    }
+                    float[] outputValuesArr = new float[output.Length * output[0].Length];
+                    for (int i = 0; i < output.Length; i++)
+                    {
+                        for (int k = 0; k < output[i].Length; k++)
+                        {
+                            outputValuesArr[i * output[i].Length + k] = (float)output[i][k];
+                        }
+                    }
+                    Value inputValues= Value.CreateBatch<float>(new int[] { inputDim }, inputValuesArr, device);
+                    Value outputValues = Value.CreateBatch<float>(new int[] { numOutputClasses }, outputValuesArr, device);
+
+                    // train the model
+                    for (int minibatchCount = 0; minibatchCount < iterations; minibatchCount++)
+                    {
+                        //TODO: sweepEnd should be set properly instead of false.
+#pragma warning disable 618
+                        trainer.TrainMinibatch(new Dictionary<Variable, Value>() { { inputVariable1, inputValues }, { outputVariable2, outputValues } }, device);
+#pragma warning restore 618
+                        //TestHelper.PrintTrainingProgress(trainer, minibatchCount, updatePerMinibatches);
+                    }
+
+                    var inputDataMap = new Dictionary<Variable, Value>() { { inputVariable1, inputValues } };
+                    var outputDataMap = new Dictionary<Variable, Value>() { { classifierOutput1.Output, null } };
+                    classifierOutput1.Evaluate(inputDataMap, outputDataMap, device);
+                    var outputValue = outputDataMap[classifierOutput1.Output];
+                    IList<IList<float>> actualLabelSoftMax = outputValue.GetDenseData<float>(classifierOutput1.Output);
+
+
+
+
+
+
+
+
+
+                    NDShape nDShape = new NDShape(1, 4);
+                    Function logisticModel = CreateLogisticModel(Variable.InputVariable(nDShape, DataType.Float), 4);
+                    LogisticRegression.TrainAndEvaluate(DeviceDescriptor.CPUDevice);
                 }, (obj) => true);
             }
+        }
+        private Function CreateLogisticModel(Variable input, int numOutputClasses)
+        {
+            Parameter bias = new Parameter(new int[] { numOutputClasses }, DataType.Float, 0);
+            Parameter weights = new Parameter(new int[] { input.Shape[0], numOutputClasses }, DataType.Float,
+              CNTKLib.GlorotUniformInitializer(
+                CNTKLib.DefaultParamInitScale,
+                CNTKLib.SentinelValueForInferParamInitRank,
+                CNTKLib.SentinelValueForInferParamInitRank, 1));
+            Function z = CNTKLib.Plus(bias, CNTKLib.Times(weights, input));
+            Function logisticClassifier = CNTKLib.Sigmoid(z, "LogisticClassifier");
+            //logisticClassifier.Inputs
+            return logisticClassifier;
         }
     }
 }

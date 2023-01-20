@@ -57,6 +57,7 @@ namespace NeuralNetworkSnake
         private bool _isGeneticLearning;
         private Random _random = new Random();
         private AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher _geneticLearningNoTeacher;
+        public AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher GeneticLearningNoTeacher { get { return _geneticLearningNoTeacher; } }
         private int _testsCount;
         private int _currentTestNumber;
         private SnakeInfo[] _snakesInfo;
@@ -489,12 +490,9 @@ namespace NeuralNetworkSnake
                         {
                             _currentTestNumber = 1;
 
-                            if (Age % 5 == 0)
-                            {
-                                AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(_geneticLearningNoTeacher.BestChromosome.Network);
-                                string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkSerializeFormat);
-                                System.IO.File.WriteAllText("bestChromosome.json", s);
-                            }
+                            AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(_geneticLearningNoTeacher.BestChromosome.Network);
+                            string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkSerializeFormat);
+                            System.IO.File.WriteAllText("bestChromosome.json", s);
 
                             double[] populationFitness = new double[_geneticLearningNoTeacher.PopulationSize];
                             for(int i = 0; i < _geneticLearningNoTeacher.PopulationSize; i++)
@@ -587,12 +585,9 @@ namespace NeuralNetworkSnake
                         {
                             _currentTestNumber = 1;
 
-                            if (Age % 5 == 0)
-                            {
-                                AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(_geneticLearningNoTeacher.BestChromosome.Network);
-                                string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkSerializeFormat);
-                                System.IO.File.WriteAllText("bestChromosome.json", s);
-                            }
+                            AForgeExtensions.Neuro.ActivationNetworkSerializeFormat activationNetworkSerializeFormat = AForgeExtensions.Features.ConvertActNetToSerializeFormat(_geneticLearningNoTeacher.BestChromosome.Network);
+                            string s = System.Text.Json.JsonSerializer.Serialize(activationNetworkSerializeFormat);
+                            System.IO.File.WriteAllText("bestChromosome.json", s);
 
                             double[] populationFitness = new double[_geneticLearningNoTeacher.PopulationSize];
                             for (int i = 0; i < _geneticLearningNoTeacher.PopulationSize; i++)

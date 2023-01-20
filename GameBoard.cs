@@ -62,7 +62,7 @@ namespace NeuralNetworkSnake
             _nextAppleScore = _baseAppleScore;
         }
         Random _random = new Random();
-        private double _baseOneStepScore = 0.005; //базовая стоимость шага змейки
+        private double _baseOneStepScore = 0.0001; //базовая стоимость шага змейки
         private double _oneStepScoreMultiply = 0; //множитель, на который увеличивается стоимость одного шага змейки, при съедении яблока
         private double _nextOneStepScore = 0; //стоимость следующего шага змейки
         private List<SnakeHistory> _snakeHistories = new List<SnakeHistory>(); //история позиций змейки. Нужно чтобы при повторении позиции, указать что игра окончена, т.к. змейка зациклилась
@@ -77,7 +77,7 @@ namespace NeuralNetworkSnake
             get { return _maxStepsWithoutApples; }
         }
         private double _baseAppleScore = 1; //базовая стоимость съеденного яблока
-        private double _appleScoreMultiply = 0.1; //множитель, на который увеличивается стоимость следующего яблока
+        private double _appleScoreMultiply = 0; //множитель, на который увеличивается стоимость следующего яблока
         private double _nextAppleScore = 0; //стоимость следующего съеденного яблока
         private int _appleScoreReduceMaxSteps = 0; //количество шагов, на котором стоимость яблока будет максимально уменьшена
         private double _appleScoreReduce = 0; //величина от стоимости яблока, на которое уменьшится его стоимость при количестве шагов _appleScoreReduceMaxSteps
@@ -618,7 +618,7 @@ namespace NeuralNetworkSnake
                     }
                 }
                 inputs[angles.Length + i] = isAppleWasFind ? (float)(1 / (minDistanceToApple - 0.5 + 1)) : 0;
-
+                
                 //расстояние до ближайшего хвоста
                 double minDistanceToTail = 0;
                 bool isTailWasFind = false;
