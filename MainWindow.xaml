@@ -91,16 +91,13 @@
                                                         <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                                        <TextBlock Text="Процент мутации" Margin="6 0 0 0"/>
-                                                        <TextBox Text="{Binding MutationPercent}" Width="30" Margin="6 0 6 0"/>
+                                                        <TextBlock Text="Вероятность мутации" Margin="6 0 0 0"/>
+                                                        <TextBox Text="{Binding MutationPercent}" Width="45" Margin="6 0 6 0"/>
                                                         <TextBlock Text="(можно изменять в процессе)" Margin="0 0 0 0"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                                                        <TextBlock Text="Количество лучших результатов, передаваемых в новое" Margin="6 0 0 0"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-                                                        <TextBlock Text="поколение без изменений" Margin="6 0 0 0"/>
-                                                        <TextBox Text="{Binding PassedToNewGenerationCount}" Width="30" Margin="6 0 6 0"/>
+                                                        <TextBlock Text="Масштабирование приспособленности" Margin="6 0 0 0"/>
+                                                        <TextBox Text="{Binding FitnessScaleRate}" Width="30" Margin="6 0 6 0"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
                                                         <TextBlock Text="Количество тестов в одном поколоении" Margin="6 0 0 0"/>

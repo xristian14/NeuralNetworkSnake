@@ -373,6 +373,19 @@ namespace NeuralNetworkSnake
                 OnPropertyChanged();
             }
         }
+        private string _fitnessScaleRate = "0";
+        public string FitnessScaleRate
+        {
+            get { return _fitnessScaleRate; }
+            set
+            {
+                if (double.TryParse(value, out double res))
+                {
+                    _fitnessScaleRate = value;
+                }
+                OnPropertyChanged();
+            }
+        }
         private string _testsCount = "3";
         public string TestsCount //количество тестов для одной нейросети, нужно чтобы провести несколько тестов для одной змейки, и на основе общего результата за все тесты выбирать пары для скрещивания. Один удачный тест может лишить потомства более совершенную нейронную сеть, у которой тест сложился неудачно
         {
@@ -384,22 +397,6 @@ namespace NeuralNetworkSnake
                     if(res > 0)
                     {
                         _testsCount = value;
-                    }
-                }
-                OnPropertyChanged();
-            }
-        }
-        private string _passedToNewGenerationCount = "3";
-        public string PassedToNewGenerationCount //Количество лучших результатов, передаваемых в новое поколение без изменений
-        {
-            get { return _passedToNewGenerationCount; }
-            set
-            {
-                if (int.TryParse(value, out int res))
-                {
-                    if(res > 0 && res < int.Parse(PopulationSize))
-                    {
-                        _passedToNewGenerationCount = value;
                     }
                 }
                 OnPropertyChanged();
@@ -509,7 +506,7 @@ namespace NeuralNetworkSnake
                         }
                         
                         int populationSize = int.Parse(PopulationSize);
-                        AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher geneticLearningNoTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher(activationNetwork, populationSize, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(true, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(50, double.Parse(MutationPercent) / 2, 4) });
+                        AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher geneticLearningNoTeacher = new AForgeExtensions.Neuro.Learning.GeneticLearningNoTeacher(activationNetwork, populationSize, new AForgeExtensions.Neuro.MSELossFunction(), new AForgeExtensions.Neuro.Learning.GeneticLearning.RouletteWheelSelection(true, true), -2, 2, new List<AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings>() { new AForgeExtensions.Neuro.Learning.GeneticLearning.StepsSettings(50, double.Parse(MutationPercent), double.Parse(FitnessScaleRate)) });
                         _simulation = new Simulation(geneticLearningNoTeacher, int.Parse(TestsCount), RealtimeDelay, FixedDuration, int.Parse(BoardSize), int.Parse(ApplesCount));
                         
                     }
@@ -871,7 +868,7 @@ namespace NeuralNetworkSnake
             AForgeExtensions.MachineLearning.QLearning qLearning = new AForgeExtensions.MachineLearning.QLearning(qLearningMap.GetLength(1) * qLearningMap.GetLength(0), 4, tabuSearchExploration);
             qLearning.DiscountFactor = 0.99;
             _qLearningMapProcessing = new QLearningMapProcessing(qLearningMap, startPoint, destinationPoints, qLearning);
-            AForge.Neuro.ActivationNetwork activationNetwork0 = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-2f, 2f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 64, 64, 3);
+            /*AForge.Neuro.ActivationNetwork activationNetwork0 = AForgeExtensions.Neuro.ActivationNetworkFeatures.BuildRandom(-2f, 2f, new AForgeExtensions.Neuro.LeakyReLuActivationFunction(), 4, 64, 64, 3);
             AForge.Neuro.ActivationNetwork activationNetwork1 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
             AForge.Neuro.ActivationNetwork activationNetwork2 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
             AForge.Neuro.ActivationNetwork activationNetwork3 = AForgeExtensions.Neuro.ActivationNetworkFeatures.CloneActivationNetwork(activationNetwork0);
@@ -961,7 +958,7 @@ namespace NeuralNetworkSnake
             File.WriteAllText("file1.json", sOutput);
             string sInput = File.ReadAllText("file1.json");
             AForge.Neuro.ActivationNetwork activationNetworkLarge2 = Newtonsoft.Json.JsonConvert.DeserializeObject<AForge.Neuro.ActivationNetwork>(sInput);
-            double[] outputLarge2 = activationNetworkLarge2.Compute(inputLarge);
+            double[] outputLarge2 = activationNetworkLarge2.Compute(inputLarge);*/
             //отрисовываем все qvalues
             for (int x = 0; x < qLearningMap.GetLength(0); x++)
             {
